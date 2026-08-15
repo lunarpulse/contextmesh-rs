@@ -1,0 +1,11 @@
+/target/
+
+# Local runtime state (introduced by later Option A work packages).
+*.db
+*.db-shm
+*.db-wal
+
+
+# agentic
+.agents
+_bmad

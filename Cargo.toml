@@ -1,0 +1,22 @@
+[package]
+name = "contextmesh"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97"
+publish = false
+autobins = false
+description = "Verifiable distributed agent history (OA-00 baseline only)"
+
+[dependencies]
+turso = { version = "=0.7.2", default-features = false }
+
+[dev-dependencies]
+tokio = { version = "1", default-features = false, features = ["macros", "rt"] }
+
+[[bin]]
+name = "contextmesh"
+path = "src/bin/contextmesh.rs"
+
+[[bin]]
+name = "demo_agent"
+path = "src/bin/demo_agent.rs"
