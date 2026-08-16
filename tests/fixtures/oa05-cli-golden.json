@@ -1,0 +1,185 @@
+{
+  "key_generate": {
+    "exit": 0,
+    "command": "key generate",
+    "ok": true,
+    "result": {
+      "author": "<AUTH>"
+    },
+    "schema_version": 1
+  },
+  "token_generate": {
+    "exit": 0,
+    "command": "token generate",
+    "ok": true,
+    "result": {},
+    "schema_version": 1
+  },
+  "context_create": {
+    "exit": 0,
+    "command": "context create",
+    "ok": true,
+    "result": {
+      "branch": "main",
+      "context": "<CTX>",
+      "genesis": "<GEN>"
+    },
+    "schema_version": 1
+  },
+  "append": {
+    "exit": 0,
+    "command": "append",
+    "ok": true,
+    "result": {
+      "event": "<EV>"
+    },
+    "schema_version": 1
+  },
+  "show_refs": {
+    "exit": 0,
+    "command": "show refs",
+    "ok": true,
+    "result": {
+      "refs": 1
+    },
+    "schema_version": 1
+  },
+  "show_projection": {
+    "exit": 0,
+    "command": "show projection",
+    "ok": true,
+    "result": {
+      "events": 2
+    },
+    "schema_version": 1
+  },
+  "show_event": {
+    "exit": 0,
+    "command": "show event",
+    "ok": true,
+    "result": {
+      "kind": "demo.note",
+      "payload": {
+        "note": "cli"
+      }
+    },
+    "schema_version": 1
+  },
+  "invoke": {
+    "exit": 0,
+    "command": "invoke",
+    "ok": true,
+    "result": {
+      "invocation_id": "<INV>",
+      "outcome": "response",
+      "request": "<REQ>",
+      "result": "<RES>"
+    },
+    "schema_version": 1
+  },
+  "invocation_pending": {
+    "exit": 0,
+    "command": "invocation pending",
+    "ok": true,
+    "result": {
+      "pending": 0
+    },
+    "schema_version": 1
+  },
+  "invocation_detached": {
+    "exit": 0,
+    "command": "invocation detached",
+    "ok": true,
+    "result": {
+      "detached": 0
+    },
+    "schema_version": 1
+  },
+  "verify": {
+    "exit": 0,
+    "command": "verify",
+    "ok": true,
+    "result": {
+      "valid": true
+    },
+    "schema_version": 1
+  },
+  "bundle_export": {
+    "exit": 0,
+    "command": "bundle export",
+    "ok": true,
+    "result": {},
+    "schema_version": 1
+  },
+  "bundle_import": {
+    "exit": 0,
+    "command": "bundle import",
+    "ok": true,
+    "result": {
+      "already_present": 0,
+      "inserted": 4
+    },
+    "schema_version": 1
+  },
+  "key_duplicate": {
+    "exit": 5,
+    "command": "?",
+    "ok": false,
+    "error": {
+      "code": "authentication",
+      "details": {
+        "key_file": "unavailable"
+      }
+    },
+    "schema_version": 1
+  },
+  "show_event_missing": {
+    "exit": 6,
+    "command": "?",
+    "ok": false,
+    "error": {
+      "code": "not_found",
+      "details": {
+        "subject": "event"
+      }
+    },
+    "schema_version": 1
+  },
+  "invalid_id": {
+    "exit": 3,
+    "command": "?",
+    "ok": false,
+    "error": {
+      "code": "validation",
+      "details": {
+        "field": "id",
+        "reason": "invalid canonical id"
+      }
+    },
+    "schema_version": 1
+  },
+  "usage_error": {
+    "exit": 2,
+    "command": "?",
+    "ok": false,
+    "error": {
+      "code": "usage",
+      "details": {
+        "reason": "clap"
+      }
+    },
+    "schema_version": 1
+  },
+  "sync_transport": {
+    "exit": 8,
+    "command": "?",
+    "ok": false,
+    "error": {
+      "code": "transport",
+      "details": {
+        "sync": "failed"
+      }
+    },
+    "schema_version": 1
+  }
+}

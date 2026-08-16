@@ -52,11 +52,14 @@ tokio_deps = [d for d in root["dependencies"] if d["name"] == "tokio"]
 normal = next(d for d in tokio_deps if d["kind"] is None)
 dev = next(d for d in tokio_deps if d["kind"] == "dev")
 assert normal["req"] == "=1.53.1" and not normal["uses_default_features"]
-assert sorted(normal["features"]) == ["net", "rt", "sync", "time"]
+assert sorted(normal["features"]) == ["io-util", "net", "process", "rt", "signal", "sync", "time"]
 assert dev["req"] == "=1.53.1" and not dev["uses_default_features"]
 assert sorted(dev["features"]) == ["macros", "net", "rt", "sync", "time"]
-assert set(deps) == set(expected) | {"tokio"}
-forbidden_direct = {"rand", "rand_core", "hex", "regex", "uuid", "serde_json_canonicalizer", "signature", "clap", "libp2p", "openssl", "native-tls", "rustls", "tokio-rustls", "hyper-rustls"}
+assert set(deps) == set(expected) | {"tokio", "clap"}
+forbidden_direct = {"rand", "rand_core", "hex", "regex", "uuid", "serde_json_canonicalizer", "signature", "libp2p", "openssl", "native-tls", "rustls", "tokio-rustls", "hyper-rustls"}
+clap_dep = deps["clap"]
+assert clap_dep["req"] == "=4.6.6" and not clap_dep["uses_default_features"]
+assert sorted(clap_dep["features"]) == ["derive", "error-context", "help", "std", "usage"]
 assert not forbidden_direct.intersection(deps)
 for name, version in {"turso": "0.7.2", "serde_jcs": "0.2.0", "ed25519-dalek": "3.0.0"}.items():
     assert any(p["name"] == name and p["version"] == version for p in m["packages"])
@@ -68,7 +71,7 @@ PY
 tmp_root="$(mktemp -d)"
 trap 'rm -rf "$tmp_root"' EXIT
 cargo tree --locked -e features | python3 -I -c 'import sys; sys.stdout.write(sys.stdin.read().replace(f"({sys.argv[1]})", "(<WORKSPACE>)"))' "$ROOT" > "$tmp_root/features.txt"
-cmp "$tmp_root/features.txt" cargo-tree-oa04-features.txt
+cmp "$tmp_root/features.txt" cargo-tree-oa05-features.txt
 printf '%s\n' 'ok: exact dependencies and locked feature graph match'
 
 actual_fixture_sha="$(sha256sum tests/fixtures/oa01-v1-golden.json | awk '{print $1}')"
@@ -80,11 +83,11 @@ cargo test --locked --test oa01_golden checked_in_fixture_is_deterministically_r
 printf '%s\n' 'ok: frozen golden fixture checksum and regeneration match'
 
 # OA-04 has since implemented the sync/http surfaces; provider and CLI
-# modules remain deferred until OA-05/OA-06.
-for file in src/provider.rs src/bin/contextmesh.rs src/bin/demo_agent.rs scripts/demo.sh; do
+# the provider/CLI surfaces were implemented by OA-05; only the demo stays frozen.
+for file in scripts/demo.sh; do
   git diff --exit-code "$BASELINE" -- "$file"
 done
-printf '%s\n' 'ok: OA-05/OA-06 provider and CLI surfaces remain deferred'
+printf '%s\n' 'ok: only the OA-06 demo sentinel remains frozen'
 
 cargo build --workspace --locked
 cargo fmt --all -- --check

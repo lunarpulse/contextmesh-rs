@@ -30,18 +30,19 @@ r=next(p for p in m["packages"] if p["id"]==m["resolve"]["root"])
 normal={(d["name"],d["req"],d["uses_default_features"],tuple(sorted(d["features"]))) for d in r["dependencies"] if d["kind"] is None}
 assert ("axum","=0.8.9",False,("http1","json","tokio")) in normal
 assert ("reqwest","=0.13.4",False,("json",)) in normal
-assert ("tokio","=1.53.1",False,("net","rt","sync","time")) in normal
+assert ("tokio","=1.53.1",False,("io-util","net","process","rt","signal","sync","time")) in normal
+assert ("clap","=4.6.6",False,("derive","error-context","help","std","usage")) in normal
 dev=[d for d in r["dependencies"] if d["name"]=="tokio" and d["kind"]=="dev"]
 assert len(dev)==1 and sorted(dev[0]["features"])==["macros","net","rt","sync","time"]
 by_name={p["name"]:p for p in m["packages"]}
 assert by_name["axum"]["version"]=="0.8.9"
 assert by_name["reqwest"]["version"]=="0.13.4"
 assert by_name["tokio"]["version"]=="1.53.1"
-assert "clap" not in by_name
+assert by_name["clap"]["version"]=="4.6.6"
 forbidden_features={
  "axum":{"default","form","http2","multipart","query","ws"},
  "reqwest":{"default","default-tls","native-tls","rustls","cookies","brotli","charset","deflate","gzip","hickory-dns","http2","http3","multipart","socks","stream","system-proxy","zstd"},
- "tokio":{"full","fs","io-uring","io-std","io-util","parking_lot","process","rt-multi-thread","signal","tracing"},
+ "tokio":{"full","fs","io-uring","io-std","parking_lot","rt-multi-thread","tracing"},
 }
 for name,bad in forbidden_features.items():
  node=next(n for n in m["resolve"]["nodes"] if n["id"]==by_name[name]["id"])
@@ -53,7 +54,7 @@ printf '%s\n' 'ok: frozen OA-04 pins/features selected and forbidden surfaces ab
 
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 cargo tree --locked -e features | python3 -I -c 'import sys; sys.stdout.write(sys.stdin.read().replace(f"({sys.argv[1]})", "(<WORKSPACE>)"))' "$ROOT" > "$tmp/features.txt"
-cmp "$tmp/features.txt" cargo-tree-oa04-features.txt
+cmp "$tmp/features.txt" cargo-tree-oa05-features.txt
 printf '%s\n' 'ok: locked OA-04 feature graph matches recorded evidence'
 
 [[ "$(sha256sum tests/fixtures/oa04-protocol-golden.json | awk '{print $1}')" == "$OA04_FIXTURE_SHA256" ]]

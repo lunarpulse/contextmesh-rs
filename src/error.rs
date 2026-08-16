@@ -113,6 +113,72 @@ pub enum SyncError {
     Internal,
 }
 
+/// Result type for OA-05 key/token file custody.
+pub type KeyFileResult<T> = std::result::Result<T, KeyFileError>;
+
+/// Stable non-secret OA-05 key and bearer-token file custody failures.
+#[derive(Clone, Copy, Debug, Eq, Error, PartialEq)]
+pub enum KeyFileError {
+    /// The file or its parent directory could not be created, opened, or synced.
+    #[error("key or token file is unavailable")]
+    Unavailable,
+    /// A file already exists at the requested path.
+    #[error("key or token file already exists")]
+    AlreadyExists,
+    /// Existing permissions allow group or other access.
+    #[error("key or token file permissions are insecure")]
+    InsecurePermissions,
+    /// File content, length, or identity is invalid.
+    #[error("key or token file is malformed")]
+    Malformed,
+    /// This platform lacks the required stable file-identity guarantees.
+    #[error("key or token custody is unsupported on this platform")]
+    Unsupported,
+}
+
+/// Result type for OA-05 provider recording.
+pub type ProviderResult<T> = std::result::Result<T, ProviderError>;
+
+/// Stable non-secret OA-05 provider recording failures.
+#[derive(Clone, Debug, Eq, Error, PartialEq)]
+pub enum ProviderError {
+    /// The invocation configuration is invalid.
+    #[error("provider invocation configuration is invalid")]
+    InvalidConfig,
+    /// The invocation input is invalid or over its bound.
+    #[error("provider invocation input is invalid")]
+    Validation,
+    /// The provider declared a failure that was recorded.
+    #[error("provider declared a failure")]
+    ProviderDeclared,
+    /// The provider transport failed before a usable response.
+    #[error("provider transport failed")]
+    ProviderTransport,
+    /// The provider output was malformed.
+    #[error("provider output was malformed")]
+    ProviderMalformed,
+    /// The provider exceeded its execution timeout and was killed.
+    #[error("provider execution timed out")]
+    ProviderTimeout,
+    /// A provider or recording bound was exceeded.
+    #[error("provider or recording limit exceeded")]
+    LimitExceeded,
+    /// The branch moved before result commit; the linked result is retained.
+    #[error("provider branch moved before result commit; the linked result is retained")]
+    PostExecutionConflict {
+        /// The retained linked result event.
+        result: EventId,
+        /// The branch head observed instead, if any.
+        current_head: Option<EventId>,
+    },
+    /// A local store operation failed.
+    #[error("provider store operation failed")]
+    Store(#[from] StoreError),
+    /// Internal checked state was inconsistent.
+    #[error("provider internal failure")]
+    Internal,
+}
+
 /// Stable, non-secret OA-02 storage and admission failures.
 #[derive(Clone, Debug, Eq, Error, PartialEq)]
 pub enum StoreError {

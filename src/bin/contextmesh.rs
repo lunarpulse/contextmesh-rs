@@ -1,8 +1,10 @@
-//! Placeholder for the OA-05 contextmesh CLI and daemon.
+//! The contextmesh automation CLI and sync daemon.
 
-use std::process::ExitCode;
-
-fn main() -> ExitCode {
-    eprintln!("contextmesh CLI is pending OA-05");
-    ExitCode::FAILURE
+fn main() -> std::process::ExitCode {
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .expect("tokio runtime");
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    runtime.block_on(contextmesh::cli::run(&args))
 }

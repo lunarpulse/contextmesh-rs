@@ -1,10 +1,11 @@
 # contextmesh
 
-contextmesh currently implements **OA-04**: the frozen OA-01 signed-event
+contextmesh currently implements **OA-05**: the frozen OA-01 signed-event
 contract, OA-02 transactional local store, OA-03 semantic-free DAG operations,
 deterministic projection, strict bounded Bundle v1 transfer, full-store
-integrity verification, and authenticated pull-only HTTP/1 synchronization
-between independent stores. OA-00's Rust 1.97/Turso baseline remains intact.
+integrity verification, OA-04 authenticated pull-only HTTP/1 synchronization,
+and OA-05 provider recording with a stable automation CLI. OA-00's Rust
+1.97/Turso baseline remains intact.
 
 ## Toolchain and verification
 
@@ -14,21 +15,18 @@ rust-toolchain.toml. Install or refresh the user-local toolchain without root:
     bash scripts/bootstrap-rust.sh
     . "$HOME/.cargo/env"
 
-Verify the current OA-04 state from the repository root:
+Verify the current OA-05 state from the repository root:
 
     cargo build --workspace --locked
     cargo fmt --all -- --check
     cargo clippy --workspace --all-targets --locked -- -D warnings
     cargo test --workspace --locked
-    bash scripts/verify-oa04.sh
+    bash scripts/verify-oa05.sh
 
-verify-oa04.sh chains the OA-01/OA-02/OA-03 verifiers and the D-04-01
-dependency-probe verifier (scripts/verify-oa04-dependencies.sh). The verifiers
-check exact dependencies/features, locked feature graphs, OA-01 fixture
-stability, OA-02 schema/admission/ref regressions, OA-03 graph/bundle/
-verification evidence, the frozen OA-04 protocol fixture and auth/transport
-matrices, deferred-module boundaries, every quality command, and the expected
-OA-06 failure sentinel.
+verify-oa05.sh chains the OA-01 through OA-04 verifiers and the D-04-01
+dependency-probe verifier. The verifiers check exact dependencies/features,
+locked feature graphs, fixture stability, regression matrices, deferred-module
+boundaries, every quality command, and the expected OA-06 failure sentinel.
 
 ## Transactional local store
 
@@ -111,6 +109,33 @@ OA-04 adds only Axum 0.8.9 (http1, json, tokio) and Reqwest 0.13.4 (json),
 plus the approved Tokio net/rt/sync/time features, per the frozen D-04-01
 record. Plain HTTP provides no confidentiality or server identity.
 
+## Provider recording and CLI
+
+OA-05 records provider invocations as ordinary signed events. An invocation
+signs and CAS-appends agent.request, invokes the provider only after that
+commit, then signs a linked agent.response or agent.error with the request as
+its sole parent and CAS-moves the branch. No transaction is held across the
+provider call; if another writer moves the branch first, the linked result is
+retained detached and the caller receives a post-execution conflict with the
+current head. Crash windows are explicit: pending requests and detached
+results are queryable, and no exactly-once claim is made.
+
+The CommandProvider runs a caller-selected local program (never a shell) over
+bounded JSONL pipes with a 30-second kill timeout. demo_agent is the reference
+JSONL provider: it validates one strict input line, echoes opaque input only
+under the demo namespace, and never executes tools or touches the environment.
+Private keys are never serializable or exposed in public values, wire, logs,
+JSON, Turso, bundles, or synchronization; D-05-01 adds only an opaque local
+seed file (atomically created 0600, symlink-rejecting, explicit-repair-only)
+for restart-safe signing, with no encryption-at-rest claim.
+
+The contextmesh CLI emits exactly one canonical JSON document per command with
+frozen exit classes (0 success, 2 usage, 3 validation, 4 conflict, 5 auth, 6
+not found, 7 provider conflict, 8 transport, 9 internal). Secrets come only
+from files and are never echoed; the full snapshot matrix is
+tests/fixtures/oa05-cli-golden.json. OA-05 activates the frozen D-04-01 Clap
+4.6.6 pin and the Tokio process/signal/io-util features its code needs.
+
 ## Frozen signed-event v1 contract
 
 A signed event has this logical wire form. Rendering always uses RFC 8785/JCS:
@@ -180,10 +205,10 @@ canonical Bundle v1 fixture is tests/fixtures/oa03-bundle-v1-golden.json.
 
 OA-04's exact locked feature graph is cargo-tree-oa04-features.txt, and its
 frozen canonical protocol fixture is tests/fixtures/oa04-protocol-golden.json.
+OA-05's exact locked feature graph is cargo-tree-oa05-features.txt.
 
 ## Deferred scope
 
-- OA-05: provider recording, key custody, and real CLI commands.
 - OA-06: two-node demonstration; scripts/demo.sh intentionally exits 1.
 - OA-07: release evidence and Option A completion verdict.
 - Option B: semantic context selection and handoff.

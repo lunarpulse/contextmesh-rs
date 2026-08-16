@@ -14,11 +14,13 @@ use crate::model::{AuthorId, ContextId, EventId, SignedEventV1};
 
 mod bundle;
 mod dag;
+mod invocation;
 mod sync;
 mod verify;
 
 pub use bundle::*;
 pub use dag::*;
+pub use invocation::*;
 pub use sync::*;
 pub use verify::*;
 
@@ -525,10 +527,11 @@ impl Store {
 
     async fn write<T, F>(&self, operation: F) -> StoreResult<T>
     where
+        T: Send,
         F: for<'a> FnOnce(
             &'a Transaction<'a>,
         ) -> std::pin::Pin<
-            Box<dyn std::future::Future<Output = StoreResult<T>> + 'a>,
+            Box<dyn std::future::Future<Output = StoreResult<T>> + Send + 'a>,
         >,
     {
         let _guard = self.write_gate.lock().await;

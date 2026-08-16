@@ -2,12 +2,12 @@
 title: 'OA-05 Provider Recording Boundary and CLI'
 type: 'implementation-spec'
 created: '2026-08-17'
-status: 'ready-for-implementation'
+status: 'done'
 approved_plan: '../planning-artifacts/oa-02-oa-07-detailed-execution-plan.md'
 decision_record: '../planning-artifacts/oa-02-oa-07-decision-record.md'
 dependency_plan: './oa-04-dependency-plan.md'
 baseline_commit: 'b593617'
-review_loop_iteration: 0
+review_loop_iteration: 1
 option_b_gate: 'blocked-until-OA-07-A1-A8'
 ---
 
@@ -390,3 +390,59 @@ obligation.
 Freeze verdict: ready for implementation from baseline b593617. Review loop
 iteration remains zero because no implementation exists yet. Option B stays
 blocked until OA-07 records Option A complete with direct A1-A8 evidence.
+
+## Implementation review and evidence (iteration 1)
+
+An independent delegated implementation review was launched but exhausted its
+action budget without producing findings text; no approval is claimed from it.
+The recorded basis is the direct adversarial review below plus the executable
+verification chain.
+
+Direct review findings and resolutions:
+
+1. Dependency delta beyond the plan letter, within its principle: D-04-01
+   froze "package-minimal features as actually needed"; the bounded subprocess
+   pipe exchange needs Tokio io-util (AsyncReadExt/AsyncWriteExt), so the
+   normal Tokio feature set is io-util, net, process, rt, signal, sync, time.
+   Clap =4.6.6 with exactly derive/std/help/usage/error-context is activated as
+   frozen. No other dependency changed; forbidden-capability audit still
+   passes (no TLS, HTTP/2/3, cookies, compression, resolvers, shells).
+2. Fixed: key-file loading ordered permission bits before symlink identity, so
+   a 0777 symlink reported InsecurePermissions instead of Malformed. Identity
+   checks now precede permission classification (05-K02 evidence).
+3. Fixed: CommandProvider held its child stdin/stdout pipe ends open across
+   child.wait(), deadlocking well-behaved children that wait for stdin EOF
+   (observed as a 30-second provider_timeout against demo_agent). Both ends
+   are now closed as soon as each direction completes.
+4. Fixed: CLI failure documents were first written to stderr while the frozen
+   contract places exactly one JSON document on stdout for both outcomes;
+   warnings only go to stderr. The snapshot matrix now covers both.
+5. Fixed: ProviderError::Store(StaleHead/RefMissing) mapped to exit 7 instead
+   of the frozen conflict class 4; ContextUnknown mapped to 6. Corrected.
+6. Fixed: sanitizer boundary accounting truncated ASCII detail to 1,021 bytes
+   and clippy-level quality issues (filter_map->filter, unused imports).
+7. Verified by construction and tests: record_invocation validates input size
+   before projection, commits agent.request via CAS before the provider call,
+   never holds a transaction across the call, records exact frozen payload
+   field sets, checks response size before recording, and retains detached
+   results on post-execution conflict (05-P01..P05). Recovery queries fail
+   closed past 1,024 rows per kind in one read snapshot.
+8. The frozen provider-timeout kill test is included at the real 30-second
+   constant (/bin/sleep 60 is killed and bounded); the suite runtime cost
+   follows the existing long-running OA-03 projection precedent.
+9. The earlier-verifier guards asserting that provider/CLI surfaces remain
+   deferred were reduced to the OA-06 demo sentinel, following the OA-04
+   precedent of each owning package updating predecessor manifest/surface
+   expectations; OA-01/OA-03/OA-04 fixtures remain checksum-frozen.
+
+Verification evidence (pinned Rust 1.97.0):
+
+- bash scripts/verify-oa05.sh: exit 0, 73 ok checkpoints — exact pins/features
+  and forbidden surfaces absent, locked feature graph matches
+  cargo-tree-oa05-features.txt, OA-01/OA-03/OA-04 fixtures unchanged, locked
+  build, rustfmt, strict Clippy -D warnings, full workspace tests, OA-05
+  keys/provider/CLI/JSONL matrices, OA-06 sentinel, and the chained
+  OA-01/OA-02/OA-03/OA-04 and D-04-01 probe verifiers.
+
+Freeze verdict updated: implementation complete. Option B remains blocked
+until OA-07 records Option A complete with direct A1-A8 evidence.
