@@ -383,7 +383,7 @@ fn parse_body(value: Value) -> Result<EventBodyV1> {
     Ok(body)
 }
 
-fn strict_json(input: &[u8]) -> Result<Value> {
+pub(crate) fn strict_json(input: &[u8]) -> Result<Value> {
     if input.starts_with(&[0xef, 0xbb, 0xbf]) {
         return Err(ContractError::JsonSyntax);
     }
@@ -404,25 +404,25 @@ fn map_json_error(error: serde_json::Error) -> ContractError {
     }
 }
 
-fn into_object(value: Value) -> Result<Map<String, Value>> {
+pub(crate) fn into_object(value: Value) -> Result<Map<String, Value>> {
     match value {
         Value::Object(object) => Ok(object),
         _ => Err(ContractError::JsonSyntax),
     }
 }
 
-fn into_string(value: Value) -> Result<String> {
+pub(crate) fn into_string(value: Value) -> Result<String> {
     match value {
         Value::String(text) => Ok(text),
         _ => Err(ContractError::JsonSyntax),
     }
 }
 
-fn parse_text<T: FromStr<Err = ContractError>>(value: Value) -> Result<T> {
+pub(crate) fn parse_text<T: FromStr<Err = ContractError>>(value: Value) -> Result<T> {
     into_string(value)?.parse()
 }
 
-fn reject_unknown(object: &Map<String, Value>, allowed: &[&str]) -> Result<()> {
+pub(crate) fn reject_unknown(object: &Map<String, Value>, allowed: &[&str]) -> Result<()> {
     if object.keys().any(|key| !allowed.contains(&key.as_str())) {
         Err(ContractError::UnknownField)
     } else {
@@ -430,7 +430,7 @@ fn reject_unknown(object: &Map<String, Value>, allowed: &[&str]) -> Result<()> {
     }
 }
 
-fn take_required(object: &mut Map<String, Value>, key: &str) -> Result<Value> {
+pub(crate) fn take_required(object: &mut Map<String, Value>, key: &str) -> Result<Value> {
     object.remove(key).ok_or(ContractError::MissingField)
 }
 
@@ -455,7 +455,7 @@ fn validate_kind(kind: &str) -> Result<()> {
     Ok(())
 }
 
-fn validate_json_value(value: &Value, depth: usize) -> Result<()> {
+pub(crate) fn validate_json_value(value: &Value, depth: usize) -> Result<()> {
     if depth > MAX_PAYLOAD_DEPTH {
         return Err(ContractError::LimitExceeded);
     }
@@ -497,7 +497,7 @@ fn validate_number(number: &Number) -> Result<()> {
     Ok(())
 }
 
-fn canonicalize<T: Serialize + ?Sized>(value: &T) -> Result<Vec<u8>> {
+pub(crate) fn canonicalize<T: Serialize + ?Sized>(value: &T) -> Result<Vec<u8>> {
     serde_jcs::to_vec(value).map_err(|_| ContractError::Canonicalization)
 }
 

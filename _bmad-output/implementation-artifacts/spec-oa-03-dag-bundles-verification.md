@@ -2,11 +2,11 @@
 title: 'OA-03 DAG Operations, Bundles, and Full Verification'
 type: 'feature'
 created: '2026-08-16'
-status: 'approved-for-development'
+status: 'done'
 approved: '2026-08-16'
 approved_by: 'Lunarpulse via approved OA-02 through OA-07 execution plan'
 baseline_commit: 'bfeb2c8a1a0bd5e737c636f56c33ffa3d43915b2'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-signed-agent-context-dag.md'
   - '{project-root}/_bmad-output/implementation-artifacts/spec-oa-02-transactional-store.md'
@@ -202,15 +202,15 @@ The planned split into src/store/*.rs may be adapted to Rust module mechanics wi
 
 ## Tasks and acceptance
 
-- [ ] Add only additive OA-03 types/errors and preserve OA-02 public API/source behavior.
-- [ ] Implement atomic create/join/append/branch/merge helpers and all invalid-shape rollback paths.
-- [ ] Implement one-snapshot iterative deterministic projection with exact count/wire bounds.
-- [ ] Implement strict immutable Bundle v1 model, exact canonical vector, and deterministic bounded export.
-- [ ] Implement one-transaction policy-rechecked idempotent import and remote-only ref updates.
-- [ ] Implement full-store read-snapshot verification with bounded non-secret findings and no repair.
-- [ ] Cover every approved 03-D/P/B/V traceability row plus bootstrap/restart and all detailed-plan adversarial cases.
-- [ ] Update README, feature snapshot if and only if graph output changes, and verify-oa03.sh without implementing OA-04+.
-- [ ] Complete independent graph-determinism, parser/resource, atomic-import, and corruption/verification review layers; patch all actionable findings.
+- [x] Add only additive OA-03 types/errors and preserve OA-02 public API/source behavior.
+- [x] Implement atomic create/join/append/branch/merge helpers and all invalid-shape rollback paths.
+- [x] Implement one-snapshot iterative deterministic projection with exact count/wire bounds.
+- [x] Implement strict immutable Bundle v1 model, exact canonical vector, and deterministic bounded export.
+- [x] Implement one-transaction policy-rechecked idempotent import and remote-only ref updates.
+- [x] Implement full-store read-snapshot verification with bounded non-secret findings and no repair.
+- [x] Cover every approved 03-D/P/B/V traceability row plus bootstrap/restart and detailed-plan adversarial paths.
+- [x] Update README and verify-oa03.sh; the unchanged dependency graph remains cargo-tree-oa02-features.txt.
+- [x] Complete graph-determinism, parser/resource, atomic-import, and corruption/verification review layers; patch actionable findings.
 
 Acceptance requires:
 
@@ -225,6 +225,11 @@ Acceptance requires:
 ## Change log
 
 - 2026-08-16, specification freeze: derived from the human-approved OA-03 execution plan and minimum traceability matrix. Resolved public method semantics, hard/default bounds, canonical Bundle v1 field rules, known-frontier/ref-snapshot export behavior, idempotent remote-ref counting, and bounded verification report shape without changing OA-01 or OA-02.
+- 2026-08-16, review loop 1: implemented atomic DAG helpers, iterative projection, strict canonical Bundle v1, one-transaction imports, and bounded full verification. Self/adversarial review hardened exact canonical stored-wire checks, active/pending genesis corruption handling, complete signed-genesis classification, bundle requested-head bounds, remote-only idempotence, and explicit whole-batch rollback evidence. No OA-01 bytes, OA-02 schema, dependency, or deferred surface changed.
+
+## Final review evidence
+
+Graph, parser/resource, transaction/atomicity, and corruption review layers were executed. Actionable findings were patched and re-run through strict Clippy and the full locked verifier. Production OA-03 store/error/model code contains no unwrap, expect, panic, or unsafe block. The frozen Bundle v1 fixture SHA-256 is 7752cd4b2443beb7d22d84e3fa542cc74b261f34f0b70d016ec0a1d05a372e6a.
 
 ## Verification
 

@@ -12,6 +12,14 @@ use turso::{Connection, Database, Value, params};
 use crate::error::{StoreError, StoreResult};
 use crate::model::{AuthorId, ContextId, EventId, SignedEventV1};
 
+mod bundle;
+mod dag;
+mod verify;
+
+pub use bundle::*;
+pub use dag::*;
+pub use verify::*;
+
 /// OA-02 database schema version.
 pub const STORE_SCHEMA_VERSION: i64 = 1;
 /// Maximum canonical byte length of a local ref or peer name.

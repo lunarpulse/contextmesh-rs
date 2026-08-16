@@ -123,6 +123,39 @@ pub enum StoreError {
     /// A store-specific count or allocation bound was exceeded.
     #[error("store limit exceeded")]
     LimitExceeded,
+    /// Operating-system entropy for context creation was unavailable.
+    #[error("operating-system entropy unavailable")]
+    EntropyUnavailable,
+    /// An append attempted to use a helper-reserved event kind.
+    #[error("event kind is reserved for a dedicated DAG operation")]
+    ReservedEventKind,
+    /// A merge request has an invalid parent shape.
+    #[error("invalid merge shape")]
+    InvalidMerge,
+    /// A cycle was detected while projecting stored ancestry.
+    #[error("stored event graph contains a cycle")]
+    ProjectionCycle,
+    /// A deterministic projection exceeded its requested bound.
+    #[error("projection limit exceeded")]
+    ProjectionLimitExceeded,
+    /// Bundle JSON, fields, or embedded values are malformed.
+    #[error("bundle is malformed")]
+    BundleMalformed,
+    /// The bundle version is unsupported.
+    #[error("bundle version is unsupported")]
+    BundleUnsupportedVersion,
+    /// Bundle events or advertised refs are not in canonical order.
+    #[error("bundle order is invalid")]
+    BundleOrder,
+    /// A bundle exceeded an event, ref, raw, or canonical byte bound.
+    #[error("bundle limit exceeded")]
+    BundleLimitExceeded,
+    /// An advertised bundle ref is invalid for the bundle context.
+    #[error("bundle advertised ref is invalid")]
+    BundleRefInvalid,
+    /// A full-verification limit is zero or above its hard maximum.
+    #[error("verification limit is invalid")]
+    VerificationLimitInvalid,
     /// Commit acknowledgement was indeterminate; a safe retry is required.
     #[error("database commit outcome is indeterminate")]
     IndeterminateCommit,

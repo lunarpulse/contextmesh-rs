@@ -1,9 +1,10 @@
-//! contextmesh provides the OA-01 frozen, persistence-independent signed-event
-//! contract for Option A's verifiable distributed agent history.
+//! contextmesh provides the frozen OA-01 signed-event contract plus OA-02/OA-03
+//! transactional persistence, explicit DAG/ref operations, bounded bundles,
+//! deterministic ancestry projection, and full-store integrity verification.
 //!
-//! OA-01 authenticates canonical immutable event bodies. Persistence, parent
-//! existence, context membership, authorization, refs, networking, provider
-//! execution, and semantic context selection remain later work packages.
+//! These facilities authenticate and preserve caller-selected history. They do
+//! not infer relevance or truth, provide consensus, or perform provider/network
+//! operations; those remain explicit later work packages.
 
 #![warn(missing_docs)]
 
@@ -17,7 +18,7 @@ pub mod http;
 pub mod model;
 /// Transport-neutral provider recording boundary (reserved for OA-05).
 pub mod provider;
-/// Embedded Turso persistence and DAG/ref operations (reserved for OA-02).
+/// Embedded Turso persistence, DAG/ref operations, bundles, and verification.
 pub mod store;
 /// Signed-event anti-entropy synchronization (reserved for OA-04).
 pub mod sync;
