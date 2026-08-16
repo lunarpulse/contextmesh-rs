@@ -494,6 +494,16 @@ The following require explicit approval before Option A completion:
 
 Normal implementation detail changes that preserve the specification, wire contract, security boundaries, and acceptance criteria do not require product reapproval.
 
+## 9.1 Approved downstream execution decisions (2026-08-16)
+
+Lunarpulse approved the detailed OA-02 through OA-07 execution plan, minimum test matrix, and decisions D-02-01, D-05-01, and D-04-01 on 2026-08-16. The authoritative records are the detailed execution plan, its traceability matrix, and the dedicated decision record in this planning-artifacts directory.
+
+1. **D-02-01:** one explicitly provisioned genesis and local append-only author allowlists during Option A; revocation remains deferred.
+2. **D-05-01:** an opaque, atomically created local seed file with restrictive permissions and no public/wire/database/bundle/sync exposure or encryption-at-rest claim.
+3. **D-04-01:** the documented Tokio/Axum/Reqwest/Clap target set and minimal feature direction are approved for mandatory Rust 1.97 probes. Passing candidates become exact audited pins; failed candidates and substitutes require approval before manifest changes.
+
+These decisions preserve the existing scope, do not alter OA-01 event bytes, and do not authorize Option B.
+
 ## 10. Option B Unlock Gate
 
 Option B planning begins only after OA-07 records `complete` for Option A.
