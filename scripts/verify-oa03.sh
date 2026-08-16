@@ -23,14 +23,16 @@ import json, subprocess
 m=json.loads(subprocess.check_output(["cargo","metadata","--locked","--format-version","1"]))
 r=next(p for p in m["packages"] if p["id"]==m["resolve"]["root"])
 normal={(d["name"],d["req"],d["uses_default_features"],tuple(sorted(d["features"]))) for d in r["dependencies"] if d["kind"] is None}
-assert ("tokio","=1.53.1",False,("sync",)) in normal
+assert ("tokio","=1.53.1",False,("net","rt","sync","time")) in normal
 assert ("turso","=0.7.2",False,()) in normal
-assert not {"axum","reqwest","clap","libp2p","rusqlite","libsqlite3-sys"}.intersection(p["name"] for p in m["packages"])
+assert ("axum","=0.8.9",False,("http1","json","tokio")) in normal
+assert ("reqwest","=0.13.4",False,("json",)) in normal
+assert not {"clap","libp2p","rusqlite","libsqlite3-sys","openssl","native-tls","rustls","tokio-rustls","hyper-rustls","h2","h3","quinn"}.intersection(p["name"] for p in m["packages"])
 PY
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 cargo tree --locked -e features | python3 -I -c 'import sys; sys.stdout.write(sys.stdin.read().replace(f"({sys.argv[1]})", "(<WORKSPACE>)"))' "$ROOT" > "$tmp/features.txt"
-cmp "$tmp/features.txt" cargo-tree-oa02-features.txt
-printf '%s\n' 'ok: OA-03 adds no dependency or feature'
+cmp "$tmp/features.txt" cargo-tree-oa04-features.txt
+printf '%s\n' 'ok: locked graph matches the frozen OA-04 dependency selection'
 
 [[ "$(sha256sum tests/fixtures/oa03-bundle-v1-golden.json | awk '{print $1}')" == "$OA03_FIXTURE_SHA256" ]]
 cargo test --locked --test oa03_bundle canonical_bundle_fixture_is_frozen_and_independently_verified
@@ -38,10 +40,10 @@ printf '%s\n' 'ok: canonical Bundle v1 fixture checksum and independent event ve
 
 [[ "$(sha256sum tests/fixtures/oa01-v1-golden.json | awk '{print $1}')" == "799f326d20584b20f455d1b3027cc904848381761b6e591e81cacde0e46d7594" ]]
 git diff --exit-code "$OA01_COMMIT" -- tests/fixtures/oa01-v1-golden.json
-for file in src/http.rs src/sync.rs src/provider.rs src/bin/contextmesh.rs src/bin/demo_agent.rs scripts/demo.sh; do
+for file in src/provider.rs src/bin/contextmesh.rs src/bin/demo_agent.rs scripts/demo.sh; do
   git diff --exit-code "$OA01_COMMIT" -- "$file"
 done
-printf '%s\n' 'ok: OA-01 fixture and OA-04+ implementation surfaces remain frozen/deferred'
+printf '%s\n' 'ok: OA-01 fixture and OA-05+ provider/CLI surfaces remain frozen/deferred'
 
 cargo build --workspace --locked
 cargo fmt --all -- --check

@@ -14,10 +14,12 @@ use crate::model::{AuthorId, ContextId, EventId, SignedEventV1};
 
 mod bundle;
 mod dag;
+mod sync;
 mod verify;
 
 pub use bundle::*;
 pub use dag::*;
+pub use sync::*;
 pub use verify::*;
 
 /// OA-02 database schema version.

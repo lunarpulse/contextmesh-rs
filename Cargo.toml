@@ -8,6 +8,7 @@ autobins = false
 description = "Verifiable distributed agent history with a transactional signed-event store"
 
 [dependencies]
+axum = { version = "=0.8.9", default-features = false, features = ["http1", "json", "tokio"] }
 base64 = { version = "=0.23.1", default-features = false, features = ["std"] }
 blake3 = { version = "=1.8.6", default-features = false, features = ["std"] }
 ed25519-dalek = { version = "=3.0.0", default-features = false, features = ["fast", "zeroize"] }
@@ -16,12 +17,13 @@ serde = { version = "=1.0.229", features = ["derive"] }
 serde_jcs = "=0.2.0"
 serde_json = { version = "=1.0.151", default-features = false, features = ["std", "float_roundtrip"] }
 thiserror = "=2.0.20"
-tokio = { version = "=1.53.1", default-features = false, features = ["sync"] }
+reqwest = { version = "=0.13.4", default-features = false, features = ["json"] }
+tokio = { version = "=1.53.1", default-features = false, features = ["net", "rt", "sync", "time"] }
 turso = { version = "=0.7.2", default-features = false }
 zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }
 
 [dev-dependencies]
-tokio = { version = "=1.53.1", default-features = false, features = ["macros", "rt", "sync"] }
+tokio = { version = "=1.53.1", default-features = false, features = ["macros", "net", "rt", "sync", "time"] }
 
 [[bin]]
 name = "contextmesh"

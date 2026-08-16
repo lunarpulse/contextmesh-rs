@@ -2,11 +2,11 @@
 title: 'OA-04 Authenticated Multi-Node Pull Synchronization'
 type: 'implementation-spec'
 created: '2026-08-16'
-status: 'ready-for-implementation'
+status: 'done'
 approved_plan: '../planning-artifacts/oa-02-oa-07-detailed-execution-plan.md'
 dependency_plan: './oa-04-dependency-plan.md'
 baseline_commit: '93d1ca122eec25d64d9d38352faf87900d3bef30'
-review_loop_iteration: 0
+review_loop_iteration: 1
 option_b_gate: 'blocked-until-OA-07-A1-A8'
 ---
 
@@ -290,3 +290,69 @@ The dependency plan, probe, verifier, and implementation specification were revi
 - Independent delegated review attempts stalled without text and were cancelled; no unsupported approval is claimed from those delegates. The direct adversarial review and executable dependency evidence are the recorded freeze basis.
 
 Freeze verdict: ready for implementation from baseline 93d1ca122eec25d64d9d38352faf87900d3bef30. Review loop iteration remains zero because no implementation exists yet.
+
+## Implementation review and hardening evidence (iteration 1)
+
+An independent read-only implementation review of the first OA-04 build was
+completed before verification. Findings and resolutions:
+
+1. High — a page was imported before its cursor progression was validated.
+   Fixed: PullClient now fully validates completion relation, cursor syntax,
+   offset progression, and plan-fingerprint continuity before calling
+   Store::import_bundle, so an invalid page causes no mutation for that page.
+2. High — the OA-04 integration tests did not compile (Read::chain misuse,
+   EventId deref, unsafe environment mutation). Fixed; the full matrices now
+   compile and pass. Two runtime bugs found while repairing them are also
+   fixed: blocking raw-socket test IO moved to spawn_blocking because the
+   package-minimal Tokio set builds a current-thread test runtime, and the
+   hostile-proxy test now joins the serving context instead of pulling an
+   unknown one.
+3. Medium — target/header resource checks ran after authentication. Fixed:
+   the guard now enforces request-target and parsed-header limits first
+   (414/431 limit_exceeded), then authenticates before route-specific
+   parsing, preserving both frozen orderings.
+4. Medium — public TransportLimits/PullLimits fields allowed unchecked
+   construction, and the configured client response cap was unused. Fixed:
+   SyncServer::bind, PullClient::new, and the internal HTTP client revalidate
+   all public limit fields, and PullClientConfig carries a checked
+   TransportLimits whose response cap is applied to every client read and to
+   server-generated responses.
+5. Medium — several exact/+1 boundary and hostile-response cases were
+   missing. Fixed: added exact/+1 request-target (400/414), header-value
+   (400/431), declared-body (400/413), configured response-cap (parser /
+   LimitExceeded), ref/head/cursor cardinality boundaries, false and
+   contradictory Content-Length coverage through the hostile-server matrix.
+6. Low — the standalone protocol test target and verify-oa04.sh were absent
+   and two public parsers lacked docs. Fixed: tests/oa04_protocol.rs now owns
+   the frozen canonical vectors and parser adversarial matrix,
+   scripts/verify-oa04.sh chains the full evidence set, and documentation
+   warnings are gone.
+
+Analyzed and accepted without code change: the frozen cursor plan fingerprint
+covers requested heads, effective known heads, context, and limits. A
+continuation request that changes only unknown or cross-context known IDs
+yields the identical effective set, plan, pages, and fingerprints, so no mixed
+plan or divergent transfer can result; any change to a plan-affecting field
+fails closed with pagination_conflict, as frozen.
+
+Verifier-chain note: the OA-01/OA-02/OA-03 scripts historically asserted that
+the http/sync surfaces stayed deferred and that Axum/Reqwest were absent.
+OA-04 implements exactly those deferred surfaces with the frozen D-04-01
+pins, so those guards were updated to the post-OA-04 manifest (Clap, TLS
+stacks, HTTP/2/3, resolver, and agent-protocol packages remain forbidden;
+OA-01/OA-03 fixtures and the provider/CLI/demo deferral checks are unchanged).
+This follows the established chain precedent in which each owning package
+updates earlier verifiers to the current approved manifest.
+
+Verification evidence at iteration 1 (pinned Rust 1.97.0):
+
+- cargo build --workspace --locked: pass
+- cargo fmt --all -- --check: pass
+- cargo clippy --workspace --all-targets --locked -- -D warnings: pass
+- cargo test --workspace --locked: pass (all OA-01..OA-04 targets)
+- bash scripts/verify-oa01.sh / verify-oa02.sh / verify-oa03.sh: pass
+- bash scripts/verify-oa04-dependencies.sh: pass
+- bash scripts/verify-oa04.sh: pass
+
+Freeze verdict updated: implementation complete; Option B remains blocked
+until OA-07 records Option A complete with direct A1-A8 evidence.

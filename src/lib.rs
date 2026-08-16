@@ -12,7 +12,7 @@
 pub mod crypto;
 /// Typed non-secret contract failures.
 pub mod error;
-/// Authenticated HTTP transport (reserved for OA-04).
+/// Authenticated bounded HTTP/1 transport for pull synchronization.
 pub mod http;
 /// Strict versioned event and wire-format types.
 pub mod model;
@@ -20,5 +20,5 @@ pub mod model;
 pub mod provider;
 /// Embedded Turso persistence, DAG/ref operations, bundles, and verification.
 pub mod store;
-/// Signed-event anti-entropy synchronization (reserved for OA-04).
+/// Strict synchronization protocol, pull state machine, and reports.
 pub mod sync;

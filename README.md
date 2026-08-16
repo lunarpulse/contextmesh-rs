@@ -1,9 +1,10 @@
 # contextmesh
 
-contextmesh currently implements **OA-03**: the frozen OA-01 signed-event
-contract, OA-02 transactional local store, and semantic-free DAG operations,
-deterministic projection, strict bounded Bundle v1 transfer, and full-store
-integrity verification. OA-00's Rust 1.97/Turso baseline remains intact.
+contextmesh currently implements **OA-04**: the frozen OA-01 signed-event
+contract, OA-02 transactional local store, OA-03 semantic-free DAG operations,
+deterministic projection, strict bounded Bundle v1 transfer, full-store
+integrity verification, and authenticated pull-only HTTP/1 synchronization
+between independent stores. OA-00's Rust 1.97/Turso baseline remains intact.
 
 ## Toolchain and verification
 
@@ -13,20 +14,21 @@ rust-toolchain.toml. Install or refresh the user-local toolchain without root:
     bash scripts/bootstrap-rust.sh
     . "$HOME/.cargo/env"
 
-Verify the current OA-03 state from the repository root:
+Verify the current OA-04 state from the repository root:
 
     cargo build --workspace --locked
     cargo fmt --all -- --check
     cargo clippy --workspace --all-targets --locked -- -D warnings
     cargo test --workspace --locked
-    bash scripts/verify-oa01.sh
-    bash scripts/verify-oa02.sh
-    bash scripts/verify-oa03.sh
+    bash scripts/verify-oa04.sh
 
-The verifiers check exact dependencies/features, locked feature graphs, OA-01
-fixture stability, OA-02 schema/admission/ref regressions, OA-03 graph/bundle/
-verification evidence, deferred-module boundaries, every quality command, and
-the expected OA-06 failure sentinel.
+verify-oa04.sh chains the OA-01/OA-02/OA-03 verifiers and the D-04-01
+dependency-probe verifier (scripts/verify-oa04-dependencies.sh). The verifiers
+check exact dependencies/features, locked feature graphs, OA-01 fixture
+stability, OA-02 schema/admission/ref regressions, OA-03 graph/bundle/
+verification evidence, the frozen OA-04 protocol fixture and auth/transport
+matrices, deferred-module boundaries, every quality command, and the expected
+OA-06 failure sentinel.
 
 ## Transactional local store
 
@@ -76,6 +78,38 @@ corruption and never repairs it.
 These are integrity and caller-selected ancestry facilities, not truth,
 semantic relevance, confidentiality, availability, authorization consensus, or
 semantic context selection.
+
+## Authenticated pull synchronization
+
+OA-04 exchanges OA-03 immutable signed events and unsigned advertised local
+refs between independent stores over authenticated plain HTTP/1. A bearer
+credential is exactly 32 random bytes rendered as token1_ plus canonical
+unpadded base64url, loaded only from an explicit environment variable or a
+permission-checked regular file; the server retains only a domain-separated
+BLAKE3 hash of the exact Authorization header bytes and compares fixed-size
+hashes. Every failure shape is a stable non-secret canonical JSON error with a
+random-seeded request ID.
+
+Peers are absolute http:// IP-literal endpoints with explicit ports; hostnames,
+DNS discovery, HTTPS, proxies, and redirects are rejected or disabled. Loopback
+is the default; non-loopback plaintext requires an explicit acknowledgement and
+carries a fixed no-confidentiality warning. Request targets, parsed headers,
+raw pre-header bytes, bodies, concurrency, pages, and responses are bounded
+with exact frozen limits and independent timeouts; partial-header slowloris
+traffic is cut at the accept layer.
+
+GET /v1/refs returns one canonical signed-order ref snapshot with a BLAKE3
+fingerprint. POST /v1/bundles/export returns deterministic parent-first
+Bundle v1 pages bound by cursor to an immutable ancestry-difference plan.
+PullClient imports each fully validated page through the OA-03 admission path
+and, only after the complete transfer, atomically replaces the selected
+peer/context remote-ref namespace. Synchronization never writes local refs,
+and earlier verified page events may remain as unreachable immutable orphans
+when a later page fails.
+
+OA-04 adds only Axum 0.8.9 (http1, json, tokio) and Reqwest 0.13.4 (json),
+plus the approved Tokio net/rt/sync/time features, per the frozen D-04-01
+record. Plain HTTP provides no confidentiality or server identity.
 
 ## Frozen signed-event v1 contract
 
@@ -144,9 +178,11 @@ OA-03 adds no dependency or feature. It preserves exact Turso 0.7.2 and Tokio
 1.53.1 pins and the captured cargo-tree-oa02-features.txt graph. The frozen
 canonical Bundle v1 fixture is tests/fixtures/oa03-bundle-v1-golden.json.
 
+OA-04's exact locked feature graph is cargo-tree-oa04-features.txt, and its
+frozen canonical protocol fixture is tests/fixtures/oa04-protocol-golden.json.
+
 ## Deferred scope
 
-- OA-04: authenticated HTTP anti-entropy synchronization.
 - OA-05: provider recording, key custody, and real CLI commands.
 - OA-06: two-node demonstration; scripts/demo.sh intentionally exits 1.
 - OA-07: release evidence and Option A completion verdict.

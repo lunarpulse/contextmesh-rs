@@ -27,23 +27,23 @@ r=next(p for p in m["packages"] if p["id"]==m["resolve"]["root"])
 deps=[d for d in r["dependencies"] if d["name"]=="tokio"]
 normal=next(d for d in deps if d["kind"] is None)
 dev=next(d for d in deps if d["kind"]=="dev")
-assert normal["req"]=="=1.53.1" and not normal["uses_default_features"] and normal["features"]==["sync"]
-assert dev["req"]=="=1.53.1" and not dev["uses_default_features"] and sorted(dev["features"])==["macros","rt","sync"]
+assert normal["req"]=="=1.53.1" and not normal["uses_default_features"] and sorted(normal["features"])==["net","rt","sync","time"]
+assert dev["req"]=="=1.53.1" and not dev["uses_default_features"] and sorted(dev["features"])==["macros","net","rt","sync","time"]
 turso=next(d for d in r["dependencies"] if d["name"]=="turso" and d["kind"] is None)
 assert turso["req"]=="=0.7.2" and not turso["uses_default_features"] and not turso["features"]
-assert not {"axum","reqwest","clap","libp2p","rusqlite","libsqlite3-sys"}.intersection(p["name"] for p in m["packages"])
+assert not {"clap","libp2p","rusqlite","libsqlite3-sys","openssl","native-tls","rustls","tokio-rustls","hyper-rustls","h2","h3","quinn"}.intersection(p["name"] for p in m["packages"])
 PY
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 cargo tree --locked -e features | python3 -I -c 'import sys; sys.stdout.write(sys.stdin.read().replace(f"({sys.argv[1]})", "(<WORKSPACE>)"))' "$ROOT" > "$tmp/features.txt"
-cmp "$tmp/features.txt" cargo-tree-oa02-features.txt
-printf '%s\n' 'ok: OA-02 exact runtime/dev features and locked graph match'
+cmp "$tmp/features.txt" cargo-tree-oa04-features.txt
+printf '%s\n' 'ok: exact runtime/dev features and locked graph match'
 
 [[ "$(sha256sum tests/fixtures/oa01-v1-golden.json | awk '{print $1}')" == "$FIXTURE_SHA256" ]]
 git diff --exit-code "$OA01_COMMIT" -- tests/fixtures/oa01-v1-golden.json
-for file in src/http.rs src/sync.rs src/provider.rs src/bin/contextmesh.rs src/bin/demo_agent.rs scripts/demo.sh; do
+for file in src/provider.rs src/bin/contextmesh.rs src/bin/demo_agent.rs scripts/demo.sh; do
   git diff --exit-code "$OA01_COMMIT" -- "$file"
 done
-printf '%s\n' 'ok: OA-01 fixture and OA-03+ implementation surfaces remain frozen/deferred'
+printf '%s\n' 'ok: OA-01 fixture and OA-05+ provider/CLI surfaces remain frozen/deferred'
 
 cargo build --workspace --locked
 cargo fmt --all -- --check

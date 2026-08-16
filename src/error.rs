@@ -66,6 +66,53 @@ pub enum ContractError {
     SignatureInvalid,
 }
 
+/// Result type used by authenticated synchronization.
+pub type SyncResult<T> = std::result::Result<T, SyncError>;
+
+/// Stable non-secret OA-04 synchronization failures.
+#[derive(Clone, Debug, Eq, Error, PartialEq)]
+pub enum SyncError {
+    /// A checked configuration value is invalid.
+    #[error("synchronization configuration is invalid")]
+    InvalidConfig,
+    /// A secret source could not be safely loaded.
+    #[error("authentication token source is unavailable")]
+    TokenSource,
+    /// A peer endpoint is malformed or outside the acknowledged exposure policy.
+    #[error("peer endpoint is invalid")]
+    InvalidEndpoint,
+    /// Authentication failed without further detail.
+    #[error("authentication failed")]
+    Authentication,
+    /// The HTTP transport failed.
+    #[error("synchronization transport failed")]
+    Transport,
+    /// A bounded operation timed out.
+    #[error("synchronization timed out")]
+    Timeout,
+    /// Strict protocol validation failed.
+    #[error("synchronization protocol is invalid")]
+    Protocol,
+    /// A peer uses an unsupported protocol version.
+    #[error("synchronization protocol version is unsupported")]
+    UnsupportedVersion,
+    /// A pagination cursor no longer identifies the requested plan.
+    #[error("synchronization pagination conflicts")]
+    PaginationConflict,
+    /// A request, response, or transfer exceeded its bound.
+    #[error("synchronization limit exceeded")]
+    LimitExceeded,
+    /// Non-loopback plaintext exposure was not acknowledged.
+    #[error("plaintext network exposure is not acknowledged")]
+    ExposureNotAcknowledged,
+    /// A local store operation failed.
+    #[error("synchronization store operation failed")]
+    Store(#[from] StoreError),
+    /// Internal checked state was inconsistent.
+    #[error("synchronization internal failure")]
+    Internal,
+}
+
 /// Stable, non-secret OA-02 storage and admission failures.
 #[derive(Clone, Debug, Eq, Error, PartialEq)]
 pub enum StoreError {
