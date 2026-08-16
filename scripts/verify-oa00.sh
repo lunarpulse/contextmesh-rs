@@ -18,7 +18,11 @@ done
 for file in scripts/bootstrap-rust.sh scripts/verify-oa00.sh scripts/demo.sh; do
   [[ -x "$file" ]] || { printf 'script is not executable: %s\n' "$file" >&2; exit 1; }
 done
-expected_src=(src/bin/contextmesh.rs src/bin/demo_agent.rs src/crypto.rs src/error.rs src/http.rs src/lib.rs src/model.rs src/provider.rs src/store.rs src/sync.rs)
+# Approved source-file surface: the OA-00 baseline plus the store submodules
+# later Option A packages added under the frozen surface discipline; any new
+# or removed file fails here. Updated by the owning packages (OA-02 onward)
+# exactly as the manifest guards are.
+expected_src=(src/bin/contextmesh.rs src/bin/demo_agent.rs src/cli.rs src/crypto.rs src/error.rs src/http.rs src/lib.rs src/model.rs src/provider.rs src/store.rs src/store/bundle.rs src/store/dag.rs src/store/invocation.rs src/store/sync.rs src/store/verify.rs src/sync.rs)
 mapfile -t actual_src < <(find src -type f -print | sort)
 [[ "$(printf '%s\n' "${expected_src[@]}" | sort)" == "$(printf '%s\n' "${actual_src[@]}")" ]] || {
   printf '%s\n' 'unexpected source-file surface:' "${actual_src[@]}" >&2
@@ -153,9 +157,14 @@ deps = {d["name"]: d for d in root["dependencies"]}
 assert {"turso", "tokio"}.issubset(deps)
 turso = deps["turso"]
 assert turso["req"] == "=0.7.2" and not turso["uses_default_features"] and not turso["features"]
-tokio = deps["tokio"]
-assert tokio["kind"] == "dev" and not tokio["uses_default_features"]
-assert sorted(tokio["features"]) == ["macros", "rt"]
+# OA-02 moved Tokio to a normal dependency; the OA-00 dev-dependency grew to
+# the OA-02/OA-04 feature set. Expectations updated by the owning packages.
+tokio_normal = next(d for d in root["dependencies"] if d["name"] == "tokio" and d["kind"] is None)
+assert tokio_normal["req"] == "=1.53.1" and not tokio_normal["uses_default_features"]
+assert sorted(tokio_normal["features"]) == ["io-util", "net", "process", "rt", "signal", "sync", "time"]
+tokio_dev = next(d for d in root["dependencies"] if d["name"] == "tokio" and d["kind"] == "dev")
+assert tokio_dev["req"] == "=1.53.1" and not tokio_dev["uses_default_features"]
+assert sorted(tokio_dev["features"]) == ["macros", "net", "rt", "sync", "time"]
 forbidden = {"rusqlite", "libsqlite3-sys"}
 assert not forbidden.intersection(p["name"] for p in m["packages"])
 turso_pkg = next(p for p in m["packages"] if p["name"] == "turso")
@@ -164,7 +173,10 @@ turso_node = next(n for n in m["resolve"]["nodes"] if n["id"] == turso_pkg["id"]
 assert not {"fts", "mimalloc", "sync"}.intersection(turso_node["features"])
 PY
 cargo tree --locked -e features | python3 -I -c 'import sys; sys.stdout.write(sys.stdin.read().replace(f"({sys.argv[1]})", "(<WORKSPACE>)"))' "$ROOT" > "$tmp_home/cargo-tree-features.txt"
-cmp "$tmp_home/cargo-tree-features.txt" cargo-tree-features.txt
+# The current approved locked graph is the newest package snapshot
+# (cargo-tree-oa05-features.txt); OA-00's original graph file remains in the
+# repository as historical evidence.
+cmp "$tmp_home/cargo-tree-features.txt" cargo-tree-oa05-features.txt
 printf '%s\n' 'ok: locked Turso dependency and feature audit passed'
 
 cargo build --workspace --locked
@@ -178,11 +190,12 @@ test_output="$(cargo test --workspace --locked --test smoke -- --exact in_memory
 grep -q 'test in_memory_turso_write_read_round_trip .* ok' <<<"$test_output"
 printf '%s\n' 'ok: local Turso round trip passed'
 
-# Matrix: the pre-OA-06 demo cannot create a false A8 success.
-set +e
-demo_output="$(bash scripts/demo.sh 2>&1)"
-demo_code=$?
-set -e
-[[ $demo_code -eq 1 ]]
-[[ "$demo_output" == 'OA-06 pending: the two-node Option A demo is not implemented in OA-00.' ]]
-printf '%s\n' 'ok: OA-06 demo sentinel fails explicitly'
+# Matrix: OA-06 has implemented the two-node demo. The OA-00 sentinel is
+# gone and the real harness is present; full demo execution is owned by
+# verify-oa06.sh so this baseline verifier stays fast.
+if grep -q 'OA-06 pending: the two-node Option A demo' scripts/demo.sh; then
+  printf '%s\n' 'the OA-06 failure sentinel is still present' >&2
+  exit 1
+fi
+grep -q 'OA-06 reproducible two-node demo' scripts/demo.sh
+printf '%s\n' 'ok: OA-06 demo harness replaced the failure sentinel'

@@ -42,10 +42,7 @@ printf '%s\n' 'ok: exact runtime/dev features and locked graph match'
 
 [[ "$(sha256sum tests/fixtures/oa01-v1-golden.json | awk '{print $1}')" == "$FIXTURE_SHA256" ]]
 git diff --exit-code "$OA01_COMMIT" -- tests/fixtures/oa01-v1-golden.json
-for file in scripts/demo.sh; do
-  git diff --exit-code "$OA01_COMMIT" -- "$file"
-done
-printf '%s\n' 'ok: OA-01 fixture unchanged; only the OA-06 demo sentinel remains frozen'
+printf '%s\n' 'ok: OA-01 fixture unchanged'
 
 cargo build --workspace --locked
 cargo fmt --all -- --check

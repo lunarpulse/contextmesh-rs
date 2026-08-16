@@ -1,11 +1,12 @@
 # contextmesh
 
-contextmesh currently implements **OA-05**: the frozen OA-01 signed-event
+contextmesh currently implements **OA-06**: the frozen OA-01 signed-event
 contract, OA-02 transactional local store, OA-03 semantic-free DAG operations,
 deterministic projection, strict bounded Bundle v1 transfer, full-store
 integrity verification, OA-04 authenticated pull-only HTTP/1 synchronization,
-and OA-05 provider recording with a stable automation CLI. OA-00's Rust
-1.97/Turso baseline remains intact.
+OA-05 provider recording with a stable automation CLI, and the OA-06
+reproducible two-node demonstration. OA-00's Rust 1.97/Turso baseline remains
+intact.
 
 ## Toolchain and verification
 
@@ -15,18 +16,20 @@ rust-toolchain.toml. Install or refresh the user-local toolchain without root:
     bash scripts/bootstrap-rust.sh
     . "$HOME/.cargo/env"
 
-Verify the current OA-05 state from the repository root:
+Verify the current OA-06 state from the repository root:
 
     cargo build --workspace --locked
     cargo fmt --all -- --check
     cargo clippy --workspace --all-targets --locked -- -D warnings
     cargo test --workspace --locked
-    bash scripts/verify-oa05.sh
+    bash scripts/verify-oa06.sh
 
-verify-oa05.sh chains the OA-01 through OA-04 verifiers and the D-04-01
-dependency-probe verifier. The verifiers check exact dependencies/features,
-locked feature graphs, fixture stability, regression matrices, deferred-module
-boundaries, every quality command, and the expected OA-06 failure sentinel.
+verify-oa06.sh runs the seventeen-stage two-node demo, the OA-06 test matrix
+including an independent fresh-checkout execution, asserts no dependency
+change since OA-05, and chains the OA-00 through OA-05 verifiers plus the
+D-04-01 dependency-probe verifier. The verifiers check exact
+dependencies/features, locked feature graphs, fixture stability, regression
+matrices, deferred-module boundaries, and every quality command.
 
 ## Transactional local store
 
@@ -136,6 +139,78 @@ from files and are never echoed; the full snapshot matrix is
 tests/fixtures/oa05-cli-golden.json. OA-05 activates the frozen D-04-01 Clap
 4.6.6 pin and the Tokio process/signal/io-util features its code needs.
 
+## Reproducible two-node demo
+
+`bash scripts/demo.sh` drives two fully independent node runtimes A and B
+exclusively through the CLI. It builds the locked binaries, generates fresh
+OS-random keys and tokens (never fixtures), provisions B from A's exported
+join descriptor, boots both pull daemons on `127.0.0.1:0`, and runs seventeen
+stages: genesis pull without implicit local movement, explicit branch
+creation, distinct request/response chains on each node, bidirectional
+exchange with ref isolation, an explicit two-parent merge, converging
+projections (equal counts and byte-identical exported event sequences on
+both nodes, every ancestor exactly once), daemon stop/restart on
+the same databases, full-store verification, idempotent zero-insert repeat
+pulls, and an atomic rejection of a one-byte signature mutation. On success
+it prints `demo: PASS ...` with public IDs and counts only (followed by a
+`runtime kept at` notice when `OA06_DEMO_KEEP=1` is set).
+
+The harness runs under bash strict mode in a private 0700 temporary runtime
+root, polls daemon readiness with a hard timeout and liveness checks, and
+cleans up recorded child PIDs with TERM, bounded grace, then KILL. On failure
+it preserves the runtime and prints its path; on success it deletes the
+runtime unless `OA06_DEMO_KEEP=1` is set. `OA06_DEMO_RUNTIME_ROOT` selects an
+explicit runtime root (must be an absent or empty directory; created and
+chmod 0700). Three test-only fault hooks
+(`OA06_DEMO_READY_TIMEOUT_SECS`, `OA06_DEMO_TEST_SERVE_DELAY_SECS`,
+`OA06_DEMO_TEST_CRASH_AFTER_READY`) delay or kill work for the lifecycle
+tests in tests/oa06_demo.rs; they cannot bypass any assertion.
+
+One frozen-engine constraint shapes the choreography: the embedded Turso
+0.7.2 database allows exactly **one process per database file**, so a node's
+daemon runs only while no local CLI command of that node touches its
+database. The demo starts and stops each daemon around local operations;
+stage 5 proves both daemons boot concurrently and stage 13 proves they reopen
+the same databases on new ephemeral ports. A long-running node must
+therefore serialize daemon serving and local CLI access in Option A.
+
+## Network deployment guidance
+
+Option A synchronization is authenticated **plaintext** HTTP/1 between
+absolute loopback IP endpoints with explicit ports. It is designed for
+single-host and controlled tunnel use: hostnames, DNS discovery, HTTPS,
+proxies, and redirects are rejected or disabled, and non-loopback plaintext
+requires an explicit acknowledgement while providing no confidentiality.
+Cross-machine operation requires an operator-managed encrypted tunnel or VPN
+(for example WireGuard) so the peers remain IP literals inside a private
+address space; contextmesh itself provides no TLS, certificate management,
+key rotation service, or discovery, and makes no confidentiality claim on
+its own. A bearer token authorizes read-only history pulls only.
+
+## Claims, non-claims, and prohibited statements
+
+Demonstrated by tests and the demo: event integrity (canonical hashing,
+strict Ed25519 signatures, verified imports), transactional admission and
+CAS ref movement, deterministic projection, tamper detection without repair,
+restart persistence, authenticated pull exchange with remote-ref
+namespacing, idempotent re-pull, and provider recording with explicit crash
+windows.
+
+Explicitly not claimed: payload truth or semantic relevance, authorization
+consensus or membership truth (the local allowlist is append-only and
+trusts its operator), confidentiality or encryption at rest, availability
+or denial-of-service resistance beyond bounded inputs, exactly-once provider
+delivery, revocation, Byzantine agreement, or multi-writer concurrency
+across processes on one database.
+
+Prohibited statements for this project include claiming A2A or ACP protocol
+compliance, agent interoperability, semantic context selection, secure
+cross-internet transport, secret protection beyond file permissions, or
+"verified truth" of recorded content. Any future A2A/ACP mapping is a
+non-compliant external adapter concern deferred past Option A; Option A
+makes no protocol-compliance claim of any kind.
+
+
 ## Frozen signed-event v1 contract
 
 A signed event has this logical wire form. Rendering always uses RFC 8785/JCS:
@@ -209,10 +284,8 @@ OA-05's exact locked feature graph is cargo-tree-oa05-features.txt.
 
 ## Deferred scope
 
-- OA-06: two-node demonstration; scripts/demo.sh intentionally exits 1.
 - OA-07: release evidence and Option A completion verdict.
 - Option B: semantic context selection and handoff.
 
-The placeholder binaries still exit unsuccessfully so automation cannot mistake
-future OA-05 behavior for an implemented command. Option B remains blocked until
-OA-07 records Option A complete with direct A1-A8 evidence.
+Option B remains blocked until OA-07 records Option A complete with direct
+A1-A8 evidence.

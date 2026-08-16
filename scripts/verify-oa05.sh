@@ -58,13 +58,14 @@ printf '%s\n' 'ok: locked build, format, strict Clippy, and all workspace tests 
 cargo test --locked --test oa05_keys --test oa05_provider --test oa05_cli --test oa05_jsonl
 printf '%s\n' 'ok: OA-05 custody, provider, CLI, and JSONL matrices passed'
 
-set +e
-demo_output="$(bash scripts/demo.sh 2>&1)"
-demo_code=$?
-set -e
-[[ $demo_code -eq 1 ]]
-[[ "$demo_output" == 'OA-06 pending: the two-node Option A demo is not implemented in OA-00.' ]]
-printf '%s\n' 'ok: OA-06 demo remains an explicit failure sentinel'
+# OA-06 replaced the sentinel with the real two-node demo harness; its full
+# execution is owned by verify-oa06.sh.
+grep -q 'OA-06 reproducible two-node demo' scripts/demo.sh
+if grep -q 'OA-06 pending: the two-node Option A demo' scripts/demo.sh; then
+  printf '%s\n' 'OA-06 failure sentinel still present' >&2
+  exit 1
+fi
+printf '%s\n' 'ok: the OA-06 demo harness replaced the failure sentinel'
 
 bash scripts/verify-oa01.sh
 bash scripts/verify-oa02.sh

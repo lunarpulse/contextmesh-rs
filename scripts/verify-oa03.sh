@@ -41,10 +41,7 @@ printf '%s\n' 'ok: canonical Bundle v1 fixture checksum and independent event ve
 
 [[ "$(sha256sum tests/fixtures/oa01-v1-golden.json | awk '{print $1}')" == "799f326d20584b20f455d1b3027cc904848381761b6e591e81cacde0e46d7594" ]]
 git diff --exit-code "$OA01_COMMIT" -- tests/fixtures/oa01-v1-golden.json
-for file in scripts/demo.sh; do
-  git diff --exit-code "$OA01_COMMIT" -- "$file"
-done
-printf '%s\n' 'ok: OA-01 fixture unchanged; only the OA-06 demo sentinel remains frozen'
+printf '%s\n' 'ok: OA-01 fixture unchanged'
 
 cargo build --workspace --locked
 cargo fmt --all -- --check

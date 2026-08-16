@@ -82,12 +82,10 @@ actual_fixture_sha="$(sha256sum tests/fixtures/oa01-v1-golden.json | awk '{print
 cargo test --locked --test oa01_golden checked_in_fixture_is_deterministically_reproducible
 printf '%s\n' 'ok: frozen golden fixture checksum and regeneration match'
 
-# OA-04 has since implemented the sync/http surfaces; provider and CLI
-# the provider/CLI surfaces were implemented by OA-05; only the demo stays frozen.
-for file in scripts/demo.sh; do
-  git diff --exit-code "$BASELINE" -- "$file"
-done
-printf '%s\n' 'ok: only the OA-06 demo sentinel remains frozen'
+# OA-04 implemented the sync/http surfaces, OA-05 the provider/CLI
+# surfaces, and OA-06 the two-node demo; nothing remains frozen here.
+grep -q 'OA-06 reproducible two-node demo' scripts/demo.sh
+printf '%s\n' 'ok: the OA-06 demo harness is present'
 
 cargo build --workspace --locked
 cargo fmt --all -- --check
@@ -95,10 +93,8 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
 printf '%s\n' 'ok: build, format, Clippy, and all workspace tests passed'
 
-set +e
-demo_output="$(bash scripts/demo.sh 2>&1)"
-demo_code=$?
-set -e
-[[ $demo_code -eq 1 ]]
-[[ "$demo_output" == 'OA-06 pending: the two-node Option A demo is not implemented in OA-00.' ]]
-printf '%s\n' 'ok: OA-06 demo remains an explicit failure sentinel'
+grep -q 'OA-06 pending' scripts/demo.sh && {
+  printf '%s\n' 'OA-06 failure sentinel still present' >&2
+  exit 1
+}
+printf '%s\n' 'ok: OA-06 demo sentinel removed by its owning package'

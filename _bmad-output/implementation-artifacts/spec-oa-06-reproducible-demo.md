@@ -2,11 +2,11 @@
 title: 'OA-06 Reproducible Two-Node Demo and Documentation'
 type: 'implementation-spec'
 created: '2026-08-17'
-status: 'frozen'
+status: 'done'
 approved_plan: '../planning-artifacts/oa-02-oa-07-detailed-execution-plan.md'
 decision_record: '../planning-artifacts/oa-02-oa-07-decision-record.md'
 baseline_commit: '6347a10'
-review_loop_iteration: 0
+review_loop_iteration: 1
 option_b_gate: 'blocked-until-OA-07-A1-A8'
 ---
 
@@ -68,6 +68,25 @@ system pass:
 
 Injection hooks only remove or delay work; they never bypass an assertion.
 
+### Single-process-per-database engine constraint (discovered at implementation)
+
+The frozen embedded Turso 0.7.2 engine allows exactly one process per local
+database file: a second process fails `Store::open` with DatabaseUnavailable
+while any other process holds the file. The OA-02 capability probe proved
+multi-connection and independent handles within one process and explicitly
+did not prove multi-process access, and no OA-02..OA-05 test exercised a
+daemon plus CLI against one database simultaneously. The demo surfaced this
+on its first execution. The plan's stage order assumed daemon and local CLI
+concurrency, so OA-06 choreographs daemon availability: stage 5 proves both
+daemons boot concurrently on distinct ephemeral ports, and thereafter each
+node's daemon runs only while no local CLI command of that node touches its
+database. Every stage's commands, order, and assertions are unchanged; only
+daemon scheduling around them differs from the plan's letter. This is
+recorded under change control as a discovered frozen-stack constraint, not a
+product change: OA-06 adds no Rust code, and the constraint is documented in
+the README. A long-running Option A node must serialize daemon serving and
+local CLI access per database.
+
 ### Stage-set and test-matrix deltas from the plan letter
 
 - Stage 2 additionally exercises the frozen `key repair-permissions`
@@ -112,7 +131,10 @@ matches, and never prints key, token, or seed material.
 3. Daemons run `contextmesh serve --listen 127.0.0.1:0` and publish
    readiness atomically through the frozen CLI ready-file mechanism after
    bind; the harness polls the ready file with a hard timeout and a
-   liveness check (`kill -0`) and never sleeps blindly.
+   liveness check (a recorded PID counts as running only while bash still
+   lists it as one of its own live jobs, so a kernel-recycled PID can never
+   be signaled) and never sleeps blindly. Bash >= 4.4 and GNU coreutils
+   (`stat -c`, fractional `sleep`) are required.
 4. Cleanup sends TERM to exactly the recorded child PIDs, waits a bounded
    grace, then KILLs and reaps. No other process is signaled.
 5. Failure preserves logs and prints the runtime path; success deletes the
@@ -128,7 +150,7 @@ matches, and never prints key, token, or seed material.
 | 1 | `cargo build --workspace --locked` | `target/debug/contextmesh` and `target/debug/demo_agent` exist and are executable |
 | 2 | `key generate` x2, `token generate` x2, `key repair-permissions` | distinct authors; key/token files exist with mode 0600 |
 | 3 | `context create` (A), `context authorize` (A adds B) | context/genesis/branch returned; empty authorize result |
-| 4 | `bundle export` (A, head=genesis), `context join` (B) | descriptor has exactly one zero-parent `context.genesis` event; B joins from the descriptor's own context/genesis IDs with authors A and B |
+| 4 | `bundle export` (A, head=genesis), `context join` (B) | descriptor has exactly one zero-parent `context.genesis` event; B joins from the descriptor's own context/genesis IDs with authors A and B; descriptor file is a single JSON document (`.json`) |
 | 5 | `serve` x2 on `127.0.0.1:0` | both ready files publish distinct addresses; optional crash injection |
 | 6 | `sync` (B from A), `show refs` (B local) | inserted=1, pages>=1, remote refs updated=1; B local refs=0 (no implicit local movement) |
 | 7 | `branch create` (B main from genesis) | branch main; B local refs=1 |
@@ -136,18 +158,21 @@ matches, and never prints key, token, or seed material.
 | 9 | `invoke` (B, distinct input), `invocation pending`, `invocation detached` | outcome=response; pending=0; detached=0; distinct event IDs from stage 8; B local refs=1 |
 | 10 | `sync` (B from A), `sync` (A from B), `show refs` local+peer both | each direction inserted=2; A local refs=1 and B local refs=1 unchanged; each side holds exactly one namespaced peer ref |
 | 11 | `branch create` (A merged), `merge` (A, parents A main + peer B main) | merge event returned; A local refs=2 |
-| 12 | `sync` (B from A), `show projection` (A and B over merge head) | B inserted=1; both projections count the same total and each ancestor exactly once (6 events) |
-| 13 | TERM both daemons, restart both | old PIDs dead before restart; new ready files publish new ephemeral ports on the same databases |
-| 14 | `verify` (A and B), `show projection` both | valid=true both; projection counts still equal |
-| 15 | `sync` (A from B), `sync` (B from A), `show refs` both | inserted=0 both; local ref counts unchanged (A=2, B=1) |
-| 16 | `bundle export` (B), mutate one signature byte, `bundle import` (A) | import exits non-zero with ok=false; A verify still valid=true; A local refs=2; merge projection still 6 |
+| 12 | `sync` (B from A), `show projection` (A and B), `bundle export` (A and B over merge head) | B inserted=1; both projections count 6; the two exported canonical event sequences are identical with six unique ancestors |
+| 13 | TERM both daemons, restart both | every old recorded PID provably dead (reaped) before restart; both nodes republish readiness on distinct ephemeral ports over the same databases |
+| 14 | `verify` (A and B), `show projection`, `show refs` peer both | valid=true both; projections still 6; A peer node-b=1 and B peer node-a=2 (A advertises main+merged) unchanged |
+| 15 | `sync` (A from B), `sync` (B from A), `show refs` both | inserted=0, remote_refs_updated=0, and pages>=1 both (the peers were contacted and streamed, not skipped); local ref counts unchanged (A=2, B=1) |
+| 16 | `bundle export` (B), byte-splice exactly one differing signature byte of the last (tip) event, `bundle import` (A) | import exits with the frozen class 9 and error.code=internal, ok=false; A verify still valid=true; local refs=2; peer refs tamper-node=0 and node-b=1; merge projection still 6 |
 | 17 | — | prints `demo: PASS` with public context ID, author count, event counts, ref counts, stage count; no secrets |
 
-   CLI-unobservable: `show projection` emits only an event count, so the
-   strongest available equality assertion is equal counts (6) on both nodes
-   over the same merge head, backed by `verify` integrity on both sides;
-   full sequence equality is asserted only through the recorded six event
-   IDs each node admits.
+   `show projection` emits only an event count, so equal counts on both
+   nodes over the same merge head, backed by `verify` integrity on both
+   sides, was initially recorded as the maximum assertion. Implementation
+   review strengthened this: bundle export is a frozen deterministic
+   on-disk artifact, so the demo exports the merge head from both nodes and
+   compares the full canonical event sequences byte-exactly, proving
+   sequence equality directly while keeping the count and uniqueness
+   assertions.
 
 The demo never issues synchronized requests, never promotes a remote ref,
 never repairs corruption, and never exposes a non-loopback listener.
@@ -185,7 +210,7 @@ README additions and edits:
 | `scripts/demo.sh` | replace sentinel with the harness and 17 stages |
 | `scripts/verify-oa06.sh` | new: artifacts, manifest-unchanged guard, demo run, oa06 test target, predecessor chain |
 | `tests/oa06_demo.rs` | new: demo matrix 06-D01..06-D06 and lifecycle/security tests |
-| `scripts/verify-oa00.sh` | drop sentinel assertion; assert the real demo marker |
+| `scripts/verify-oa00.sh` | drop sentinel assertion, assert the real demo marker; repair stale expectations dormant since OA-02 (src surface including `src/cli.rs` and `src/store/*`, Tokio normal+dev split, current locked feature-graph snapshot) |
 | `scripts/verify-oa01.sh` | drop `scripts/demo.sh` freeze guard and sentinel run |
 | `scripts/verify-oa02.sh` | drop `scripts/demo.sh` freeze guard |
 | `scripts/verify-oa03.sh` | drop `scripts/demo.sh` freeze guard |
@@ -197,7 +222,8 @@ Predecessor verifier edits follow the OA-04/OA-05 precedent: each owning
 package updates predecessor expectations, and OA-01/OA-03/OA-04/OA-05
 fixture checksums remain frozen. The sentinel string
 `OA-06 pending: the two-node Option A demo is not implemented in OA-00.`
-must be absent from the repository after OA-06.
+must be absent from scripts/ and README.md after OA-06 (verify-oa06.sh
+asserts exactly that scope; the spec may quote the string as history).
 
 ## Test traceability
 
@@ -321,3 +347,118 @@ Freeze verdict: ready for implementation from baseline 6347a10. Review loop
 iteration remains zero because no implementation exists yet. Option B stays
 blocked until OA-07 records Option A complete with direct A1-A8 evidence.
 
+
+## Implementation review and evidence (iteration 1)
+
+All four required adversarial review layers ran as independent delegated
+reviews and each completed with findings; every finding was triaged and
+resolved below, together with a direct re-verification of the executable
+chain.
+
+### Discoveries during implementation
+
+1. Single-process-per-database constraint (recorded above as a decision):
+   the first demo execution failed because B's sync client could not open
+   B's database while B's daemon held it. Reproduced standalone (daemon up
+   -> any CLI open of the same file exits 9 with store_error=database;
+   daemon down -> succeeds). Choreography adopted; no product code changed.
+2. `scripts/verify-oa00.sh` had been stale since OA-02 and was never chained
+   again by any later verifier: its frozen src-surface list predated
+   `src/cli.rs` and `src/store/*`, its manifest audit predated the Tokio
+   normal/dev split, and its feature-graph `cmp` targeted the OA-00-era
+   snapshot. OA-06 repairs those expectations to the current approved state
+   (16-file surface, Tokio =1.53.1 normal [io-util, net, process, rt,
+   signal, sync, time] plus dev [macros, net, rt, sync, time], graph
+   compared against cargo-tree-oa05-features.txt) exactly as OA-04/OA-05
+   updated predecessor manifest guards; the guard stays strict for any
+   future file or feature drift. verify-oa00 now passes again (8
+   checkpoints) and verify-oa06 chains it so it cannot rot silently again.
+
+### Review-layer findings and resolutions
+
+Layer 1 (shell/process lifecycle) — no blockers or majors; minors fixed:
+
+- PID-recycle hazard in TERM->KILL escalation: liveness now derives from
+  `jobs -rp` membership, so only our own unreaped children can be signaled.
+- `stop_daemons_gracefully` skipped `wait` for gracefully exited PIDs: now
+  every recorded PID is reaped.
+- `run` failing inside command substitution could distort the failure
+  message: `jsonget` now reports unparsable documents explicitly and all
+  failures remain fatal under `set -e`.
+- `ls -A` emptiness TOCTOU replaced by `find -mindepth 1 -print -quit`.
+- The unchecked success-path `rm -rf` now warns on failure instead of
+  silently claiming PASS.
+- verify-oa06.sh secrecy check now captures and scans demo stderr too.
+- Portability documented (bash >= 4.4, GNU stat/sleep) in the harness
+  header and the harness contract.
+
+Layer 2 (reproducibility) — three majors fixed in the Rust test harness:
+
+- The concurrent-test child was unbounded: both children now run under the
+  same bounded poll with TERM-then-KILL termination.
+- A bound-breach `kill()` bypassed the demo's EXIT trap and could orphan
+  daemons: `terminate_gracefully` TERMs first, waits a bounded grace so the
+  trap can clean up, then KILLs.
+- Wall-clock bounds could be eaten by cargo target-lock contention: a
+  global test mutex serializes demo runs and the concurrent pair pre-builds
+  once, so bounds measure the demo itself.
+- Minors fixed: documented-command coverage asserts exact subcommand
+  phrases (key generate, context authorize, invocation pending, bundle
+  import, ...); the stage-13 printf no longer overclaims port novelty and
+  the demo proves old PIDs dead before restart; the check-ignore test is
+  reframed (the real assertion is the porcelain before/after equality);
+  live `ps` sampling during the concurrent pair asserts no `token1_` prefix
+  ever appears in any process arguments; the fresh-checkout test asserts a
+  clean tree before cloning; the descriptor is renamed `.jsonl` -> `.json`
+  (a single JSON document); temp base directories are cleaned after
+  non-KEEP runs.
+
+Layer 3 (tamper evidence) — majors fixed by strengthening the demo:
+
+- The tampered import now pins the frozen exit class 9 with error.code
+  internal (the OA-05 mapping) instead of any non-zero exit.
+- The mutation byte-splices exactly one differing byte of the last event's
+  signature (the tip, absent on A) and asserts a one-byte diff — no whole
+  document re-serialization.
+- Stage 16 additionally proves the tamper-node peer namespace stayed empty
+  and the existing node-b peer refs are untouched.
+- Stage 12 proves sequence equality directly: both nodes export the merge
+  head and the canonical event sequences compare identical with six unique
+  ancestors (the frozen disclosure claiming this was CLI-unobservable was
+  wrong and is corrected above).
+- Stage 15 distinguishes idempotence from a skipped transfer: pages>=1 and
+  remote_refs_updated=0 are asserted in both directions.
+- Stage 14 re-asserts peer refs after restart (A node-b=1; B node-a=2 after
+  A advertised main and merged).
+
+Layer 4 (docs/security claims) — no blockers or majors; minors fixed: the
+PASS line wording no longer claims to be the final line under
+OA06_DEMO_KEEP; `OA06_DEMO_RUNTIME_ROOT` documents the absent-or-empty 0700
+rule; the projection claim states equal counts and byte-identical exported
+sequences. All standing README sections were re-verified current against
+code and tests; no prohibited or overstated claim was found.
+
+### Verification evidence (pinned Rust 1.97.0, pre-commit)
+
+- bash scripts/demo.sh: exit 0, all seventeen stages, `demo: PASS ...`.
+- cargo build --workspace --locked, cargo fmt --all -- --check,
+  cargo clippy --workspace --all-targets --locked -- -D warnings, and
+  cargo test --workspace --locked: green, including
+  cargo test --locked --test oa06_demo (10 passed, 1 ignored).
+- bash scripts/verify-oa00.sh: exit 0 (8 checkpoints) after the repair
+  above; bash scripts/verify-oa01.sh, verify-oa02.sh, verify-oa03.sh,
+  verify-oa04.sh, verify-oa04-dependencies.sh, and verify-oa05.sh: exit 0
+  (verify-oa05 reports its full 73-checkpoint chain).
+- bash scripts/verify-oa06.sh is rerun on the committed tree immediately
+  after the OA-06 commit (its clean-worktree and fresh-checkout checks are
+  commit-sensitive by design); the result is recorded below.
+
+Post-commit rerun on the final evidence commit: verify-oa06.sh exit 0 —
+artifacts, manifest-unchanged guard, sentinel absence, README sections,
+locked build/fmt/Clippy/full tests, OA-06 matrix plus the ignored
+fresh-checkout execution, the seventeen-stage demo with a secret-free
+summary, a clean worktree, and the chained OA-00..OA-05 verifiers all green.
+
+Freeze verdict updated: implementation complete, review loop iteration 1.
+Option B remains blocked until OA-07 records Option A complete with direct
+A1-A8 evidence.
