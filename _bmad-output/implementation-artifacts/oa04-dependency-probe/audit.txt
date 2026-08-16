@@ -1,0 +1,21 @@
+PROBE_RESULT=pass
+PROXY_ENV_TEST=pass (HTTP_PROXY and HTTPS_PROXY pointed at 127.0.0.1:1; client used no_proxy)
+REDIRECT_TEST=pass (302 remained 302; redirect policy disabled)
+DIRECT_DEPENDENCIES
+axum =0.8.9 defaults=false features=http1,json,tokio
+blake3 =1.8.6 defaults=false features=std
+clap =4.6.6 defaults=false features=derive,error-context,help,std,usage
+reqwest =0.13.4 defaults=false features=json
+serde =1.0.229 defaults=true features=derive
+tokio =1.53.1 defaults=false features=macros,net,process,rt,signal,sync,time
+SELECTED_TARGETS
+axum 0.8.9 rust_version=1.80 enabled=http1,json,tokio
+reqwest 0.13.4 rust_version=1.85.0 enabled=json
+clap 4.6.6 rust_version=1.85 enabled=derive,error-context,help,std,usage
+tokio 1.53.1 rust_version=1.71 enabled=bytes,default,libc,macros,mio,net,process,rt,signal,signal-hook-registry,socket2,sync,time,tokio-macros,windows-sys
+blake3 1.8.6 rust_version=None enabled=std
+FORBIDDEN_DIRECT_FEATURES=none
+FORBIDDEN_PACKAGES=none
+REQWEST_SYSTEM_PROXY=disabled
+NOTE=reqwest unconditionally selects hyper-util/client-proxy and tower-http/follow-redirect implementation support; system-proxy is absent and the representative client explicitly calls no_proxy, Policy::none, and http1_only
+RESOLVED_PACKAGES=110
