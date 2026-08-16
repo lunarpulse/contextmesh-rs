@@ -5,10 +5,19 @@ edition = "2024"
 rust-version = "1.97"
 publish = false
 autobins = false
-description = "Verifiable distributed agent history (OA-00 baseline only)"
+description = "Verifiable distributed agent history with a frozen signed-event v1 contract"
 
 [dependencies]
+base64 = { version = "=0.23.1", default-features = false, features = ["std"] }
+blake3 = { version = "=1.8.6", default-features = false, features = ["std"] }
+ed25519-dalek = { version = "=3.0.0", default-features = false, features = ["fast", "zeroize"] }
+getrandom = { version = "=0.4.3", default-features = false }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_jcs = "=0.2.0"
+serde_json = { version = "=1.0.151", default-features = false, features = ["std", "float_roundtrip"] }
+thiserror = "=2.0.20"
 turso = { version = "=0.7.2", default-features = false }
+zeroize = { version = "=1.9.0", default-features = false, features = ["alloc"] }
 
 [dev-dependencies]
 tokio = { version = "1", default-features = false, features = ["macros", "rt"] }

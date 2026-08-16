@@ -140,7 +140,7 @@ rustup run "$EXPECTED_TOOLCHAIN" cargo clippy --version | grep -q '^clippy 0.1.9
 printf '%s\n' 'ok: pinned user-local Rust toolchain and components are active'
 
 # Acceptance: exact package, feature, and forbidden-dependency state.
-python3 - <<'PY'
+python3 -I - <<'PY'
 import json
 import subprocess
 m = json.loads(subprocess.check_output(["cargo", "metadata", "--locked", "--format-version", "1"]))
@@ -150,7 +150,7 @@ root = next(p for p in m["packages"] if p["id"] == root_id)
 assert root["name"] == "contextmesh"
 assert root["edition"] == "2024" and root["rust_version"] == "1.97"
 deps = {d["name"]: d for d in root["dependencies"]}
-assert set(deps) == {"turso", "tokio"}
+assert {"turso", "tokio"}.issubset(deps)
 turso = deps["turso"]
 assert turso["req"] == "=0.7.2" and not turso["uses_default_features"] and not turso["features"]
 tokio = deps["tokio"]
@@ -163,7 +163,7 @@ assert turso_pkg["version"] == "0.7.2"
 turso_node = next(n for n in m["resolve"]["nodes"] if n["id"] == turso_pkg["id"])
 assert not {"fts", "mimalloc", "sync"}.intersection(turso_node["features"])
 PY
-cargo tree --locked -e features > "$tmp_home/cargo-tree-features.txt"
+cargo tree --locked -e features | python3 -I -c 'import sys; sys.stdout.write(sys.stdin.read().replace(f"({sys.argv[1]})", "(<WORKSPACE>)"))' "$ROOT" > "$tmp_home/cargo-tree-features.txt"
 cmp "$tmp_home/cargo-tree-features.txt" cargo-tree-features.txt
 printf '%s\n' 'ok: locked Turso dependency and feature audit passed'
 

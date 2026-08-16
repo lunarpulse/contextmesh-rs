@@ -1,0 +1,33 @@
+{
+  "provenance": {
+    "baseline_commit": "53777ce3668708a5f1b668d25c2a461d04b9985e",
+    "generator": "tests/oa01_golden.rs::fixture_vector",
+    "jcs_upstream_testdata": "https://github.com/cyberphone/json-canonicalization/tree/master/testdata",
+    "rfc_8785": "https://www.rfc-editor.org/rfc/rfc8785",
+    "spec": "_bmad-output/implementation-artifacts/spec-oa-01-signed-event-contract.md",
+    "warning": "The fixed seed is public test material and MUST NOT be used in production."
+  },
+  "schema_version": 1,
+  "vectors": [
+    {
+      "author": "ed25519_A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg",
+      "author_public_key_base64url": "A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg",
+      "canonical_body_base64url": "eyJhdXRob3IiOiJlZDI1NTE5X0E2RUh2X1BPRUw0ZGNOMFk1MHZBbVdmazFqQ2JwUTFmSGR5R1pCSlZNYmciLCJjb250ZXh0IjoiY3R4MV9nSUdDZzRTRmhvZUlpWXFMakkyT2o1Q1JrcE9VbFphWG1KbWFtNXlkbnA4Iiwia2luZCI6ImFnZW50LnJlcXVlc3QiLCJwYXJlbnRzIjpbXSwicGF5bG9hZCI6e30sInZlcnNpb24iOjF9",
+      "canonical_body_utf8": "{\"author\":\"ed25519_A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg\",\"context\":\"ctx1_gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8\",\"kind\":\"agent.request\",\"parents\":[],\"payload\":{},\"version\":1}",
+      "canonical_envelope_base64url": "eyJib2R5Ijp7ImF1dGhvciI6ImVkMjU1MTlfQTZFSHZfUE9FTDRkY04wWTUwdkFtV2ZrMWpDYnBRMWZIZHlHWkJKVk1iZyIsImNvbnRleHQiOiJjdHgxX2dJR0NnNFNGaG9lSWlZcUxqSTJPajVDUmtwT1VsWmFYbUptYW01eWRucDgiLCJraW5kIjoiYWdlbnQucmVxdWVzdCIsInBhcmVudHMiOltdLCJwYXlsb2FkIjp7fSwidmVyc2lvbiI6MX0sImV2ZW50X2lkIjoiZXZ0MV9oeEJQRUVWWHZQTi0xNWxfd1pVMmg3S3Nha2pFZHhLUE8weXpZNGVPWG5ZIiwic2lnbmF0dXJlIjoic2lnMV8yWnk2bDJ4SFFaNFc1VjVROWxVd05feDhfNGhPMmFKYnpud3FDNXhoN2ZoMW41VHdkMkVnbmFESTlhWG5VaXJmRFRPRGtoNDRSelo0WDk5akwtWlBBdyJ9",
+      "canonical_envelope_utf8": "{\"body\":{\"author\":\"ed25519_A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg\",\"context\":\"ctx1_gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8\",\"kind\":\"agent.request\",\"parents\":[],\"payload\":{},\"version\":1},\"event_id\":\"evt1_hxBPEEVXvPN-15l_wZU2h7KsakjEdxKPO0yzY4eOXnY\",\"signature\":\"sig1_2Zy6l2xHQZ4W5V5Q9lUwN_x8_4hO2aJbznwqC5xh7fh1n5Twd2EgnaDI9aXnUirfDTODkh44RzZ4X99jL-ZPAw\"}",
+      "context": "ctx1_gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "context_bytes_base64url": "gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8",
+      "event_id": "evt1_hxBPEEVXvPN-15l_wZU2h7KsakjEdxKPO0yzY4eOXnY",
+      "event_id_bytes_base64url": "hxBPEEVXvPN-15l_wZU2h7KsakjEdxKPO0yzY4eOXnY",
+      "event_id_domain": "org.aaif.contextmesh.event-id.v1",
+      "expected_outcome": "valid",
+      "fixed_seed_base64url": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+      "name": "empty-object-zero-parents",
+      "signature": "sig1_2Zy6l2xHQZ4W5V5Q9lUwN_x8_4hO2aJbznwqC5xh7fh1n5Twd2EgnaDI9aXnUirfDTODkh44RzZ4X99jL-ZPAw",
+      "signature_bytes_base64url": "2Zy6l2xHQZ4W5V5Q9lUwN_x8_4hO2aJbznwqC5xh7fh1n5Twd2EgnaDI9aXnUirfDTODkh44RzZ4X99jL-ZPAw",
+      "signature_domain_with_nul_base64url": "b3JnLmFhaWYuY29udGV4dG1lc2guc2lnbmF0dXJlLnYxAA",
+      "signing_message_base64url": "b3JnLmFhaWYuY29udGV4dG1lc2guc2lnbmF0dXJlLnYxAIcQTxBFV7zzfteZf8GVNoeyrGpIxHcSjztMs2OHjl52"
+    }
+  ]
+}

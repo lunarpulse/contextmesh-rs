@@ -1,94 +1,127 @@
 # contextmesh
 
-contextmesh is currently the **OA-00 toolchain and embedded-storage baseline**
-for Option A (verifiable distributed agent history). The approved module and
-binary surfaces exist, but OA-01+ behavior is intentionally not implemented.
-In particular, this baseline does not claim to pass the final Option A A8 gate.
+contextmesh currently implements **OA-01**, the persistence-independent signed
+event contract for Option A (verifiable distributed agent history). OA-00's
+Rust 1.97/Turso baseline remains intact. Turso persistence is not used by the
+contract yet; that begins in OA-02.
 
-## Rust toolchain
+## Toolchain and verification
 
-The project pins Rust **1.97.0**, the minimal rustup profile, rustfmt, and
-Clippy in rust-toolchain.toml. It uses Rust edition **2024** and advertises
-only the tested MSRV **1.97**. A lower MSRV has not been tested or declared.
+The project pins Rust **1.97.0**, edition **2024**, rustfmt, and Clippy in
+`rust-toolchain.toml`. Install or refresh the user-local toolchain without
+root privileges:
 
-Rustup and the toolchain are installed under the current user's home directory;
-no root privileges or distribution Rust package are required. The repeatable
-bootstrap fails closed if the official installer cannot be fetched:
+```bash
+bash scripts/bootstrap-rust.sh
+. "$HOME/.cargo/env"
+```
 
-    bash scripts/bootstrap-rust.sh
+Verify OA-01 from the repository root:
 
-In a fresh shell, expose the user-local tools and let the project pin select
-the toolchain:
+```bash
+cargo build --workspace --locked
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+bash scripts/verify-oa01.sh
+```
 
-    . "$HOME/.cargo/env"
-    rustc --version
-    cargo --version
-    rustfmt --version
-    cargo clippy --version
+The verifier checks exact dependency versions/features, the locked feature
+graph, golden-vector checksum and regeneration, deferred-module boundaries,
+every quality command, and the expected OA-06 failure sentinel.
 
-## Embedded Turso decision and dependency audit
+## Frozen signed-event v1 contract
 
-OA-00 pins exactly turso = 0.7.2 with default-features = false. This keeps
-the top-level Turso fts and mimalloc defaults disabled; the top-level
-sync feature is also not enabled. Only local embedded Turso is used. Turso
-Cloud sync/database replication is outside this baseline and must not replace
-the validated signed-event anti-entropy protocol planned for OA-04.
+A signed event has this logical wire form. Rendering always uses RFC 8785/JCS:
 
-The only development dependency is Tokio with its macros and current-thread
-rt features, which are needed by the asynchronous integration smoke test.
-There is no resolved `rusqlite` or `libsqlite3-sys` dependency. OA-00 does not claim that arbitrary future native dependencies cannot link SQLite.
+```json
+{
+  "event_id": "evt1_<43 unpadded base64url characters>",
+  "body": {
+    "version": 1,
+    "context": "ctx1_<43>",
+    "parents": [],
+    "kind": "agent.request",
+    "author": "ed25519_<43>",
+    "payload": {}
+  },
+  "signature": "sig1_<86>"
+}
+```
 
-Turso 0.7.2 does not publish an upstream rust-version, so a successful build
-with this project's pin is local compatibility evidence, not an upstream MSRV
-guarantee. Even with the top-level optional features disabled, Turso
-unconditionally brings turso_core, turso_sdk_kit, and
-turso_sync_sdk_kit. The locked graph is materially large, includes
-build-time bindgen, and activates core storage/encryption facilities. It is
-captured in Cargo.lock and can be audited with:
+- `EventId`, `ContextId`, and `AuthorId` decode to exactly 32 bytes.
+- `EventSignature` decodes to exactly 64 bytes.
+- Text uses URL-safe base64 without padding and must decode/re-encode exactly.
+- Parents are strictly increasing by canonical `EventId` text and unique.
+- Kinds are 1–64 ASCII bytes under the frozen lowercase segment grammar.
+- Unicode is preserved without normalization.
+- Duplicate keys at every JSON depth, unknown envelope/body fields, BOMs, and
+  trailing JSON are rejected.
 
-    cargo tree --locked -e features
+### Identity and signature
 
-The bootstrap itself requires Bash, curl, mktemp, TLS CA certificates, and network access to the configured rustup installer. Overriding `RUSTUP_INIT_URL`, `CARGO_HOME`, or `RUSTUP_HOME` changes the trusted installer or installation location and is intended for controlled testing/automation.
+Canonical body bytes are hashed with BLAKE3 derive-key mode using:
 
-The host also needs the native build prerequisites required by the locked graph (including a C/C++ toolchain, CMake, and libclang). OA-00 does not
-install system packages or infer compatibility; its locked build and smoke test
-are the evidence.
+```text
+org.aaif.contextmesh.event-id.v1
+```
 
-## Layout and scope
+The Ed25519 signing message is:
 
-- src/model.rs, crypto.rs, and error.rs reserve the OA-01 contract.
-- src/store.rs reserves OA-02/OA-03 local DAG persistence.
-- src/sync.rs and http.rs reserve OA-04 event synchronization/transport.
-- src/provider.rs and both binaries reserve OA-05 provider/CLI work.
-- tests/fixtures/ is reserved for OA-01 golden vectors.
-- tests/smoke.rs is the only implemented behavior: it creates a fresh
-  in-memory local Turso database, creates a table, writes one row, reads it
-  back, and checks the result.
+```text
+ASCII("org.aaif.contextmesh.signature.v1") || NUL || raw_event_id[32]
+```
 
-Both placeholder binaries print a pending message and exit unsuccessfully, so automation cannot mistake them for implemented commands.
+Verification recomputes the ID and uses Ed25519 strict verification. A body can
+be signed only when its author equals the signing identity's public key.
+Private keys are neither serializable nor exposed. Production identities use
+fallible OS entropy; checked-in fixed seeds are explicitly test-only material.
 
-No signed-event contract, cryptography, persistent DAG/ref behavior, provider
-execution, HTTP service, multi-node synchronization, semantic context
-selection, Option B dependency, A2A/ACP integration, or Turso Cloud sync is
-implemented in OA-00.
+### Limits
 
-## Verification
+| Item | v1 limit |
+|---|---:|
+| Raw wire JSON | 2,097,152 bytes |
+| Canonical payload | 1,048,576 bytes |
+| Canonical body | 1,114,112 bytes |
+| Parents | 64 |
+| Payload depth | 64 |
+| Kind | 64 bytes |
+| Integer-valued JSON number | ±9,007,199,254,740,991 |
 
-From the repository root after sourcing the rustup environment:
+Larger exact integers must be strings. Finite non-integer binary64 values are
+allowed. Public failures use non-secret `ContractError` categories and
+external malformed input must not panic.
 
-    . "$HOME/.cargo/env"
-    cargo build --workspace --locked
-    cargo tree --locked -e features
-    cargo fmt --all -- --check
-    cargo clippy --workspace --all-targets --locked -- -D warnings
-    cargo test --workspace --locked
-    bash scripts/verify-oa00.sh
+## Golden vectors
 
-The matrix verifier exercises a controlled clean-home bootstrap, a failed-installer path, the genuine pinned local toolchain, exact dependency and feature boundaries, every quality command, the embedded Turso round trip, and the intentional demo failure.
+`tests/fixtures/oa01-v1-golden.json` records a deterministic fixed-seed event,
+canonical body/envelope bytes, ID, author key, signing message, and signature.
+The seed is public and must never be used in production. Tests also cover RFC
+8785 number and UTF-16 ordering examples, canonical-equivalent JSON, Unicode
+non-normalization, all signed-field mutations, strict duplicate detection at
+maximum depth, every typed encoding, strict-Ed25519 malleability/weak-key cases,
+limits (including exact raw-wire size), malformed input, and no-panic behavior.
 
-The final script is deliberately a sentinel until OA-06:
+Changing any v1 field, prefix, domain, limit, canonical bytes, ID, or signature
+now requires explicit human approval and normally a new wire version.
 
-    bash scripts/demo.sh
+## Dependency boundary
 
-It prints an OA-06 pending message and exits non-zero. That intentional
-failure prevents this placeholder baseline from reporting false A8 success.
+OA-01 uses exact audited versions of `serde_jcs`, `blake3`,
+`ed25519-dalek`, `getrandom`, `zeroize`, `base64`, Serde, and
+`thiserror`. Turso remains exactly 0.7.2 with top-level defaults and sync
+disabled. The captured graph is `cargo-tree-oa01-features.txt`.
+
+## Deferred scope
+
+- OA-02: Turso schema, admission authorization, parent existence/context, refs.
+- OA-03: projections and bundles.
+- OA-04: authenticated HTTP anti-entropy synchronization.
+- OA-05: provider recording and real CLI commands.
+- OA-06: two-node demonstration. Until then, `scripts/demo.sh` intentionally
+  exits 1.
+- Option B: semantic context selection and handoff.
+
+The current placeholder binaries also exit unsuccessfully so automation cannot
+mistake future OA-05 functionality for an implemented command.
