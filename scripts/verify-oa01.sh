@@ -46,9 +46,10 @@ for name, (req, defaults, features) in expected.items():
     assert dep["req"] == req
     assert dep["uses_default_features"] is defaults
     assert sorted(dep["features"]) == sorted(features)
-tokio = deps["tokio"]
-assert tokio["kind"] == "dev" and not tokio["uses_default_features"]
-assert sorted(tokio["features"]) == ["macros", "rt"]
+tokio_deps = [d for d in root["dependencies"] if d["name"] == "tokio"]
+tokio = next(d for d in tokio_deps if d["kind"] == "dev")
+assert tokio["req"] == "=1.53.1" and not tokio["uses_default_features"]
+assert sorted(tokio["features"]) == ["macros", "rt", "sync"]
 assert set(deps) == set(expected) | {"tokio"}
 forbidden_direct = {"rand", "rand_core", "hex", "regex", "uuid", "serde_json_canonicalizer", "signature", "axum", "reqwest", "libp2p"}
 assert not forbidden_direct.intersection(deps)
@@ -74,10 +75,10 @@ cargo test --locked --test oa01_golden checked_in_fixture_is_deterministically_r
 printf '%s\n' 'ok: frozen golden fixture checksum and regeneration match'
 
 # OA-01 must not implement deferred persistence, transport, provider, or CLI modules.
-for file in src/store.rs src/sync.rs src/http.rs src/provider.rs src/bin/contextmesh.rs src/bin/demo_agent.rs scripts/demo.sh; do
+for file in src/sync.rs src/http.rs src/provider.rs src/bin/contextmesh.rs src/bin/demo_agent.rs scripts/demo.sh; do
   git diff --exit-code "$BASELINE" -- "$file"
 done
-printf '%s\n' 'ok: OA-02/OA-04/OA-05/OA-06 surfaces remain deferred'
+printf '%s\n' 'ok: OA-04/OA-05/OA-06 surfaces remain deferred'
 
 cargo build --workspace --locked
 cargo fmt --all -- --check

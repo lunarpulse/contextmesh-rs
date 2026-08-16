@@ -1,9 +1,14 @@
-//! Typed, non-secret OA-01 failures.
+//! Typed, non-secret failures for the OA-01 contract and OA-02 store.
 
 use thiserror::Error;
 
+use crate::model::EventId;
+
 /// Result type used by the signed-event contract.
 pub type Result<T> = std::result::Result<T, ContractError>;
+
+/// Result type used by the transactional store.
+pub type StoreResult<T> = std::result::Result<T, StoreError>;
 
 /// Stable validation categories returned for all external-input failures.
 ///
@@ -59,4 +64,69 @@ pub enum ContractError {
     /// The Ed25519 public key or signature is malformed or does not verify.
     #[error("event signature is invalid")]
     SignatureInvalid,
+}
+
+/// Stable, non-secret OA-02 storage and admission failures.
+#[derive(Clone, Debug, Eq, Error, PartialEq)]
+pub enum StoreError {
+    /// The local database could not be opened or accessed.
+    #[error("local database unavailable")]
+    DatabaseUnavailable,
+    /// A migration failed or an existing schema is incomplete.
+    #[error("database migration failed")]
+    MigrationFailed,
+    /// The database schema is newer than this binary supports.
+    #[error("database schema is newer than supported")]
+    NewerSchema,
+    /// Stored rows contradict the canonical event or schema invariants.
+    #[error("stored data is corrupt")]
+    CorruptStorage,
+    /// The context has not been explicitly provisioned.
+    #[error("context is not provisioned")]
+    ContextUnknown,
+    /// The context already exists with different provisioning data.
+    #[error("context provisioning conflicts with existing policy")]
+    ContextProvisionMismatch,
+    /// The pending context received the wrong genesis event.
+    #[error("event does not match the provisioned genesis")]
+    GenesisMismatch,
+    /// The event author is not in the context's local allowlist.
+    #[error("event author is not authorized for this context")]
+    UnauthorizedAuthor,
+    /// A required parent event is absent.
+    #[error("event parent is missing: {0}")]
+    ParentMissing(EventId),
+    /// A parent belongs to another context.
+    #[error("event parent belongs to another context: {0}")]
+    ParentContextMismatch(EventId),
+    /// An existing EventId maps to different canonical wire bytes.
+    #[error("event identifier collides with different canonical bytes")]
+    EventCollision,
+    /// A local-ref or peer name is noncanonical or out of bounds.
+    #[error("invalid ref or peer name")]
+    InvalidRefName,
+    /// A requested ref mutation does not target the admitted event and context.
+    #[error("ref mutation does not match admitted event")]
+    RefMutationMismatch,
+    /// A referenced ref is absent.
+    #[error("ref does not exist")]
+    RefMissing,
+    /// A ref expected to be absent already exists.
+    #[error("ref already exists")]
+    RefAlreadyExists,
+    /// Compare-and-swap observed a different current head.
+    #[error("stale ref head")]
+    StaleHead {
+        /// The current head, or None if the ref is absent.
+        current: Option<EventId>,
+    },
+    /// A store-specific count or allocation bound was exceeded.
+    #[error("store limit exceeded")]
+    LimitExceeded,
+    /// Commit acknowledgement was indeterminate; a safe retry is required.
+    #[error("database commit outcome is indeterminate")]
+    IndeterminateCommit,
+    /// OA-01 rejected the event before storage admission.
+    #[error(transparent)]
+    Contract(#[from] ContractError),
 }

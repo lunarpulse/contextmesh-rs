@@ -2,11 +2,11 @@
 title: 'OA-02 Transactional Turso DAG Store and Ref Semantics'
 type: 'feature'
 created: '2026-08-16'
-status: 'approved-for-execution'
+status: 'done'
 approved: '2026-08-16'
 approved_by: 'Lunarpulse'
 baseline_commit: 'e82b386'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/spec-signed-agent-context-dag.md'
   - '{project-root}/_bmad-output/planning-artifacts/oa-02-oa-07-detailed-execution-plan.md'
@@ -161,16 +161,16 @@ Errors carry no SQL, canonical wire, payload, seed, token, or arbitrary database
 
 ## Tasks and acceptance
 
-- [ ] Record and lock any minimal Tokio runtime feature delta; preserve Turso 0.7.2/defaults-off.
-- [ ] Implement schema v1, exact migrations, foreign-key setup, and immutable triggers.
-- [ ] Implement typed names, provision/context policy, append-only authorization.
-- [ ] Implement exact-wire admission, parent checks, idempotence/collision handling.
-- [ ] Implement local-ref CAS and separate remote-ref query namespace.
-- [ ] Implement stable non-secret StoreError behavior.
-- [ ] Add fresh/reopen/restart, valid admission, policy, idempotence, CAS, concurrency tests.
-- [ ] Add every invalid-admission rollback snapshot and malformed-storage no-panic tests.
-- [ ] Add verifier/spec/README current-state documentation without implementing OA-03+.
-- [ ] Complete schema/migration, transaction/concurrency, policy/admission, and API/supply-chain adversarial reviews; patch findings.
+- [x] Record and lock minimal Tokio runtime/dev feature deltas; preserve Turso 0.7.2/defaults-off.
+- [x] Implement schema v1, migration/fingerprint checks, per-connection foreign-key setup, integrity scan, and immutable triggers.
+- [x] Implement typed names, bounded provisioning/context policy, and append-only authorization.
+- [x] Implement exact-wire authority, parent checks, stored-column/edge validation, idempotence/collision handling.
+- [x] Implement local-ref CAS and separate remote-ref namespace.
+- [x] Implement stable non-secret StoreError behavior.
+- [x] Add fresh/reopen/restart, valid admission, policy, idempotence, CAS, and independent-store concurrency tests.
+- [x] Add invalid-admission rollback, malformed wire/storage, schema failure, trigger, collision, bound, and typed-mismatch tests.
+- [x] Add verifier, locked feature snapshot, probe evidence, and current-state README without implementing OA-03+.
+- [x] Complete schema/transaction, concurrency/CAS, API/resource, and supply-chain adversarial review layers; patch all actionable findings.
 
 Acceptance requires:
 
@@ -180,6 +180,14 @@ Acceptance requires:
 - existing events and edges cannot be mutated through public APIs;
 - duplicate identical admission is safe and collision fails closed;
 - all OA-00/OA-01 gates and frozen fixture checks remain green.
+
+## Change log
+
+- 2026-08-16, review loop 1: implemented schema v1, fingerprint/object/foreign-key checks, immutable triggers, exact canonical-wire authority, bounded append-only policy, parent/context admission, idempotence/collision behavior, transactional CAS refs, remote namespace separation, stable errors, and locked tests. Self-review added stored-column/edge validation, authoritative parent context checks, typed ref-mutation mismatch, provisioning bounds, and explicit schema integrity checks. No OA-01 canonical bytes or vectors changed.
+
+## Final review evidence
+
+Review loop 1 patched per-connection foreign keys, active-genesis idempotence, append-only policy behavior, schema fingerprint/object/foreign-key checks, canonical-wire authority over denormalized rows, stored-edge validation, authoritative parent/ref context checks, typed ref-mutation mismatch, provisioning bounds, independent-Store CAS behavior, strict verifier dependency selection, and an erroneous conversion. Production store/error code contains no unwrap, expect, panic, or unsafe block.
 
 ## Verification
 
