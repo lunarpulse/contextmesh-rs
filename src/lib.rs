@@ -6,11 +6,19 @@
 //! These facilities authenticate and preserve caller-selected history. They do
 //! not infer relevance or truth, provide consensus, or perform provider/network
 //! operations; those remain explicit later work packages.
+//!
+//! Option B adds task-conditioned source selection and bounded context
+//! compilation over that history: self-contained signed receipts (OB-01) and
+//! the deterministic baseline selector with budget enforcement (OB-02).
+//! Relevance scoring is a derived, recorded Option B artifact — it never
+//! rewrites or extends Option A history.
 
 #![warn(missing_docs)]
 
 /// Stable automation command-line interface.
 pub mod cli;
+/// Option B context compiler: bounded source-reference assembly.
+pub mod compiler;
 /// Domain-separated signing, hashing, and verification primitives.
 pub mod crypto;
 /// Typed non-secret contract failures.
@@ -23,6 +31,8 @@ pub mod model;
 pub mod provider;
 /// Option B agent-experience receipts and derived selection layer.
 pub mod receipt;
+/// Option B task-conditioned source selection core.
+pub mod selection;
 /// Embedded Turso persistence, DAG/ref operations, bundles, and verification.
 pub mod store;
 /// Strict synchronization protocol, pull state machine, and reports.

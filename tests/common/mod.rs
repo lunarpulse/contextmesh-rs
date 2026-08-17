@@ -30,6 +30,7 @@ pub fn genesis(who: &SigningIdentity, context: ContextId) -> SignedEventV1 {
     who.create_event(context, vec![], "context.genesis", json!({}))
         .unwrap()
 }
+#[allow(dead_code)] // each integration test binary uses a subset of these helpers
 pub fn child(
     who: &SigningIdentity,
     context: ContextId,
