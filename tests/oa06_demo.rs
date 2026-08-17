@@ -287,13 +287,17 @@ fn concurrent_demos_use_independent_ports() {
     }
     let left = left.wait_with_output().expect("collect left");
     let right = right.wait_with_output().expect("collect right");
-    std::fs::remove_dir_all(left_base).ok();
-    std::fs::remove_dir_all(right_base).ok();
     assert_eq!(left.status.code(), Some(0), "left demo failed");
     assert_eq!(right.status.code(), Some(0), "right demo failed");
     let left_stdout = String::from_utf8_lossy(&left.stdout);
     let right_stdout = String::from_utf8_lossy(&right.stdout);
     assert!(left_stdout.contains("demo: PASS"), "left demo missing PASS");
+    assert!(
+        right_stdout.contains("demo: PASS"),
+        "right demo missing PASS"
+    );
+    std::fs::remove_dir_all(left_base).ok();
+    std::fs::remove_dir_all(right_base).ok();
     assert!(
         right_stdout.contains("demo: PASS"),
         "right demo missing PASS"

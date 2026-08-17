@@ -2,12 +2,12 @@
 title: 'OA-07 Release Verification and Option A Gate'
 type: 'implementation-spec'
 created: '2026-08-17'
-status: 'frozen'
+status: 'done'
 approved_plan: '../planning-artifacts/oa-02-oa-07-detailed-execution-plan.md'
 decision_record: '../planning-artifacts/oa-02-oa-07-decision-record.md'
 baseline_commit: 'c3c9dd4'
-review_loop_iteration: 0
-option_b_gate: 'blocked-until-OA-07-A1-A8'
+review_loop_iteration: 1
+option_b_gate: 'unblocked-by-complete-verdict'
 ---
 
 # OA-07 Release Verification and Option A Gate
@@ -213,3 +213,79 @@ Freeze verdict: ready for implementation from baseline c3c9dd4. Review loop
 iteration remains zero because no implementation exists yet. Option B stays
 blocked until this spec records a complete A1-A8 verdict.
 
+
+## Implementation review and evidence (iteration 1)
+
+The release procedure was executed on the candidate tree; the eight
+independent audit layers ran as delegated adversarial reviews and all
+completed. Verdicts: crypto, database, graph, transport, provider, shell,
+and claims — release-ready with non-blocking findings recorded in the
+evidence and claim audit; supply-chain — release-ready after two fixes
+below. No product code changed (the OA-07 boundary held).
+
+Findings and resolutions:
+
+1. Supply-chain blocker: verify-oa07.sh's forbidden-package list wrongly
+   banned rand/rand_core/hex/regex/uuid/signature from the transitive
+   closure, though they appear legitimately via ed25519-dalek and turso.
+   Fixed: the closure ban covers capability surfaces only; the six are
+   banned as direct dependencies, asserted separately.
+2. Supply-chain state blocker: evidence was uncommitted with placeholders
+   (expected mid-procedure). Resolved by finalization and the evidence
+   commit; the gate additionally asserts HEAD is exactly the OA-07
+   evidence commit whose parent matches the recorded candidate commit and
+   procedure tree.
+3. Shell minors fixed in gate-owned files: the whole gate now runs with
+   CARGO_NET_OFFLINE=true; tmp_chain is initialized before the trap
+   references it; verify-oa06.sh scans both stdout and stderr for token
+   prefixes explicitly, keeps the PASS-summary assertion, and no longer
+   leaks its stderr temp file; the concurrent demo test removes its base
+   directories only after its assertions; verify-oa07.sh re-asserts a
+   clean worktree at the end.
+4. Sequencing discovery (disclosed in the evidence): the OA-06 verifier's
+   full gate includes commit-sensitive tests (porcelain before/after and
+   the ignored fresh-checkout test), so the chained procedure can only
+   pass on a committed tree. Two pre-commit chain runs were interrupted
+   (one by concurrent evidence authoring tripping the porcelain canary —
+   the canary worked as designed; one by the verify-oa06 README-reference
+   grep after the README advanced to OA-07 wording, fixed by the owning
+   package to accept the current release-gate reference). The
+   authoritative procedure execution is scripts/verify-oa07.sh on the
+   committed evidence tree.
+5. Product-level minors from the database/provider/graph/transport/crypto
+   layers are recorded as limitations and claim-audit rows, not fixed
+   here: OA-07 adds no product behavior, and none is a release blocker
+   (every layer verdicted release-ready).
+6. Release-gate flake repair (one OA-05 test, no product code): the gate
+   caught an intermittent failure in
+   command_provider_maps_failures_without_hanging (tests/oa05_jsonl.rs).
+   The /bin/echo child never reads stdin, so under load it can exit before
+   the request write completes and the pipe-EOF race flips the recorded
+   classification between provider_transport and provider_malformed.
+   Replaced with /bin/cat, which reads stdin to EOF and echoes the request
+   back — valid JSON but never a provider response — making the
+   provider_malformed classification deterministic with the assertion
+   unchanged. Stress-verified: three consecutive full oa05_jsonl target
+   runs green (each includes the frozen 30-second timeout-kill test).
+
+Verification evidence (pinned Rust 1.97.0):
+
+- The deterministic gate scripts/verify-oa07.sh exits 0 on the final
+  evidence commit: clean worktree and evidence/parent identity, pinned
+  toolchain and native prerequisites with no overrides, exact dependency
+  pins with the 320-crate closure and permissive-license allowlist, the
+  full OA-00..OA-06 chain (>= 155 ok checkpoints, no failure markers),
+  the fresh-target offline repetition (build, Clippy, tests, demo), the
+  secret and runtime-artifact scans, the eight recorded audit layers, the
+  A1-A8 rows, and the Always/Never table.
+- cargo audit 0.22.2 against RustSec advisory-db 69f93e1d (2026-08-12):
+  0 vulnerabilities over the 320-crate closure; recorded in the evidence,
+  with the offline gate verifying the recorded closure count.
+- Evidence artifacts: verification-artifacts/oa-07-release-evidence.md
+  and oa-07-claim-audit.md, committed with no keys, tokens, sensitive
+  paths, or arbitrary payloads.
+
+Freeze verdict updated: implementation complete, review loop iteration 1.
+verdict: complete — Option A A1-A8 satisfied with direct evidence; Option
+B is unblocked by this verdict per the frozen gating rule, and no Option B
+work is part of this release.

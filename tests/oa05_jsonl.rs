@@ -170,8 +170,11 @@ async fn command_provider_maps_failures_without_hanging() {
     assert!(
         matches!(&outcome, ProviderOutcome::Failure { code, .. } if *code == "provider_transport")
     );
-    // Malformed output: echo is not a JSON provider response.
-    let echo = CommandProvider::new("/bin/echo", vec!["hello".into()]);
+    // Malformed output: cat echoes the request back; it is valid JSON but
+    // never a provider response, so the classification is deterministic.
+    // (A plain echo-style child can exit before the request write completes,
+    // racing the classification between transport and malformed.)
+    let echo = CommandProvider::new("/bin/cat", Vec::new());
     let outcome = echo.invoke(&invocation("inv1_t2").await).await;
     assert!(
         matches!(&outcome, ProviderOutcome::Failure { code, .. } if *code == "provider_malformed")

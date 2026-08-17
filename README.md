@@ -1,12 +1,13 @@
 # contextmesh
 
-contextmesh currently implements **OA-06**: the frozen OA-01 signed-event
-contract, OA-02 transactional local store, OA-03 semantic-free DAG operations,
-deterministic projection, strict bounded Bundle v1 transfer, full-store
-integrity verification, OA-04 authenticated pull-only HTTP/1 synchronization,
-OA-05 provider recording with a stable automation CLI, and the OA-06
-reproducible two-node demonstration. OA-00's Rust 1.97/Turso baseline remains
-intact.
+contextmesh currently implements **OA-07**: Option A is complete — the
+frozen OA-01 signed-event contract, OA-02 transactional local store, OA-03
+semantic-free DAG operations, deterministic projection, strict bounded
+Bundle v1 transfer, full-store integrity verification, OA-04 authenticated
+pull-only HTTP/1 synchronization, OA-05 provider recording with a stable
+automation CLI, the OA-06 reproducible two-node demonstration, and the
+OA-07 release evidence with the A1-A8 completion verdict. OA-00's Rust
+1.97/Turso baseline remains intact.
 
 ## Toolchain and verification
 
@@ -16,20 +17,22 @@ rust-toolchain.toml. Install or refresh the user-local toolchain without root:
     bash scripts/bootstrap-rust.sh
     . "$HOME/.cargo/env"
 
-Verify the current OA-06 state from the repository root:
+Verify the released Option A state from the repository root:
 
     cargo build --workspace --locked
     cargo fmt --all -- --check
     cargo clippy --workspace --all-targets --locked -- -D warnings
     cargo test --workspace --locked
-    bash scripts/verify-oa06.sh
+    bash scripts/verify-oa07.sh
 
-verify-oa06.sh runs the seventeen-stage two-node demo, the OA-06 test matrix
-including an independent fresh-checkout execution, asserts no dependency
-change since OA-05, and chains the OA-00 through OA-05 verifiers plus the
-D-04-01 dependency-probe verifier. The verifiers check exact
-dependencies/features, locked feature graphs, fixture stability, regression
-matrices, deferred-module boundaries, and every quality command.
+verify-oa07.sh is the deterministic non-recording release gate: it asserts
+a clean worktree with committed evidence matching HEAD, the pinned
+toolchain and native prerequisites with no overrides, exact dependencies
+and the 320-crate closure with permissive licenses, the full OA-00 through
+OA-06 verifier chain, a fresh-target offline repetition of the build,
+Clippy, tests, and demo, secret and runtime-artifact scans, and the eight
+audit layers plus the A1-A8 evidence matrix and Always/Never consistency
+table recorded in the evidence artifacts.
 
 ## Transactional local store
 
@@ -284,8 +287,10 @@ OA-05's exact locked feature graph is cargo-tree-oa05-features.txt.
 
 ## Deferred scope
 
-- OA-07: release evidence and Option A completion verdict.
-- Option B: semantic context selection and handoff.
+- Option B: semantic context selection and handoff — unblocked by the
+  complete OA-07 verdict; no Option B work has begun.
 
-Option B remains blocked until OA-07 records Option A complete with direct
-A1-A8 evidence.
+The release evidence is _bmad-output/verification-artifacts/
+oa-07-release-evidence.md and the claim audit is oa-07-claim-audit.md in
+the same directory. Any future Option B work must keep Option A's frozen
+wire, bounds, and claim discipline or seek explicit approval.

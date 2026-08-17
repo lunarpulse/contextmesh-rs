@@ -33,7 +33,9 @@ printf '%s\n' 'ok: the demo sentinel was replaced by the real two-node harness'
 grep -q '## Reproducible two-node demo' README.md
 grep -q '## Network deployment guidance' README.md
 grep -q '## Claims, non-claims, and prohibited statements' README.md
-grep -q 'verify-oa06.sh' README.md
+# OA-07 renamed the entry-point gate; the README must reference whichever
+# release verifier is current (owning-package update per the OA-04+ precedent).
+grep -Eq 'verify-oa0(6|7)\.sh' README.md
 printf '%s\n' 'ok: README documents the demo, deployment guidance, and claims'
 
 cargo build --workspace --locked
@@ -47,12 +49,17 @@ cargo test --locked --test oa06_demo -- --ignored fresh_checkout_demo_passes
 printf '%s\n' 'ok: OA-06 demo matrix and independent fresh-checkout execution passed'
 
 demo_err="$(mktemp)"
-demo_output="$(bash scripts/demo.sh 2>"$demo_err")"
-[[ "$demo_output" == *"demo: PASS"* ]] || {
+if ! demo_output="$(bash scripts/demo.sh 2>"$demo_err")"; then
+  rm -f "$demo_err"
+  printf '%s\n' 'demo exited unsuccessfully' >&2
+  exit 1
+fi
+if [[ "$demo_output" != *"demo: PASS"* ]]; then
+  rm -f "$demo_err"
   printf '%s\n' 'demo completed without a PASS summary' >&2
   exit 1
-}
-if grep -q 'token1_' "$demo_err" <<<"$demo_output"; then
+fi
+if grep -q 'token1_' "$demo_err" || grep -q 'token1_' <<<"$demo_output"; then
   printf '%s\n' 'token prefix leaked from the demo' >&2
   rm -f "$demo_err"
   exit 1
