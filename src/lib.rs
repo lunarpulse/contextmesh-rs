@@ -21,6 +21,8 @@ pub mod http;
 pub mod model;
 /// Provider recording boundary and invocation contract.
 pub mod provider;
+/// Option B agent-experience receipts and derived selection layer.
+pub mod receipt;
 /// Embedded Turso persistence, DAG/ref operations, bundles, and verification.
 pub mod store;
 /// Strict synchronization protocol, pull state machine, and reports.
