@@ -12,6 +12,9 @@
 //! the deterministic baseline selector with budget enforcement (OB-02).
 //! Relevance scoring is a derived, recorded Option B artifact — it never
 //! rewrites or extends Option A history.
+//!
+//! OB-03 and OB-04 extend that layer with dependency closure and critical/risk
+//! coverage, and the recipient-known-history delta for state-safe handoff.
 
 #![warn(missing_docs)]
 
@@ -23,6 +26,8 @@ pub mod closure;
 pub mod compiler;
 /// Domain-separated signing, hashing, and verification primitives.
 pub mod crypto;
+/// Option B recipient-known-history delta.
+pub mod delta;
 /// Typed non-secret contract failures.
 pub mod error;
 /// Authenticated bounded HTTP/1 transport for pull synchronization.
