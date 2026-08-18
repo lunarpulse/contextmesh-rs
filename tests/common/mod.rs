@@ -26,6 +26,7 @@ pub fn sorted_authors(mut authors: Vec<AuthorId>) -> Vec<AuthorId> {
 pub fn context(byte: u8) -> ContextId {
     ContextId::from_bytes([byte; 32])
 }
+#[allow(dead_code)] // each integration test binary uses a subset of these helpers
 pub fn genesis(who: &SigningIdentity, context: ContextId) -> SignedEventV1 {
     who.create_event(context, vec![], "context.genesis", json!({}))
         .unwrap()

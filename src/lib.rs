@@ -17,6 +17,8 @@
 
 /// Stable automation command-line interface.
 pub mod cli;
+/// Option B dependency closure and critical-risk coverage.
+pub mod closure;
 /// Option B context compiler: bounded source-reference assembly.
 pub mod compiler;
 /// Domain-separated signing, hashing, and verification primitives.
