@@ -15,6 +15,10 @@
 //!
 //! OB-03 and OB-04 extend that layer with dependency closure and critical/risk
 //! coverage, and the recipient-known-history delta for state-safe handoff.
+//!
+//! OB-05 binds that delta to the recipient head it was computed against: a
+//! handoff is valid only against that head, and a stale handoff is rejected
+//! and re-derived, never applied.
 
 #![warn(missing_docs)]
 
@@ -30,6 +34,8 @@ pub mod crypto;
 pub mod delta;
 /// Typed non-secret contract failures.
 pub mod error;
+/// Option B state-bound handoff validity.
+pub mod handoff;
 /// Authenticated bounded HTTP/1 transport for pull synchronization.
 pub mod http;
 /// Strict versioned event and wire-format types.
