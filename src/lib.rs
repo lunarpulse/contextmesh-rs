@@ -43,9 +43,16 @@
 //! OB-09 produces derived, verifiable summaries at hierarchical levels
 //! (event → ref → project) as content-addressed references over Option A
 //! history, so a recipient can enter a large history at the right altitude.
+//!
+//! OB-11 models what a recipient can do alongside what it knows: the
+//! capability model is recorded and versioned per recipient, and a handoff
+//! respects the recipient's stated capabilities — a capability mismatch is
+//! flagged in the omission/uncertainty list, never assumed.
 
 #![warn(missing_docs)]
 
+/// Option B recipient capability modeling.
+pub mod capability;
 /// Stable automation command-line interface.
 pub mod cli;
 /// Option B dependency closure and critical-risk coverage.
