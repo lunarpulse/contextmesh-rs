@@ -39,6 +39,10 @@
 //! only when the frozen B8 evaluation backs it, minimality only when the
 //! recorded metric (selected count/bytes against budget) backs it, and any
 //! claim beyond the metric is refused.
+//!
+//! OB-09 produces derived, verifiable summaries at hierarchical levels
+//! (event → ref → project) as content-addressed references over Option A
+//! history, so a recipient can enter a large history at the right altitude.
 
 #![warn(missing_docs)]
 
@@ -72,5 +76,7 @@ pub mod repair;
 pub mod selection;
 /// Embedded Turso persistence, DAG/ref operations, bundles, and verification.
 pub mod store;
+/// Option B hierarchical and project summaries.
+pub mod summary;
 /// Strict synchronization protocol, pull state machine, and reports.
 pub mod sync;
