@@ -18,12 +18,24 @@
 //! configuration hash) is recorded in every result. Changing the selector
 //! version changes the recorded version, never the history. Option A modules
 //! are untouched; this module reads events read-only through the store.
+//!
+//! Gate B10 adds the sufficiency/minimality claim discipline over that
+//! selection: sufficiency is claimed only when the frozen B8 evaluation backs
+//! it (the task succeeds with the selected context), minimality only when a
+//! recorded metric (selected count/bytes against budget) backs it, and any
+//! claim beyond the metric is refused.
 
 use serde::Serialize;
 use serde_json::Value;
 use thiserror::Error;
 
+use crate::closure::{
+    ClosedSelection, ClosureError, ClosureLimits, CriticalPolicy, close_selection,
+};
 use crate::compiler::{CompiledContext, compile_context};
+use crate::delta::{DeltaError, RecipientState, compute_delta};
+use crate::eval::simulate;
+use crate::handoff::{Handoff, HandoffError};
 use crate::model::{AuthorId, ContextId, EventId, SignedEventV1, canonical_payload_bytes};
 use crate::receipt::{SelectorRecordV1, TaskRecordV1, task_content_hash};
 use crate::store::Store;
@@ -488,4 +500,217 @@ pub async fn select_sources(
         uncertainty,
         selector: selector_provenance,
     })
+}
+
+// ---------------------------------------------------------------------------
+// OB-10 — minimal-sufficient-context claim discipline (gate B10).
+//
+// Sufficiency is claimed only when the frozen B8 evaluation backs it (the
+// task succeeds with the selected context); minimality is claimed only when a
+// recorded metric (selected count/bytes against budget) backs it; any claim
+// beyond the metric is refused.
+// ---------------------------------------------------------------------------
+
+/// A recorded selection metric: selected count and exported bytes against
+/// the budget the selection was computed under (gate B10).
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+pub struct SelectionMetric {
+    /// Number of selected sources.
+    pub selected_events: usize,
+    /// Total canonical exported bytes of the selection.
+    pub exported_bytes: usize,
+    /// Budget cap on selected events.
+    pub max_selected_events: usize,
+    /// Budget cap on exported bytes.
+    pub max_exported_bytes: usize,
+}
+
+impl SelectionMetric {
+    /// Records the metric from a closed selection and its budget.
+    #[must_use]
+    pub fn record(closed: &ClosedSelection, budget: &SelectionBudget) -> Self {
+        Self {
+            selected_events: closed.selected().len(),
+            exported_bytes: closed.total_bytes(),
+            max_selected_events: budget.max_selected_events,
+            max_exported_bytes: budget.max_exported_bytes,
+        }
+    }
+
+    /// Returns true when the recorded selection stays within its budget.
+    #[must_use]
+    pub fn within_budget(&self) -> bool {
+        self.selected_events <= self.max_selected_events
+            && self.exported_bytes <= self.max_exported_bytes
+    }
+}
+
+/// The recorded evidence that backs a sufficiency or minimality claim
+/// (gate B10).
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ClaimBasis {
+    /// The frozen B8 evaluation demonstrated task success.
+    B8Evaluation,
+    /// A recorded selection metric (selected count/bytes against budget).
+    Metric,
+}
+
+/// A typed sufficiency claim: sufficiency is claimed only when the frozen B8
+/// evaluation backs it, and the claim carries its basis so the backing is
+/// auditable from the claim alone.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+pub struct SufficiencyClaim {
+    /// Whether the selection is sufficient for the task.
+    pub sufficient: bool,
+    /// The recorded evidence backing the claim.
+    pub basis: ClaimBasis,
+}
+
+/// A typed minimality claim: removal-minimality is claimed only when the
+/// recorded metric backs it, and the claim carries both the metric and its
+/// basis.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
+pub struct MinimalityClaim {
+    /// Whether the selection is removal-minimal (every selected source is
+    /// load-bearing: removing any one breaks sufficiency).
+    pub minimal: bool,
+    /// The recorded metric backing the claim.
+    pub metric: SelectionMetric,
+    /// The recorded evidence backing the claim.
+    pub basis: ClaimBasis,
+}
+
+/// The claim-scope vocabulary (gate B10).
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ClaimRequest {
+    /// Sufficiency: the task succeeds with the selected context.
+    Sufficiency,
+    /// Removal-minimality: every selected source is load-bearing.
+    RemovalMinimality,
+    /// Global minimality across the candidate set: never backed by the
+    /// recorded metric.
+    GlobalMinimality,
+}
+
+/// A refused claim: beyond what the recorded evidence shows (gate B10).
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct ClaimRefusal {
+    /// The requested claim that was refused.
+    pub requested: String,
+    /// Why the recorded evidence cannot back it.
+    pub reason: String,
+    /// The recorded metric, when one was offered.
+    pub metric: Option<SelectionMetric>,
+}
+
+impl ClaimRefusal {
+    /// Refuses a claim the recorded evidence cannot back. Sufficiency
+    /// without the B8 evaluation and minimality beyond the metric are always
+    /// refused.
+    #[must_use]
+    pub fn refuse(request: ClaimRequest, metric: Option<SelectionMetric>) -> Self {
+        let (requested, reason) = match request {
+            ClaimRequest::Sufficiency => (
+                "sufficiency",
+                "sufficiency is claimed only when the frozen B8 evaluation backs it",
+            ),
+            ClaimRequest::RemovalMinimality => (
+                "removal-minimality",
+                "removal-minimality is claimed only when the recorded metric backs it",
+            ),
+            ClaimRequest::GlobalMinimality => (
+                "global-minimality",
+                "the recorded metric proves removal-minimality only, never global minimality",
+            ),
+        };
+        Self {
+            requested: requested.to_owned(),
+            reason: reason.to_owned(),
+            metric,
+        }
+    }
+}
+
+/// Stable typed sufficiency/minimality check failures (gate B10).
+#[derive(Debug, Error)]
+pub enum ClaimError {
+    /// The recipient-known-history delta failed during the check.
+    #[error("sufficiency/minimality delta computation failed")]
+    Delta(#[from] DeltaError),
+    /// The handoff construction failed during the check.
+    #[error("sufficiency/minimality handoff construction failed")]
+    Handoff(#[from] HandoffError),
+    /// The dependency closure failed during the check.
+    #[error("sufficiency/minimality closure failed")]
+    Closure(#[from] ClosureError),
+    /// An internal checked invariant failed.
+    #[error("sufficiency/minimality check internal failure")]
+    Internal,
+}
+
+/// Checks sufficiency of a closed selection against the frozen B8 evaluation:
+/// builds the handoff the selection delivers and runs the eval's simulated
+/// recipient against the task's critical events. The claim's basis is the B8
+/// evaluation; a selection that hides a critical fact is never sufficient.
+pub async fn check_sufficiency(
+    store: &Store,
+    context: ContextId,
+    genesis: EventId,
+    critical: &[EventId],
+    closed: &ClosedSelection,
+    limits: &ClosureLimits,
+) -> Result<SufficiencyClaim, ClaimError> {
+    let recipient = RecipientState::at_head(store, context, genesis, limits).await?;
+    let handoff = Handoff::from_delta(compute_delta(store, closed, &recipient).await?)?;
+    let result = simulate(&handoff, critical);
+    let sufficient = result.completed && result.hidden.is_empty();
+    Ok(SufficiencyClaim {
+        sufficient,
+        basis: ClaimBasis::B8Evaluation,
+    })
+}
+
+/// Checks removal-minimality of a selection: every selected source must be
+/// load-bearing — removing any one of them must make the selection
+/// insufficient under the B8 evaluation. The claim's basis is the recorded
+/// metric (selected count/bytes against the budget).
+pub async fn check_minimality(
+    store: &Store,
+    context: ContextId,
+    genesis: EventId,
+    critical: &[EventId],
+    closed: &ClosedSelection,
+    budget: &SelectionBudget,
+    limits: &ClosureLimits,
+) -> Result<MinimalityClaim, ClaimError> {
+    let metric = SelectionMetric::record(closed, budget);
+    let mut minimal = true;
+    for removed in closed.selected() {
+        let reduced: Vec<EventId> = closed
+            .selected()
+            .iter()
+            .filter(|event| *event != removed)
+            .copied()
+            .collect();
+        let reduced_closed =
+            close_selection(store, context, &reduced, &reduced, &no_add_policy(), limits).await?;
+        let claim =
+            check_sufficiency(store, context, genesis, critical, &reduced_closed, limits).await?;
+        if claim.sufficient {
+            minimal = false;
+            break;
+        }
+    }
+    Ok(MinimalityClaim {
+        minimal,
+        metric,
+        basis: ClaimBasis::Metric,
+    })
+}
+
+/// The check closure policy: a kind that never appears in the B8 eval chains,
+/// so the closure adds nothing and the checks measure the selection alone.
+fn no_add_policy() -> CriticalPolicy {
+    CriticalPolicy::new(vec!["ob10.no-critical-kind".to_owned()]).expect("static no-add policy")
 }

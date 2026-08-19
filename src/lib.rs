@@ -34,6 +34,11 @@
 //! measurable: a curated task set with known critical-context annotations,
 //! run in two sub-modes (challenge probes and task benchmarks), where the
 //! withheld-context case fails and the repaired case passes.
+//!
+//! OB-10 adds the claim discipline for that selection: sufficiency is claimed
+//! only when the frozen B8 evaluation backs it, minimality only when the
+//! recorded metric (selected count/bytes against budget) backs it, and any
+//! claim beyond the metric is refused.
 
 #![warn(missing_docs)]
 
