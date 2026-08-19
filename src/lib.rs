@@ -48,6 +48,12 @@
 //! capability model is recorded and versioned per recipient, and a handoff
 //! respects the recipient's stated capabilities — a capability mismatch is
 //! flagged in the omission/uncertainty list, never assumed.
+//!
+//! OB-12 records the semantic-mechanisms decision (B2's named heavy
+//! mechanisms — embeddings, vector search, reranking): no candidate passes
+//! the frozen forbidden-surface audit and the pinned 320-dependency closure,
+//! so non-adoption is recorded with the demonstrated lexical baseline and the
+//! B8 evaluation results — a recorded decision, never a silent deferral.
 
 #![warn(missing_docs)]
 
