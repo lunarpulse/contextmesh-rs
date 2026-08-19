@@ -16,13 +16,16 @@ pub fn path(label: &str) -> PathBuf {
     let _ = std::fs::remove_file(&path);
     path
 }
+#[allow(dead_code)] // each integration test binary uses a subset of these helpers
 pub fn identity(seed: u8) -> SigningIdentity {
     SigningIdentity::from_fixture_seed([seed; 32])
 }
+#[allow(dead_code)] // each integration test binary uses a subset of these helpers
 pub fn sorted_authors(mut authors: Vec<AuthorId>) -> Vec<AuthorId> {
     authors.sort_by_key(ToString::to_string);
     authors
 }
+#[allow(dead_code)] // each integration test binary uses a subset of these helpers
 pub fn context(byte: u8) -> ContextId {
     ContextId::from_bytes([byte; 32])
 }
@@ -46,6 +49,7 @@ pub fn child(
     )
     .unwrap()
 }
+#[allow(dead_code)] // each integration test binary uses a subset of these helpers
 pub async fn provision(store: &Store, event: &SignedEventV1, authors: Vec<AuthorId>) {
     store
         .provision_context(ContextProvision {
@@ -56,6 +60,7 @@ pub async fn provision(store: &Store, event: &SignedEventV1, authors: Vec<Author
         .await
         .unwrap();
 }
+#[allow(dead_code)] // each integration test binary uses a subset of these helpers
 pub fn main_cas(context: ContextId, expected: RefExpectation, head: EventId) -> RefMutation {
     RefMutation::CompareAndSwap {
         context,

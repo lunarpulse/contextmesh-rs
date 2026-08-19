@@ -29,6 +29,11 @@
 //! comprehension or task failure it iteratively re-includes omitted context
 //! and re-handoffs, recording every attempt to a distinct JSON-lines history
 //! file and always reporting convergence or non-convergence.
+//!
+//! OB-08 ships the frozen, offline evaluation suite that makes comprehension
+//! measurable: a curated task set with known critical-context annotations,
+//! run in two sub-modes (challenge probes and task benchmarks), where the
+//! withheld-context case fails and the repaired case passes.
 
 #![warn(missing_docs)]
 
@@ -44,6 +49,8 @@ pub mod crypto;
 pub mod delta;
 /// Typed non-secret contract failures.
 pub mod error;
+/// Option B frozen comprehension and task-performance evaluation.
+pub mod eval;
 /// Option B state-bound handoff validity.
 pub mod handoff;
 /// Authenticated bounded HTTP/1 transport for pull synchronization.
