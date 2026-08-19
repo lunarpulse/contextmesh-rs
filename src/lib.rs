@@ -24,6 +24,11 @@
 //! carries an explicit omission list and uncertainty markers, and a
 //! challenged omission is re-included in a follow-up handoff with the
 //! challenge recorded — no omission is hidden.
+//!
+//! OB-07 runs a bounded progressive repair loop over that handoff: on
+//! comprehension or task failure it iteratively re-includes omitted context
+//! and re-handoffs, recording every attempt to a distinct JSON-lines history
+//! file and always reporting convergence or non-convergence.
 
 #![warn(missing_docs)]
 
@@ -49,6 +54,8 @@ pub mod model;
 pub mod provider;
 /// Option B agent-experience receipts and derived selection layer.
 pub mod receipt;
+/// Option B bounded progressive context repair.
+pub mod repair;
 /// Option B task-conditioned source selection core.
 pub mod selection;
 /// Embedded Turso persistence, DAG/ref operations, bundles, and verification.
