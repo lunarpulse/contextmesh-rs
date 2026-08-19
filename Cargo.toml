@@ -33,3 +33,7 @@ path = "src/bin/contextmesh.rs"
 [[bin]]
 name = "demo_agent"
 path = "src/bin/demo_agent.rs"
+
+[[bin]]
+name = "demo_ob"
+path = "src/bin/demo_ob.rs"

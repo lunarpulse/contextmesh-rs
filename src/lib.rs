@@ -54,6 +54,12 @@
 //! the frozen forbidden-surface audit and the pinned 320-dependency closure,
 //! so non-adoption is recorded with the demonstrated lexical baseline and the
 //! B8 evaluation results — a recorded decision, never a silent deferral.
+//!
+//! OB-13 closes the loop with the end-to-end demonstration: a recipient with
+//! partial known history fails its task when a critical fact is withheld,
+//! challenges the omission, and succeeds only after the repair loop
+//! re-includes it — the Option B phase success signal, recorded with the
+//! B1–B11 completion matrix and the claim audit.
 
 #![warn(missing_docs)]
 
