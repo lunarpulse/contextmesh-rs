@@ -19,6 +19,11 @@
 //! OB-05 binds that delta to the recipient head it was computed against: a
 //! handoff is valid only against that head, and a stale handoff is rejected
 //! and re-derived, never applied.
+//!
+//! OB-06 makes omissions first-class, challengeable data: every handoff
+//! carries an explicit omission list and uncertainty markers, and a
+//! challenged omission is re-included in a follow-up handoff with the
+//! challenge recorded — no omission is hidden.
 
 #![warn(missing_docs)]
 
