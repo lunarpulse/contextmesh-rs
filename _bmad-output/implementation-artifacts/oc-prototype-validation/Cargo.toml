@@ -1,0 +1,8 @@
+[package]
+name = "contextmesh-salience"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Zero external dependencies by design: offline-buildable, minimal disk footprint.
+[dependencies]

@@ -1,0 +1,62 @@
+{
+  "seed": 20260820,
+  "sessions": 48,
+  "events_total": 399,
+  "E1_attribution_ladder": [
+    {
+      "mech": "M0",
+      "precision": 0.661,
+      "recall": 0.863,
+      "f1": 0.749,
+      "judge_calls_per_session": 0.0
+    },
+    {
+      "mech": "M1n",
+      "precision": 0.693,
+      "recall": 1.0,
+      "f1": 0.819,
+      "judge_calls_per_session": 0.0
+    },
+    {
+      "mech": "M3",
+      "precision": 1.0,
+      "recall": 0.88,
+      "f1": 0.936,
+      "judge_calls_per_session": 7.3
+    },
+    {
+      "mech": "M4",
+      "precision": 1.0,
+      "recall": 0.995,
+      "f1": 0.997,
+      "judge_calls_per_session": 314.5
+    },
+    {
+      "mech": "M0+M1n+M4",
+      "precision": 0.693,
+      "recall": 1.0,
+      "f1": 0.819,
+      "judge_calls_per_session": 0.0
+    }
+  ],
+  "E2_propagation_selection": {
+    "recall@6_base": 0.008,
+    "recall@6_enh": 0.025,
+    "recall@12_base": 0.017,
+    "recall@12_enh": 0.05,
+    "precision@12_base": 0.014,
+    "precision@12_enh": 0.042,
+    "expected_random_precision": 0.014,
+    "fail_share_top12_base": 0.0,
+    "fail_share_top12_enh": 0.0,
+    "mean_useful_pool": 4.833,
+    "probes": 12
+  },
+  "E3_cost_ledger": {
+    "useful_ms": 78.2,
+    "dead_ms": 17.4,
+    "noise_ms": 69.5,
+    "wasted_pct": 52.6
+  },
+  "wall_s": 0.63
+}
