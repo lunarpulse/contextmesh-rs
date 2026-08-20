@@ -243,6 +243,46 @@ enum Commands {
         #[arg(long, default_value = "false")]
         acknowledge_non_loopback_plaintext: bool,
     },
+    /// Option B receipt operations.
+    ObReceipt {
+        #[command(subcommand)]
+        sub: ObReceiptSub,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum ObReceiptSub {
+    /// Issues a signed Option B agent-experience receipt. `--task` is the
+    /// task verbatim; prefix `@` to read a bounded file, or `-` for stdin.
+    Issue {
+        #[arg(long)]
+        db: PathBuf,
+        #[arg(long)]
+        key_file: PathBuf,
+        #[arg(long)]
+        context: String,
+        #[arg(long = "event")]
+        events: Vec<String>,
+        #[arg(long)]
+        task: String,
+        #[arg(long)]
+        recipient_head: String,
+        #[arg(long)]
+        selector: String,
+        #[arg(long)]
+        selector_version: String,
+        #[arg(long)]
+        config_hash: String,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Verifies a receipt's signature and its references against the DAG.
+    Verify {
+        #[arg(long)]
+        db: PathBuf,
+        #[arg(long)]
+        file: PathBuf,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -435,6 +475,10 @@ fn command_name(command: &Commands) -> &'static str {
         Commands::Invoke { .. } => "invoke",
         Commands::Serve { .. } => "serve",
         Commands::Sync { .. } => "sync",
+        Commands::ObReceipt { sub } => match sub {
+            ObReceiptSub::Issue { .. } => "ob-receipt issue",
+            ObReceiptSub::Verify { .. } => "ob-receipt verify",
+        },
     }
 }
 
@@ -920,6 +964,133 @@ async fn dispatch(command: Commands) -> Result<Value, CliError> {
                 "pages": report.pages,
                 "remote_refs_updated": report.remote_refs_updated
             }))
+        }
+        Commands::ObReceipt {
+            sub:
+                ObReceiptSub::Issue {
+                    db,
+                    key_file,
+                    context,
+                    events,
+                    task,
+                    recipient_head,
+                    selector,
+                    selector_version,
+                    config_hash,
+                    out,
+                },
+        } => {
+            let store = open_store(&db).await?;
+            let identity = load_identity(&key_file)?;
+            let context = parse_context(&context)?;
+            let mut parsed_events = Vec::with_capacity(events.len());
+            for event in &events {
+                parsed_events.push(parse_event(event, "event")?);
+            }
+            parsed_events.sort();
+            parsed_events.dedup();
+            if parsed_events.len() != events.len() {
+                return Err(validation(json!({"field": "event", "reason": "duplicate"})));
+            }
+            // `--task` is verbatim text, `@path` reads a bounded file, `-`
+            // reads bounded stdin (documented in the subcommand help).
+            let task_bytes = if let Some(path) = task.strip_prefix('@') {
+                let mut buffer = Vec::new();
+                std::fs::File::open(path)
+                    .and_then(|mut handle| handle.read_to_end(&mut buffer))
+                    .map_err(|_| usage(json!({"field": "task", "reason": "file unreadable"})))?;
+                if buffer.len() > CLI_PAYLOAD_LIMIT {
+                    return Err(validation(json!({"field": "task", "reason": "over limit"})));
+                }
+                buffer
+            } else if task == "-" {
+                let mut buffer = Vec::new();
+                std::io::stdin()
+                    .read_to_end(&mut buffer)
+                    .map_err(|_| usage(json!({"field": "task", "reason": "stdin unreadable"})))?;
+                if buffer.len() > CLI_PAYLOAD_LIMIT {
+                    return Err(validation(json!({"field": "task", "reason": "over limit"})));
+                }
+                buffer
+            } else {
+                task.into_bytes()
+            };
+            let verbatim = String::from_utf8(task_bytes)
+                .map_err(|_| validation(json!({"field": "task", "reason": "invalid UTF-8"})))?;
+            let task = crate::receipt::TaskRecordV1::from_verbatim(verbatim, None)
+                .map_err(|_| validation(json!({"field": "task", "reason": "invalid"})))?;
+            let selector =
+                crate::receipt::SelectorRecordV1::new(selector, selector_version, config_hash)
+                    .map_err(|_| validation(json!({"field": "selector", "reason": "invalid"})))?;
+            let body = crate::receipt::ReceiptBodyV1::new(
+                context,
+                parsed_events,
+                task,
+                crate::receipt::RecipientStateV1::new(parse_event(
+                    &recipient_head,
+                    "recipient-head",
+                )?),
+                selector,
+                Vec::new(),
+                Vec::new(),
+                crate::receipt::utc_timestamp(),
+                identity.author(),
+            )
+            .map_err(|_| validation(json!({"field": "receipt", "reason": "invalid"})))?;
+            let receipt = crate::receipt::SignedReceiptV1::issue(&identity, body)
+                .map_err(|_| validation(json!({"field": "receipt", "reason": "cannot sign"})))?;
+            let report = receipt
+                .verify_against_dag(&store)
+                .await
+                .map_err(store_error)?;
+            if !report.valid {
+                let findings: Vec<Value> = report
+                    .findings
+                    .iter()
+                    .map(|finding| {
+                        json!({"reason": finding.reason, "event": finding.event.to_string()})
+                    })
+                    .collect();
+                return Err(conflict(
+                    json!({"subject": "receipt", "findings": findings}),
+                ));
+            }
+            let wire = receipt
+                .to_wire()
+                .map_err(|_| internal(json!({"reason": "render"})))?;
+            std::fs::write(&out, wire)
+                .map_err(|_| usage(json!({"field": "out", "reason": "unwritable"})))?;
+            Ok(crate::receipt::receipt_json(&receipt))
+        }
+        Commands::ObReceipt {
+            sub: ObReceiptSub::Verify { db, file },
+        } => {
+            let store = open_store(&db).await?;
+            let wire = std::fs::read(&file)
+                .map_err(|_| usage(json!({"field": "file", "reason": "unreadable"})))?;
+            let receipt = crate::receipt::SignedReceiptV1::from_wire(&wire).map_err(|_| {
+                validation(json!({"field": "receipt", "reason": "invalid or tampered"}))
+            })?;
+            let report = receipt
+                .verify_against_dag(&store)
+                .await
+                .map_err(store_error)?;
+            if report.valid {
+                Ok(json!({
+                    "receipt_id": receipt.receipt_id().to_string(),
+                    "valid": true,
+                    "checked_events": report.checked_events
+                }))
+            } else {
+                let findings: Vec<Value> = report
+                    .findings
+                    .iter()
+                    .map(|finding| {
+                        json!({"reason": finding.reason, "event": finding.event.to_string()})
+                    })
+                    .collect();
+                Err(internal(json!({"valid": false, "findings": findings})))
+            }
         }
     }
 }

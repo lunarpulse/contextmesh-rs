@@ -1,0 +1,76 @@
+{
+  "schema": "ob08-eval-manifest",
+  "version": "1",
+  "tasks": [
+    {
+      "id": "probe-security-constraint",
+      "mode": "challenge-probe",
+      "task": "summarize the request chain including the security constraint",
+      "chain": {
+        "kind": "agent.request",
+        "steps": [
+          "request chain start",
+          "security constraint applies to the escalation step",
+          "request chain end"
+        ]
+      },
+      "critical_index": 1,
+      "critical_kind": "context.critical",
+      "critical_note": "security constraint applies to the escalation step",
+      "expected": { "withheld": "fails", "repaired": "passes" }
+    },
+    {
+      "id": "probe-approval-requirement",
+      "mode": "challenge-probe",
+      "task": "summarize the request chain including the approval requirement",
+      "chain": {
+        "kind": "agent.request",
+        "steps": [
+          "request chain start",
+          "approval is required for the final step",
+          "request chain end"
+        ]
+      },
+      "critical_index": 1,
+      "critical_kind": "context.critical",
+      "critical_note": "approval is required for the final step",
+      "expected": { "withheld": "fails", "repaired": "passes" }
+    },
+    {
+      "id": "benchmark-escalation-policy",
+      "mode": "task-benchmark",
+      "task": "summarize the request chain including the escalation policy",
+      "chain": {
+        "kind": "agent.request",
+        "steps": [
+          "request chain start",
+          "escalation policy caps access at tier two",
+          "request chain mid",
+          "request chain end"
+        ]
+      },
+      "critical_index": 1,
+      "critical_kind": "context.critical",
+      "critical_note": "escalation policy caps access at tier two",
+      "expected": { "withheld": "fails", "repaired": "passes" }
+    },
+    {
+      "id": "benchmark-retention-rule",
+      "mode": "task-benchmark",
+      "task": "summarize the request chain including the retention rule",
+      "chain": {
+        "kind": "agent.request",
+        "steps": [
+          "request chain start",
+          "retention rule keeps logs for ninety days",
+          "request chain mid",
+          "request chain end"
+        ]
+      },
+      "critical_index": 1,
+      "critical_kind": "context.critical",
+      "critical_note": "retention rule keeps logs for ninety days",
+      "expected": { "withheld": "fails", "repaired": "passes" }
+    }
+  ]
+}

@@ -116,6 +116,46 @@ pub(crate) fn verify_parts(
 }
 
 impl SigningIdentity {
+    /// Signs a caller-supplied domain-separated message (Option B reuse point).
+    ///
+    /// This is the Option B accessor over the same private key used for
+    /// events; it introduces no new signature primitive. The caller must pass
+    /// a frozen ASCII domain constant so cross-purpose message reuse is
+    /// impossible (receipts use `receipt::RECEIPT_SIGNATURE_DOMAIN`).
+    pub fn sign_domain_message(&self, domain: &[u8], message: &[u8]) -> Vec<u8> {
+        let mut prefixed = Vec::with_capacity(domain.len() + message.len());
+        prefixed.extend_from_slice(domain);
+        prefixed.extend_from_slice(message);
+        self.signing_key.sign(&prefixed).to_bytes().to_vec()
+    }
+}
+
+/// Strictly verifies a domain-separated signed message (Option B reuse point).
+///
+/// Mirrors `verify_parts`' strict Ed25519 verification over an explicit domain
+/// prefix, so Option B artifacts share Option A's signature discipline without
+/// reusing event-specific messages.
+pub fn verify_domain_message(
+    author: AuthorId,
+    domain: &[u8],
+    message: &[u8],
+    signature: &[u8],
+) -> Result<()> {
+    let signature_bytes: [u8; 64] = signature
+        .try_into()
+        .map_err(|_| ContractError::SignatureInvalid)?;
+    let signature = Signature::from_bytes(&signature_bytes);
+    let mut prefixed = Vec::with_capacity(domain.len() + message.len());
+    prefixed.extend_from_slice(domain);
+    prefixed.extend_from_slice(message);
+    let verifying_key = VerifyingKey::from_bytes(&author.to_bytes())
+        .map_err(|_| ContractError::SignatureInvalid)?;
+    verifying_key
+        .verify_strict(&prefixed, &signature)
+        .map_err(|_| ContractError::SignatureInvalid)
+}
+
+impl SigningIdentity {
     /// Constructs a production identity from an explicit 32-byte seed.
     ///
     /// The supplied copy is zeroized after key construction. This is the loader
