@@ -2,22 +2,26 @@
 title: 'Option C — Salience Provenance Layer (Attention Ledger)'
 type: 'feature'
 created: '2026-08-20'
-status: 'draft'
-approved_by: 'pending founder review'
+status: 'approved'
+approved: '2026-08-21'
+approved_by: 'Lunarpulse'
+approval_source: 'Discord message 1540302757649457254'
 phase: 'Option C — Salience Provenance Layer'
-review_loop_iteration: 0
+review_loop_iteration: 2
 context:
   - '../implementation-artifacts/spec-signed-agent-context-dag.md'
   - '../implementation-artifacts/spec-option-b-source-grounded-context-handoff.md'
 charter: '2026-08-20 founder session — frozen dependency discipline opened for Option C'
-delivery_plan: 'pending — to be authored after founder approval of this spec'
+delivery_plan: '../planning-artifacts/option-c-priority-and-gate-plan.md'
+priority_plan: '../planning-artifacts/option-c-priority-and-gate-plan.md'
+integration_decision_record: '../planning-artifacts/oc-00-5-founder-decision-record.md'
 ---
 
 # Option C — Salience Provenance Layer (Attention Ledger)
 
-> DRAFT awaiting founder review. On approval, the Intent and Boundaries
-> section below becomes `<frozen-after-approval>` human-owned intent, exactly
-> as in the Option A and Option B specifications.
+> Approved and frozen by Lunarpulse on 2026-08-21 after OC-0.5 integration
+> audit, Hermes real-data replay, and two independent documentation reviews.
+> D-C-00 through D-C-10 govern execution and change control.
 
 ## Charter (recorded 2026-08-20)
 
@@ -32,6 +36,8 @@ not constraints:
 2. Selector/attribution provenance (identity, version, configuration hash) is
    recorded in every artifact.
 3. Option A history is never mutated; Option C only adds derived layers.
+
+<frozen-after-approval reason="human-owned intent — do not modify unless human renegotiates">
 
 ## Intent
 
@@ -57,17 +63,20 @@ normalized value matching, citation analysis) and expensive causal
 mechanisms verify them (leave-one-out counterfactual ablation,
 Shapley-sampling coalition attribution over shortlists). Outcomes are
 recorded as Outcome Ledgers (cost, attempts, dead ends, load-bearing set
-with mechanism provenance). Dead ends accumulate into a Thorn Index
-(negative knowledge); annotations propagate as a versioned Salience Prior
-over DAG-parent and entity edges (personalized PageRank). Selection fuses
-the lexical baseline with priors and thorn suppression, gated by a B8-style
-evaluation before any deployment claim.
+with mechanism provenance). Positive annotations propagate as a versioned
+nonnegative Salience Prior over DAG-parent and entity edges. Eligible,
+conditional dead ends separately propagate as nonnegative Thorn proximity;
+the channels are never collapsed into signed or negative PPR seeds. Selection
+forms a bounded lexical/prior candidate union before deterministic reranking.
+Thorn suppression remains off until its later independent gate. Every
+deployment claim is gated by preregistered human-gold and B8-style evaluation.
 
-**Phase success signal:** on the frozen vocabulary-mismatch probe set,
-prior-fused selection beats both the lexical baseline and random
-expectation at fixed budget with all influences stated explicitly; the
-validation gate reproduces deterministically offline from a clean
-checkout, Python ground truth and Rust port agreeing.
+**Phase success signal:** on a preregistered temporal-family human-gold test
+including a strict all-gold-TF=0 stratum, positive-prior candidate union beats
+the lexical baseline on the frozen primary metric at fixed budget, while the
+OC-to-Option-B execution binding and structural validation reproduce exactly
+offline from a clean checkout. Existing OC-00 synthetic and Hermes silver
+replays are directional baselines, not the phase-completion gate.
 
 ## Boundaries & Constraints
 
@@ -76,8 +85,9 @@ checkout, Python ground truth and Rust port agreeing.
 unverifiable reference. Record mechanism provenance (identity, version,
 configuration hash) for every attribution and selection. Record wall-clock
 and call counts when available and mark them `clock: unavailable` when not;
-never fabricate times. State thorn influence and omissions explicitly in
-every selection's uncertainty list. Gate every selector/prior version with
+never fabricate times. State prior influence and omissions explicitly; when
+Thorn is separately approved and enabled, state its influence explicitly in
+the selection uncertainty. Gate every selector/prior version with
 the frozen evaluation before any sufficiency claim; claim nothing beyond
 what the metric demonstrates. Guarantee determinism only on structural and
 verification paths; model-inference mechanisms are recorded, never
@@ -93,6 +103,8 @@ artifacts inside the Option A store. Claim objective salience, minimality,
 sufficiency, or recipient comprehension beyond recorded metrics. Hide a
 dead end or filter negatives silently. Emit an artifact whose references do
 not verify against the DAG.
+
+</frozen-after-approval>
 
 ## Completion Gates (C1–C5)
 
@@ -123,33 +135,44 @@ judge calls/session on the OC set); redundant carriers are credited by M4
 where M3 under-marks by design, both recorded.
 
 ### C3 — Thorn Index and Salience Prior
-**Intent:** Dead-end fingerprints (failure mode × entity × cost) accumulate
-into a versioned `ThornIndexV1`; annotations (load-bearing marks, thorns)
-propagate as a versioned `SaliencePriorV1` over DAG-parent and bounded
-entity edges via personalized PageRank (thorns as negative seeds).
-**Success:** Prior and thorn versions are recorded; thorn proximity
-suppresses dead-end recurrence in selection with the influence stated in
-the uncertainty list; an all-failure history produces explicit thorn
-warnings rather than silent filtering.
+**Intent:** Positive load-bearing annotations propagate into a versioned
+nonnegative fixed-point `SaliencePriorV1`. Conditional dead-end fingerprints
+(failure mode × entity × cost × task/recipient/world state × expiry) accumulate
+separately in a bounded `ThornIndexV1` and propagate into a nonnegative
+fixed-point Thorn-proximity channel. Both use deterministic bounded graphs and
+separate provenance; production does not use negative PPR seeds.
+**Success:** Positive-prior exact vectors pass before any Thorn rollout. Prior
+and Thorn versions/channels are recorded independently; Thorn is disabled until
+human gold demonstrates incremental benefit over positive-only selection and
+false suppression below the frozen threshold. An all-failure history produces
+explicit warnings rather than silent filtering.
 
-### C4 — Prior-fused selection
-**Intent:** Fuse the lexical-TF baseline with salience prior and thorn
-suppression (`score = tf × (1 + α·prior) × (1 − β·thorn)`), with α/β
-recorded per selector version; every deployment claim is gated by the
-frozen evaluation.
-**Success:** On the frozen vocabulary-mismatch probe set, prior-fused
-selection beats the lexical baseline and random expectation at fixed
-budget (measured direction: precision@12 0.042 vs 0.014 baseline =
-random); no claim beyond the demonstrated budget regime.
+### C4 — Prior-assisted selection and execution binding
+**Intent:** Generate bounded lexical and positive-prior candidate arms, take a
+deterministic EventId-deduplicated union, then rerank under the preregistered
+normalization/formula/caps/tie-break/overflow configuration. A TF=0 event can
+enter through the prior arm. `SelectionInfluenceV1` records ordered influence;
+`SelectionExecutionV1` binds the exact pre-closure IDs and budget through B3
+closure, B4 delta, B5 state verification, B6 uncertainty, and final handoff.
+Thorn is a separate later reranker input and is off by default.
+**Success:** On preregistered human gold, positive-prior selection passes the
+frozen nDCG@12/Any-hit@12, family-bootstrap, strict TF=0, and Option B regression
+gates. Influence/execution mismatch or stale state fails closed with neither a
+deliverable handoff nor execution artifact. No claim extends beyond the tested
+budget and label regime.
 
-### C5 — Deterministic validation gate
-**Intent:** Freeze the prototype validation (E1 attribution ladder, E2
-propagation/selection, E3 cost ledger) as a seeded, offline, deterministic
-test: Python ground truth and Rust port must agree — E1/E3 exactly, E2
-within a declared float tolerance for set-iteration order.
-**Success:** The gate passes from a clean checkout with the pinned
-toolchain; results are recorded in
-`_bmad-output/verification-artifacts/oc-00-prototype-validation.md`.
+### C5 — Deterministic validation and claim gate
+**Intent:** Preserve OC-00 (E1 attribution ladder, E2 propagation/selection,
+E3 cost ledger) as seeded directional prototype evidence, then add production
+vectors for strict OC artifacts, corrected shortlist attribution, separate
+fixed-point prior/Thorn channels, and OC-to-Option-B execution binding.
+Production content-addressed paths require exact canonical-byte equality; float
+tolerance remains prototype-only.
+**Success:** A clean checkout on the pinned toolchain passes exact artifact,
+fixed-point, integration, dependency-closure, privacy, real-replay, B8, and claim
+audit gates. OC-00 Python/Rust evidence remains recorded at
+`_bmad-output/verification-artifacts/oc-00-prototype-validation.md` but does not
+alone complete C5.
 
 ## I/O & Edge-Case Matrix
 
@@ -159,10 +182,10 @@ toolchain; results are recorded in
 | Empty shortlist | M0–M2 nominate nothing | M3/M4 skipped, recorded as `no nominations` | Not an error |
 | Judge unavailable | Causal tier cannot run | Fail closed for M3/M4; M0/M1 marks recorded with uncertainty marker | No causal claim made |
 | Redundant carriers | Two events carry the same fact | M3 under-marks by design; M4 splits credit | Both outcomes recorded |
-| Thorn-only history | All prior sessions failed | Empty prior, explicit thorn warnings, lexical baseline proceeds | No silent negative filter |
+| Thorn-only history | All prior sessions failed | Empty positive prior, explicit Thorn warnings, lexical baseline proceeds; suppression disabled until approved | No silent negative filter |
 | Cross-context reference | Ledger cites event of another context | Rejected as unverifiable | Typed error, no partial artifact |
 | Timeless environment | Wall-clock unavailable | Cost ledger records `clock: unavailable` | Never fabricate times |
-| Vocabulary mismatch | Task wording ≠ event wording | Prior carries selection; uncertainty list states the regime | No relevance claim beyond probe set |
+| Vocabulary mismatch | Task wording ≠ event wording | TF=0 event may enter through bounded prior arm; influence records entry reason | No relevance claim beyond human-gold gate |
 
 ## Feature-completeness map
 
@@ -199,12 +222,40 @@ above; OB-12's method (recorded decision with audit evidence) is kept.
   `contextmesh-salience` crate per the delivery plan to be authored after
   approval.
 
+## OC-0.5 integration status (2026-08-21)
+
+Option B has merged to `main`, this branch has been rebased onto that merge,
+and the repository/real-data audit is recorded. The final execution priorities
+are now repository-owned by
+`../planning-artifacts/option-c-priority-and-gate-plan.md`. The binding founder
+dispositions are approved in
+`../planning-artifacts/oc-00-5-founder-decision-record.md`.
+
+This specification incorporates the approved OC-0.5 dispositions:
+
+1. C2's M3/M4 shortlist rule is authoritative; OC-00 full-candidate M3 is
+   directional evidence and must be rerun under the approved pipeline.
+2. Bounded lexical/prior candidate union precedes deterministic reranking so a
+   prior-nominated TF=0 event is not structurally excluded.
+3. C3/C4 production scores are separate nonnegative fixed-point prior/Thorn
+   channels with exact production reproduction; float tolerance is
+   prototype-only.
+4. Positive prior ships before Thorn; Thorn remains off until its independent
+   human-gold false-suppression gate.
+5. C4 deployment claims require preregistered human-gold and B8 evidence, not
+   the current entity-continuity silver replay alone.
+6. `SelectionInfluenceV1` and `SelectionExecutionV1` bind ranking evidence to
+   the exact B3–B6 execution without changing Option B wires.
+
+The dispositions and human-owned intent are frozen. Any amendment requires
+founder renegotiation and must update the decision record and this spec together.
+
 ## Approval Record
 
 - **Charter:** 2026-08-20 — founder opened the frozen dependency
   discipline for Option C design (this session).
-- **Spec approval:** PENDING. This document is a draft for founder review;
-  nothing in it is frozen until approved. On approval, wrap Intent and
-  Boundaries in `<frozen-after-approval>`, set `status: 'approved'`, and
-  author `_bmad-output/planning-artifacts/option-c-delivery-plan.md`
-  mapping OC-01..OC-05 to gates C1–C5.
+- **Spec approval:** APPROVED 2026-08-21 by Lunarpulse. D-C-00 through D-C-10
+  were approved in full; Intent and Boundaries are frozen. Approval authorizes
+  P1 under the priority plan but does not claim C1–C5 completion.
+- **Approval provenance:** Discord message `1540302757649457254` directed spec
+  freeze and P0 commit.
