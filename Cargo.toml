@@ -1,3 +1,7 @@
+[workspace]
+members = [".", "contextmesh-salience"]
+resolver = "3"
+
 [package]
 name = "contextmesh"
 version = "0.1.0"
