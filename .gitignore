@@ -1,4 +1,11 @@
+# Rust build outputs (root and nested prototype crates).
 /target/
+**/target/
+
+# Python caches and private replay inputs/repeat runs.
+**/__pycache__/
+/_bmad-output/implementation-artifacts/oc-real-data-replay/private/
+/graphify-out/
 
 # Local runtime state (introduced by later Option A work packages).
 *.db

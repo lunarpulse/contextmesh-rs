@@ -1,0 +1,159 @@
+{
+  "corpus": {
+    "active_messages": 11704,
+    "duplicate_nonempty_rows_if_supported": null,
+    "eligible_terminal_episodes": 470,
+    "eligible_tool_events": 4770,
+    "episode_split": {
+      "test": 68,
+      "train": 327,
+      "validation": 75
+    },
+    "family_split": {
+      "test": 16,
+      "train": 48,
+      "validation": 16
+    },
+    "message_token_count_nonnull": 0,
+    "sessions": 148,
+    "tool_messages": 5877,
+    "unique_families": 80
+  },
+  "manifest": {
+    "aggregate_fingerprint": "c3b98e747131ece0dc5445e10bf96c354fe6ea64929f0b92ab9f13d20e2b312f",
+    "alpha": 2.0,
+    "beta": 0.6,
+    "budgets": [
+      6,
+      12
+    ],
+    "db_sha256": "74cf2df7ff5752e3171ce8232396fbde2c27e3a914eed0da38f40cd3c3eba910",
+    "entity_version": "oc-real-replay-entity-v1",
+    "generated_at_utc": "2026-08-20T19:08:26.715915+00:00",
+    "m0_version": "oc-prototype-m0-v1-compatible",
+    "m1_version": "oc-prototype-m1n-v1-compatible",
+    "network_used": false,
+    "ppr_damping": 0.85,
+    "ppr_iterations": 20,
+    "raw_content_emitted": false,
+    "repo_commit": "7394c9b57d56ce0d557abf5924240cc09a08fcc2",
+    "schema_version": 19,
+    "seed": 20260820,
+    "split_policy": "temporal-family-60-20-20"
+  },
+  "nomination_proxy": {
+    "candidate_tools": 4770,
+    "episodes": 470,
+    "m0_nominations": 1141,
+    "m0_unique_hits": 234,
+    "m1_incremental": 22,
+    "m1_nominations": 1163,
+    "m1_unique_hits": 240,
+    "no_m0": 251,
+    "no_m1": 248,
+    "unique_value_silver": 240
+  },
+  "selection_proxy": {
+    "candidate_events_mean": 4087.983,
+    "episodes_all_proxy_gold_zero_tf": 0,
+    "episodes_without_proxy_gold": 9,
+    "evaluated_episodes": 59,
+    "metrics": {
+      "exploratory_additive": {
+        "12": {
+          "hit": 0.457627,
+          "ndcg": 0.165141,
+          "precision": 0.163842,
+          "recall": 0.013453
+        },
+        "6": {
+          "hit": 0.423729,
+          "ndcg": 0.173149,
+          "precision": 0.177966,
+          "recall": 0.00741
+        }
+      },
+      "full_multiplicative": {
+        "12": {
+          "hit": 0.542373,
+          "ndcg": 0.207506,
+          "precision": 0.210452,
+          "recall": 0.018283
+        },
+        "6": {
+          "hit": 0.491525,
+          "ndcg": 0.212001,
+          "precision": 0.223164,
+          "recall": 0.009353
+        }
+      },
+      "lexical": {
+        "12": {
+          "hit": 0.457627,
+          "ndcg": 0.156669,
+          "precision": 0.152542,
+          "recall": 0.01272
+        },
+        "6": {
+          "hit": 0.40678,
+          "ndcg": 0.165527,
+          "precision": 0.166667,
+          "recall": 0.007051
+        }
+      },
+      "prior_only_multiplicative": {
+        "12": {
+          "hit": 0.576271,
+          "ndcg": 0.215564,
+          "precision": 0.217514,
+          "recall": 0.018743
+        },
+        "6": {
+          "hit": 0.508475,
+          "ndcg": 0.218528,
+          "precision": 0.225989,
+          "recall": 0.008906
+        }
+      },
+      "random": {
+        "12": {
+          "hit": 0.20339,
+          "ndcg": 0.017678,
+          "precision": 0.021186,
+          "recall": 0.001511
+        },
+        "6": {
+          "hit": 0.135593,
+          "ndcg": 0.016431,
+          "precision": 0.022599,
+          "recall": 0.000751
+        }
+      },
+      "thorn_only_multiplicative": {
+        "12": {
+          "hit": 0.440678,
+          "ndcg": 0.153434,
+          "precision": 0.15113,
+          "recall": 0.012639
+        },
+        "6": {
+          "hit": 0.40678,
+          "ndcg": 0.162275,
+          "precision": 0.166667,
+          "recall": 0.007106
+        }
+      }
+    },
+    "proxy_gold_mean": 117.831,
+    "test_episodes_total": 68
+  },
+  "validity": {
+    "finish_reason_is_not_task_success": true,
+    "label_status": "silver proxies only; no causal or human gold",
+    "m0_m1_precision_claim_allowed": false,
+    "multiplicative_formula_cannot_resurrect_tf_zero": true,
+    "selection_usefulness_claim_allowed": false,
+    "state_db_is_not_option_a_signed_dag": true,
+    "tokens_unavailable_if_nonnull_zero": true
+  }
+}
