@@ -6,12 +6,20 @@ use std::fs::{self, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
 
+#[cfg(unix)]
+use std::os::unix::process::CommandExt;
+
 const COMMAND_TIMEOUT: Duration = Duration::from_secs(120);
+const HISTORICAL_TIMEOUT: Duration = Duration::from_secs(1_800);
+const OA07_COMMIT: &str = "9c275f0f83b320d697dc9ccccc2b51ee60a05114";
+const OB13_COMMIT: &str = "1df53344afc29ac7730e373de1fb4a46def3a9f5";
 static TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
+static WORKTREE_LOCK: Mutex<()> = Mutex::new(());
 
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -345,4 +353,361 @@ fn dependency_helper_output_and_feature_tree_are_stable() {
         actual.into_bytes(),
         fs::read(root().join("cargo-tree-oa05-features.txt")).unwrap()
     );
+}
+
+const OA_SCRIPT_HASHES: &[(&str, &str)] = &[
+    (
+        "scripts/verify-oa00.sh",
+        "81aa0da49934c55fecaa6adc99b8912fca04e6f460ebd3cebdf6befdb929c77d",
+    ),
+    (
+        "scripts/verify-oa01.sh",
+        "aa49a3cb745c7274ac8e6fbe60b71c65a03b5cec10b2c79d0d9998cd64d823f6",
+    ),
+    (
+        "scripts/verify-oa02.sh",
+        "a3b184408ba021c4a49f4cd64854823e94c648e2c2889a4ec283f17d7d4d1c34",
+    ),
+    (
+        "scripts/verify-oa03.sh",
+        "d010ed928a0f24f237393f859ea8831847383f141124d05bec9d2faeb79eb494",
+    ),
+    (
+        "scripts/verify-oa04.sh",
+        "f69326dfaf576dcbbf6f2996f046f4137bf90b6e8a68d78eae6928bcf10d8559",
+    ),
+    (
+        "scripts/verify-oa04-dependencies.sh",
+        "fc8fbcba46e114d66e28f53744067ae40f966343684f4687bb5d1d097cef0a33",
+    ),
+    (
+        "scripts/verify-oa05.sh",
+        "e93069379a04962d44671a2d925e9678fdd5c13892eaf739ca95b4bf7a684618",
+    ),
+    (
+        "scripts/verify-oa06.sh",
+        "4386997f008952cff8a3ce2b8da6ea511f6bd0ad0f770b163b71b30e63e3b998",
+    ),
+    (
+        "scripts/verify-oa07.sh",
+        "d3cda00f56dd6d8ddae97fa88291e2a55d94a57ca56bd6ff11c9b4d28580f87d",
+    ),
+];
+
+const OB_SCRIPT_HASHES: &[(&str, &str)] = &[
+    (
+        "scripts/verify-ob01.sh",
+        "c4b07275952c57d8eae6ead3e7f70b397e058262c564840f963291bc88611fac",
+    ),
+    (
+        "scripts/verify-ob02.sh",
+        "c2a141b87714ebb4f87c862f5418d138e18aa71c80ddecfcb162bfc93d36fbb3",
+    ),
+    (
+        "scripts/verify-ob03.sh",
+        "d5ade1db451c6fc2ce7e32705d75f4e58d97fb5f2bdbf7a55097ae0dace553e6",
+    ),
+    (
+        "scripts/verify-ob04.sh",
+        "9c95a0bbfc7ed8a9c17accd3822a7a9eb15d9789768ad146a5d7c75e0702af4d",
+    ),
+    (
+        "scripts/verify-ob05.sh",
+        "fabde8211e47f6a7fab2340030a2311183c0ace3aa1091275bd64ef7f83c15a8",
+    ),
+    (
+        "scripts/verify-ob06.sh",
+        "bfa448c1586775291cee65232b195ddcaef4e904bc1fd3ec390b696b1784e9df",
+    ),
+    (
+        "scripts/verify-ob07.sh",
+        "c3d47481ee394593ddffbd547da86dd53f47349a6a32c6225f96f149b02638e3",
+    ),
+    (
+        "scripts/verify-ob08.sh",
+        "6f236c980b72d8f772f092cbaa7970847c1c4dfc0d83775dc9964275f64834ba",
+    ),
+    (
+        "scripts/verify-ob09.sh",
+        "ae5d3e0d036259285b7363e55b782b64f471828dc56752746af9dc7e1c56a15a",
+    ),
+    (
+        "scripts/verify-ob10.sh",
+        "fa635b2594693481e9cdf24698b06fabde8b225058570a08736ece8ff1a6c2ee",
+    ),
+    (
+        "scripts/verify-ob11.sh",
+        "2b1bd82c78b3824087d15961042881186ceb259d2e77c2400f2ad27475b98db2",
+    ),
+    (
+        "scripts/verify-ob12.sh",
+        "fe40303455c6d4159b53ecf59dcd7fb34d70c138335a05917c162a0e74f718b9",
+    ),
+    (
+        "scripts/verify-ob13.sh",
+        "8de64abbc4e792112fa6fb1ab0931d5485f743aca43e12c78d5376539f5deae1",
+    ),
+];
+
+fn sha256(path: &Path) -> String {
+    let mut command = Command::new("sha256sum");
+    command.arg(path);
+    let output = run(command);
+    String::from_utf8(output.stdout)
+        .expect("sha256sum output is UTF-8")
+        .split_whitespace()
+        .next()
+        .expect("sha256sum emits a digest")
+        .to_owned()
+}
+
+fn assert_script_hashes(commit: &str, expected: &[(&str, &str)]) {
+    let mut verify_commit = Command::new("git");
+    verify_commit
+        .current_dir(root())
+        .args(["cat-file", "-e", &format!("{commit}^{{commit}}")]);
+    run(verify_commit);
+
+    let mut rev_parse = Command::new("git");
+    rev_parse
+        .current_dir(root())
+        .args(["rev-parse", &format!("{commit}^{{commit}}")]);
+    assert_eq!(
+        String::from_utf8(run(rev_parse).stdout).unwrap().trim(),
+        commit,
+        "historical commit identity changed"
+    );
+
+    for (path, digest) in expected {
+        assert_eq!(
+            sha256(&root().join(path)),
+            *digest,
+            "legacy verifier changed"
+        );
+        let mut historical = Command::new("git");
+        historical
+            .current_dir(root())
+            .args(["show", &format!("{commit}:{path}")]);
+        let bytes = run(historical).stdout;
+        let input = TemporaryInput::create("historical-script", &bytes);
+        assert_eq!(
+            sha256(&input.path),
+            *digest,
+            "historical verifier baseline changed"
+        );
+    }
+}
+
+struct HistoricalWorktree {
+    repository: PathBuf,
+    parent: PathBuf,
+    path: PathBuf,
+    added: bool,
+}
+
+impl HistoricalWorktree {
+    fn add(commit: &str, tag: &str) -> Self {
+        let nonce = SigningIdentity::generate()
+            .expect("operating-system entropy")
+            .author();
+        let sequence = TEMP_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+        let parent = std::env::temp_dir().join(format!(
+            "oc01-worktree-{tag}-{}-{nonce}-{sequence}",
+            std::process::id()
+        ));
+        fs::create_dir(&parent).expect("exclusive temporary worktree parent");
+        let path = parent.join("checkout");
+        let mut result = Self {
+            repository: root(),
+            parent,
+            path,
+            added: false,
+        };
+        let mut command = Command::new("git");
+        command
+            .current_dir(&result.repository)
+            .args(["worktree", "add", "--detach"])
+            .arg(&result.path)
+            .arg(commit);
+        run(command);
+        result.added = true;
+        result
+    }
+}
+
+impl Drop for HistoricalWorktree {
+    fn drop(&mut self) {
+        if self.added {
+            let _ = Command::new("git")
+                .current_dir(&self.repository)
+                .args(["worktree", "remove", "--force"])
+                .arg(&self.path)
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .status();
+        }
+        let _ = Command::new("git")
+            .current_dir(&self.repository)
+            .args(["worktree", "prune"])
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status();
+        let _ = fs::remove_dir_all(&self.parent);
+    }
+}
+
+fn historical_chain(commit: &str, verifier: &str, hashes: &[(&str, &str)], tag: &str) {
+    if std::env::var_os("OC01_INNER_CURRENT_GATE").is_some() {
+        return;
+    }
+    let _serial = WORKTREE_LOCK.lock().expect("historical worktree lock");
+    assert_script_hashes(commit, hashes);
+    let worktree = HistoricalWorktree::add(commit, tag);
+
+    let mut status = Command::new("git");
+    status
+        .current_dir(&worktree.path)
+        .args(["status", "--porcelain"]);
+    assert!(
+        run(status).stdout.is_empty(),
+        "historical worktree is not clean"
+    );
+
+    let cargo_home = std::env::var_os("CARGO_HOME")
+        .map(PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".cargo")))
+        .expect("Cargo home is discoverable");
+    let proxy_directory = cargo_home.join("bin");
+    assert!(
+        proxy_directory.join("cargo").is_file(),
+        "rustup Cargo proxy missing"
+    );
+    let mut search_path = vec![proxy_directory];
+    if let Some(existing) = std::env::var_os("PATH") {
+        search_path.extend(std::env::split_paths(&existing));
+    }
+    let search_path = std::env::join_paths(search_path).expect("toolchain PATH joins");
+
+    let mut command = Command::new("bash");
+    command
+        .current_dir(&worktree.path)
+        .env("PATH", search_path)
+        .env("CARGO_NET_OFFLINE", "true")
+        .env("CARGO_BUILD_JOBS", "1")
+        .env("CARGO_INCREMENTAL", "0")
+        .env("CARGO_PROFILE_DEV_DEBUG", "0")
+        .env("CARGO_PROFILE_TEST_DEBUG", "0")
+        .env_remove("CARGO_TARGET_DIR")
+        .env_remove("RUSTUP_TOOLCHAIN")
+        .arg(verifier)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    #[cfg(unix)]
+    command.process_group(0);
+    let mut child = command.spawn().expect("historical verifier starts");
+    let mut stdout = child.stdout.take().expect("historical stdout pipe");
+    let mut stderr = child.stderr.take().expect("historical stderr pipe");
+    let stdout_reader = thread::spawn(move || {
+        let mut bytes = Vec::new();
+        stdout
+            .read_to_end(&mut bytes)
+            .expect("historical stdout read");
+        bytes
+    });
+    let stderr_reader = thread::spawn(move || {
+        let mut bytes = Vec::new();
+        stderr
+            .read_to_end(&mut bytes)
+            .expect("historical stderr read");
+        bytes
+    });
+    let started = Instant::now();
+    let status = loop {
+        if let Some(status) = child.try_wait().expect("historical verifier status") {
+            break status;
+        }
+        if started.elapsed() >= HISTORICAL_TIMEOUT {
+            let _ = Command::new("kill")
+                .args(["-KILL", &format!("-{}", child.id())])
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .status();
+            let _ = child.wait();
+            panic!("historical verifier timed out");
+        }
+        thread::sleep(Duration::from_millis(100));
+    };
+    let stdout = stdout_reader.join().expect("historical stdout reader");
+    let stderr = stderr_reader.join().expect("historical stderr reader");
+    if !status.success() {
+        let summary = stdout
+            .split(|byte| *byte == b'\n')
+            .chain(stderr.split(|byte| *byte == b'\n'))
+            .find_map(|line| {
+                let text = std::str::from_utf8(line).ok()?;
+                let allowed_prefix = text.starts_with("verify-oa07: FAIL ")
+                    || text.starts_with("verify-ob13: FAIL ");
+                (allowed_prefix
+                    && text.len() <= 256
+                    && text
+                        .bytes()
+                        .all(|byte| byte == b' ' || byte.is_ascii_graphic()))
+                .then_some(text)
+            })
+            .unwrap_or("historical verifier failed");
+        panic!("{summary}");
+    }
+}
+
+#[test]
+fn historical_oa07_chain_runs_unchanged_at_completion_commit() {
+    historical_chain(
+        OA07_COMMIT,
+        "scripts/verify-oa07.sh",
+        OA_SCRIPT_HASHES,
+        "oa07",
+    );
+}
+
+#[test]
+fn historical_ob13_chain_runs_unchanged_at_completion_commit() {
+    historical_chain(
+        OB13_COMMIT,
+        "scripts/verify-ob13.sh",
+        OB_SCRIPT_HASHES,
+        "ob13",
+    );
+}
+
+#[test]
+fn current_workspace_checks_are_package_scoped_and_legacy_scripts_immutable() {
+    if std::env::var_os("OC01_INNER_CURRENT_GATE").is_some() {
+        return;
+    }
+    assert_script_hashes(OA07_COMMIT, OA_SCRIPT_HASHES);
+    assert_script_hashes(OB13_COMMIT, OB_SCRIPT_HASHES);
+
+    let verifier = fs::read_to_string(root().join("scripts/verify-oc01.sh"))
+        .expect("current OC verifier exists");
+    for command in [
+        "cargo build -p contextmesh --locked",
+        "cargo build -p contextmesh-salience --locked",
+        "cargo build --workspace --locked",
+        "cargo test -p contextmesh-salience --locked",
+        "cargo test -p contextmesh --locked",
+        "cargo test --workspace --locked",
+    ] {
+        assert!(
+            verifier.contains(command),
+            "missing package-scoped current check"
+        );
+    }
+    assert!(!verifier.contains("bash scripts/verify-oa"));
+    assert!(!verifier.contains("bash scripts/verify-ob"));
+
+    let mut command = Command::new("bash");
+    command
+        .current_dir(root())
+        .args(["scripts/verify-oc01.sh", "--planned-surface-only"]);
+    run(command);
 }
