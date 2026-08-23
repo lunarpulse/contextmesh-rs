@@ -3,6 +3,7 @@
 //! Row OC01-I01 (body/envelope shapes) belongs to `outcome.rs` in Stage 2B
 //! and is intentionally absent here.
 
+use contextmesh::crypto::SigningIdentity;
 use contextmesh::model::{ContextId, EventId};
 use contextmesh_salience::error::{OutcomeError, OutcomeOperationError};
 use contextmesh_salience::json;
@@ -10,9 +11,9 @@ use contextmesh_salience::types::{
     AttemptErrorV1, AttemptStatus, AttemptV1, AttributionLabel, AttributionMarkV1, Blake3HashText,
     CostLedgerV1, CostValueV1, DeadEndV1, Disposition, InputRefSnapshotV1, LocalRefEntry,
     MAX_OUTCOME_NOTE_BYTES, MAX_OUTCOME_NOTES, MAX_OUTCOME_WIRE_BYTES, MechanismRecordV1,
-    OutcomeId, OutcomeLimits, OutcomeSignature, OutcomeValue, QualityV1, RemoteRefEntry,
-    TaskBindingV1, TerminalV1, TimestampText, validate_attempt_tree, validate_attribution_marks,
-    validate_dead_ends, validate_warnings,
+    OutcomeId, OutcomeLimits, OutcomeRecordV1, OutcomeSignature, OutcomeValue, QualityV1,
+    RemoteRefEntry, TaskBindingV1, TerminalV1, TimestampText, UnterminatedReason,
+    validate_attempt_tree, validate_attribution_marks, validate_dead_ends, validate_warnings,
 };
 use serde_json::json;
 
@@ -135,6 +136,99 @@ fn mark(event_id: EventId, label: AttributionLabel) -> AttributionMarkV1 {
         &limits(),
     )
     .expect("mark is valid")
+}
+
+/// OC01-I01: body/envelope shapes, required fields, null and tagged variants.
+#[test]
+fn exact_v1_shapes_tags_requiredness_and_version() {
+    use contextmesh_salience::outcome::{OutcomeLedgerBodyV1, SignedOutcomeLedgerV1};
+
+    let identity = SigningIdentity::from_fixture_seed([42; 32]);
+    let body = OutcomeLedgerBodyV1::new(
+        context(),
+        InputRefSnapshotV1::new(context(), vec![], vec![]).unwrap(),
+        TaskBindingV1::new(hash(&hash_text()), None, None, &limits()).unwrap(),
+        TerminalV1::Unterminated {
+            reason: UnterminatedReason::NoTerminalEvent,
+        },
+        OutcomeRecordV1::new(OutcomeValue::Unknown, vec![], mechanism(), &limits()).unwrap(),
+        QualityV1::new(
+            QualityV1::Unavailable {
+                reason: "no recorded rubric".into(),
+                provenance: mechanism(),
+            },
+            &limits(),
+        )
+        .unwrap(),
+        ledger(),
+        vec![attempt(0, None)],
+        vec![dead_end(0, 0)],
+        vec![mark(event(1), AttributionLabel::LoadBearingCandidate)],
+        vec!["collector warning".into()],
+        TimestampText::parse("2026-08-21T00:00:00Z").unwrap(),
+        identity.author(),
+        limits(),
+    )
+    .unwrap();
+    let issued = SignedOutcomeLedgerV1::issue(&identity, body, limits()).unwrap();
+    let wire = issued.to_wire(limits()).unwrap();
+    let parsed = SignedOutcomeLedgerV1::from_wire(&wire, limits()).unwrap();
+    assert_eq!(parsed.outcome_id(), issued.outcome_id());
+    assert_eq!(parsed.body().version(), 1);
+
+    let value: serde_json::Value = serde_json::from_slice(&wire).unwrap();
+    let canonical = |value: &serde_json::Value| json::jcs(value).unwrap();
+
+    let mut unknown_envelope = value.clone();
+    unknown_envelope["unexpected"] = json!(true);
+    assert_eq!(
+        SignedOutcomeLedgerV1::from_wire(&canonical(&unknown_envelope), limits()).unwrap_err(),
+        OutcomeError::Malformed
+    );
+    let mut missing_envelope = value.clone();
+    missing_envelope
+        .as_object_mut()
+        .unwrap()
+        .remove("signature");
+    assert_eq!(
+        SignedOutcomeLedgerV1::from_wire(&canonical(&missing_envelope), limits()).unwrap_err(),
+        OutcomeError::Malformed
+    );
+    let mut unknown_body = value.clone();
+    unknown_body["body"]["unexpected"] = json!(true);
+    assert_eq!(
+        SignedOutcomeLedgerV1::from_wire(&canonical(&unknown_body), limits()).unwrap_err(),
+        OutcomeError::Malformed
+    );
+    let mut missing_body = value.clone();
+    missing_body["body"]
+        .as_object_mut()
+        .unwrap()
+        .remove("author");
+    assert_eq!(
+        SignedOutcomeLedgerV1::from_wire(&canonical(&missing_body), limits()).unwrap_err(),
+        OutcomeError::Malformed
+    );
+    let mut wrong_version = value.clone();
+    wrong_version["body"]["version"] = json!(2);
+    assert_eq!(
+        SignedOutcomeLedgerV1::from_wire(&canonical(&wrong_version), limits()).unwrap_err(),
+        OutcomeError::UnsupportedVersion
+    );
+    let mut illegal_null = value.clone();
+    illegal_null["body"]["author"] = serde_json::Value::Null;
+    assert_eq!(
+        SignedOutcomeLedgerV1::from_wire(&canonical(&illegal_null), limits()).unwrap_err(),
+        OutcomeError::Malformed
+    );
+    let mut mixed_terminal = value;
+    mixed_terminal["body"]["terminal"] = json!({
+        "status": "event", "event": event(1).to_string(), "reason": "unknown"
+    });
+    assert_eq!(
+        SignedOutcomeLedgerV1::from_wire(&canonical(&mixed_terminal), limits()).unwrap_err(),
+        OutcomeError::Malformed
+    );
 }
 
 /// OC01-I02: typed encodings and timestamps are exact.
