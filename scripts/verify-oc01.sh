@@ -42,7 +42,9 @@ allowed_path() {
     contextmesh-salience/tests/fixtures/oc01-outcome-ledger-v1-golden.json|\
     contextmesh-salience/tests/fixtures/oc01-outcome-ledger-v1-unterminated.json|\
     scripts/check-core-dependencies.py|scripts/verify-oc01.sh|\
-    _bmad-output/verification-artifacts/oc-01-evidence.md) return 0 ;;
+    scripts/run-oc01-historical-chains.sh|\
+    _bmad-output/verification-artifacts/oc-01-evidence.md|\
+    _bmad-output/implementation-artifacts/oc01-heavy-delegation-task.md) return 0 ;;
     *) return 1 ;;
   esac
 }
