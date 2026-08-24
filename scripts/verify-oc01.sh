@@ -37,6 +37,7 @@ allowed_path() {
     contextmesh-salience/tests/oc01_schema.rs|\
     contextmesh-salience/tests/oc01_crypto.rs|\
     contextmesh-salience/tests/oc01_dag.rs|\
+    contextmesh-salience/tests/support/oc01_fixed_dag.rs|\
     contextmesh-salience/tests/oc01_io.rs|\
     contextmesh-salience/tests/oc01_adversarial.rs|\
     contextmesh-salience/tests/fixtures/oc01-outcome-ledger-v1-golden.json|\

@@ -3,7 +3,6 @@
 //! Row OC01-I01 (body/envelope shapes) belongs to `outcome.rs` in Stage 2B
 //! and is intentionally absent here.
 
-use contextmesh::crypto::SigningIdentity;
 use contextmesh::model::{ContextId, EventId};
 use contextmesh_salience::error::{OutcomeError, OutcomeOperationError};
 use contextmesh_salience::json;
@@ -11,9 +10,9 @@ use contextmesh_salience::types::{
     AttemptErrorV1, AttemptStatus, AttemptV1, AttributionLabel, AttributionMarkV1, Blake3HashText,
     CostLedgerV1, CostValueV1, DeadEndV1, Disposition, InputRefSnapshotV1, LocalRefEntry,
     MAX_OUTCOME_NOTE_BYTES, MAX_OUTCOME_NOTES, MAX_OUTCOME_WIRE_BYTES, MechanismRecordV1,
-    OutcomeId, OutcomeLimits, OutcomeRecordV1, OutcomeSignature, OutcomeValue, QualityV1,
-    RemoteRefEntry, TaskBindingV1, TerminalV1, TimestampText, UnterminatedReason,
-    validate_attempt_tree, validate_attribution_marks, validate_dead_ends, validate_warnings,
+    OutcomeId, OutcomeLimits, OutcomeSignature, OutcomeValue, QualityV1, RemoteRefEntry,
+    TaskBindingV1, TerminalV1, TimestampText, validate_attempt_tree, validate_attribution_marks,
+    validate_dead_ends, validate_warnings,
 };
 use serde_json::json;
 
@@ -141,37 +140,16 @@ fn mark(event_id: EventId, label: AttributionLabel) -> AttributionMarkV1 {
 /// OC01-I01: body/envelope shapes, required fields, null and tagged variants.
 #[test]
 fn exact_v1_shapes_tags_requiredness_and_version() {
-    use contextmesh_salience::outcome::{OutcomeLedgerBodyV1, SignedOutcomeLedgerV1};
+    use contextmesh_salience::outcome::SignedOutcomeLedgerV1;
 
-    let identity = SigningIdentity::from_fixture_seed([42; 32]);
-    let body = OutcomeLedgerBodyV1::new(
-        context(),
-        InputRefSnapshotV1::new(context(), vec![], vec![]).unwrap(),
-        TaskBindingV1::new(hash(&hash_text()), None, None, &limits()).unwrap(),
-        TerminalV1::Unterminated {
-            reason: UnterminatedReason::NoTerminalEvent,
-        },
-        OutcomeRecordV1::new(OutcomeValue::Unknown, vec![], mechanism(), &limits()).unwrap(),
-        QualityV1::new(
-            QualityV1::Unavailable {
-                reason: "no recorded rubric".into(),
-                provenance: mechanism(),
-            },
-            &limits(),
-        )
-        .unwrap(),
-        ledger(),
-        vec![attempt(0, None)],
-        vec![dead_end(0, 0)],
-        vec![mark(event(1), AttributionLabel::LoadBearingCandidate)],
-        vec!["collector warning".into()],
-        TimestampText::parse("2026-08-21T00:00:00Z").unwrap(),
-        identity.author(),
-        limits(),
-    )
+    // A committed fixed-DAG envelope is the valid base. Schema testing needs
+    // no alternative public signing/materialization path.
+    let wire = std::fs::read(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/tests/fixtures/oc01-outcome-ledger-v1-unterminated.json"
+    ))
     .unwrap();
-    let issued = SignedOutcomeLedgerV1::issue(&identity, body, limits()).unwrap();
-    let wire = issued.to_wire(limits()).unwrap();
+    let issued = SignedOutcomeLedgerV1::from_wire(&wire, limits()).unwrap();
     let parsed = SignedOutcomeLedgerV1::from_wire(&wire, limits()).unwrap();
     assert_eq!(parsed.outcome_id(), issued.outcome_id());
     assert_eq!(parsed.body().version(), 1);
@@ -236,16 +214,16 @@ fn exact_v1_shapes_tags_requiredness_and_version() {
 /// accessors leave no deserialize/unchecked bypass into public state.
 #[test]
 fn public_api_has_no_unchecked_or_deserialize_bypass() {
-    use contextmesh_salience::outcome::{
-        OutcomeLedgerBodyV1, SignedOutcomeLedgerV1, derive_outcome_id,
-    };
+    use contextmesh_salience::outcome::{SignedOutcomeLedgerV1, derive_outcome_id};
 
-    // Every public constructor path is checked: `new` validates, `issue`
-    // signs only after validation + author match, `from_wire` revalidates
-    // everything from untrusted bytes, and `verify` revalidates in memory.
-    let identity = SigningIdentity::from_fixture_seed([42; 32]);
-    let body = base_body(&identity);
-    let ledger = SignedOutcomeLedgerV1::issue(&identity, body, limits()).unwrap();
+    // The only public construction paths are store-aware `issue` (exercised
+    // in oc01_dag) and checked `from_wire`; use a committed valid wire here.
+    let wire = std::fs::read(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/tests/fixtures/oc01-outcome-ledger-v1-unterminated.json"
+    ))
+    .unwrap();
+    let ledger = SignedOutcomeLedgerV1::from_wire(&wire, limits()).unwrap();
     ledger.verify(limits()).unwrap();
 
     // Cross-check: verify() and from_wire(to_wire()) agree — there is no
@@ -279,38 +257,8 @@ fn public_api_has_no_unchecked_or_deserialize_bypass() {
     // a derived Deserialize); nested value types that do deserialize are
     // always revalidated by body.validate() before any public state exists.
     fn assert_serialize<T: serde::Serialize>() {}
-    assert_serialize::<OutcomeLedgerBodyV1>();
+    assert_serialize::<contextmesh_salience::outcome::OutcomeLedgerBodyV1>();
     assert_serialize::<SignedOutcomeLedgerV1>();
-}
-
-/// Helper for P05: the schema suite's base valid body.
-fn base_body(identity: &SigningIdentity) -> contextmesh_salience::outcome::OutcomeLedgerBodyV1 {
-    contextmesh_salience::outcome::OutcomeLedgerBodyV1::new(
-        context(),
-        InputRefSnapshotV1::new(context(), vec![], vec![]).unwrap(),
-        TaskBindingV1::new(hash(&hash_text()), None, None, &limits()).unwrap(),
-        TerminalV1::Unterminated {
-            reason: UnterminatedReason::NoTerminalEvent,
-        },
-        OutcomeRecordV1::new(OutcomeValue::Unknown, vec![], mechanism(), &limits()).unwrap(),
-        QualityV1::new(
-            QualityV1::Unavailable {
-                reason: "no recorded rubric".into(),
-                provenance: mechanism(),
-            },
-            &limits(),
-        )
-        .unwrap(),
-        ledger(),
-        vec![attempt(0, None)],
-        vec![dead_end(0, 0)],
-        vec![mark(event(1), AttributionLabel::LoadBearingCandidate)],
-        vec!["collector warning".into()],
-        TimestampText::parse("2026-08-21T00:00:00Z").unwrap(),
-        identity.author(),
-        limits(),
-    )
-    .unwrap()
 }
 
 /// OC01-I02: typed encodings and timestamps are exact.

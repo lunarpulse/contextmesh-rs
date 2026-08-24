@@ -8,9 +8,13 @@
 //! Rows OC01-I25..I26 (hostile JSON and JCS canonicality matrices) belong to
 //! `oc01_adversarial.rs` in Stage 2E and are intentionally absent here.
 
+#[path = "support/oc01_fixed_dag.rs"]
+mod fixed_dag;
+
 use contextmesh::crypto::SigningIdentity;
 use contextmesh::model::{AuthorId, ContextId, EventId};
-use contextmesh_salience::error::OutcomeError;
+use contextmesh::store::Store;
+use contextmesh_salience::error::{OutcomeError, OutcomeOperationError};
 use contextmesh_salience::json;
 use contextmesh_salience::outcome::{
     OutcomeLedgerBodyV1, SignedOutcomeLedgerV1, derive_outcome_id,
@@ -40,6 +44,18 @@ const UNTERMINATED_FIXTURE: &str = concat!(
 
 fn limits() -> OutcomeLimits {
     OutcomeLimits::default()
+}
+
+/// Opens a throwaway empty store (no context provisioned).
+async fn empty_store() -> Store {
+    static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let serial = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let path = std::env::temp_dir().join(format!(
+        "oc01-crypto-empty-{}-{serial}.db",
+        std::process::id()
+    ));
+    let _ = std::fs::remove_file(&path);
+    Store::open(&path).await.expect("store opens")
 }
 
 fn identity(seed: [u8; 32]) -> SigningIdentity {
@@ -275,9 +291,9 @@ fn golden_body(author: AuthorId) -> OutcomeLedgerBodyV1 {
     .expect("golden body is valid")
 }
 
-/// Fixed explicit-unterminated ledger body: unavailable clock, calls,
-/// retries, and tokens, with the exact terminal reason (P10 fixture
-/// identity).
+/// Fixed explicit-unterminated structural body retained only for the
+/// P01–P06 standalone vector helpers; P10 uses `admitted_unterminated_fixture`.
+#[allow(dead_code)]
 fn unterminated_body(author: AuthorId) -> OutcomeLedgerBodyV1 {
     OutcomeLedgerBodyV1::new(
         context(),
@@ -319,16 +335,159 @@ fn unterminated_body(author: AuthorId) -> OutcomeLedgerBodyV1 {
     .expect("unterminated body is valid")
 }
 
-fn golden_ledger() -> SignedOutcomeLedgerV1 {
-    let identity = identity(GOLDEN_SEED);
-    SignedOutcomeLedgerV1::issue(&identity, golden_body(identity.author()), limits())
-        .expect("golden ledger issues")
+async fn golden_ledger() -> SignedOutcomeLedgerV1 {
+    admitted_terminal_fixture().await.1
 }
 
-fn unterminated_ledger() -> SignedOutcomeLedgerV1 {
-    let identity = identity(UNTERMINATED_SEED);
-    SignedOutcomeLedgerV1::issue(&identity, unterminated_body(identity.author()), limits())
-        .expect("unterminated ledger issues")
+async fn admitted_terminal_fixture() -> (fixed_dag::FixedDag, SignedOutcomeLedgerV1) {
+    let dag = fixed_dag::build().await;
+    let issuer = identity(GOLDEN_SEED);
+    let refs = fixed_dag::snapshot(&dag).await;
+    let ids = &dag.events;
+    let mut outcome_evidence = vec![ids[4], ids[5]];
+    outcome_evidence.sort_by_key(ToString::to_string);
+    let mut quality_evidence = vec![ids[3], ids[5]];
+    quality_evidence.sort_by_key(ToString::to_string);
+    let mut attempts = vec![
+        attempt(0, None),
+        attempt(1, Some(0)),
+        attempt(2, Some(1)),
+        attempt(3, Some(0)),
+    ];
+    for (attempt, event_id) in attempts.iter_mut().zip([ids[1], ids[2], ids[3], ids[4]]) {
+        attempt.event_refs = vec![event_id];
+        *attempt = AttemptV1::new(attempt.clone(), &limits()).expect("fixed attempt validates");
+    }
+    let mut dead_ends = vec![
+        dead_end_with(0, 1, Disposition::Unresolved),
+        dead_end_with(1, 1, Disposition::Recovered),
+        dead_end_with(2, 2, Disposition::Abandoned),
+    ];
+    for (dead_end, event_id) in dead_ends.iter_mut().zip([ids[1], ids[2], ids[3]]) {
+        dead_end.event_refs = vec![event_id];
+        *dead_end = DeadEndV1::new(dead_end.clone(), &limits()).expect("fixed dead end validates");
+    }
+    let mut marks = vec![
+        mark_with(
+            ids[1],
+            AttributionLabel::LoadBearingCandidate,
+            "mechanism-a",
+        ),
+        mark_with(ids[2], AttributionLabel::SupportingCandidate, "mechanism-b"),
+        mark_with(ids[4], AttributionLabel::DeadEndCandidate, "mechanism-c"),
+    ];
+    for (mark, evidence_id) in marks.iter_mut().zip([ids[1], ids[2], ids[4]]) {
+        mark.evidence = vec![evidence_id];
+        *mark = AttributionMarkV1::new(mark.clone(), &limits()).expect("fixed mark validates");
+    }
+    marks.sort_by_key(|mark| {
+        (
+            mark.event.to_string(),
+            mark.label.text(),
+            mark.mechanism.identity.clone(),
+            mark.mechanism.version.clone(),
+            mark.mechanism.config_hash.as_str().to_owned(),
+        )
+    });
+    let body = OutcomeLedgerBodyV1::new(
+        dag.context,
+        refs,
+        TaskBindingV1::new(
+            hash_text_of(b"oc01-golden-task"),
+            Some(hash_text_of(b"oc01-golden-structured")),
+            None,
+            &limits(),
+        )
+        .unwrap(),
+        TerminalV1::Event { event: ids[5] },
+        OutcomeRecordV1::new(
+            OutcomeValue::Succeeded,
+            outcome_evidence,
+            mechanism_named("caller.example"),
+            &limits(),
+        )
+        .unwrap(),
+        QualityV1::new(
+            QualityV1::Available {
+                value_ppm: 990_000,
+                evidence: quality_evidence,
+                provenance: mechanism_named("caller.example"),
+            },
+            &limits(),
+        )
+        .unwrap(),
+        cost_ledger_mixed(),
+        attempts,
+        dead_ends,
+        marks,
+        vec!["collector warning".to_owned()],
+        TimestampText::parse("2026-08-21T00:00:00Z").unwrap(),
+        issuer.author(),
+        limits(),
+    )
+    .unwrap();
+    let ledger = match SignedOutcomeLedgerV1::issue(&issuer, &dag.store, body, limits()).await {
+        Ok(ledger) => ledger,
+        Err(OutcomeOperationError::Artifact(error)) => {
+            panic!("fixed terminal ledger artifact failure: {error}")
+        }
+        Err(OutcomeOperationError::Store(_)) => panic!("fixed terminal ledger store failure"),
+        Err(OutcomeOperationError::Io(_)) => panic!("fixed terminal ledger I/O failure"),
+    };
+    (dag, ledger)
+}
+
+/// Builds an exact P10 unterminated ledger against the same fixed admitted
+/// DAG and fixed ref snapshot.
+async fn admitted_unterminated_fixture() -> (fixed_dag::FixedDag, SignedOutcomeLedgerV1) {
+    let dag = fixed_dag::build().await;
+    let issuer = identity(UNTERMINATED_SEED);
+    let refs = fixed_dag::snapshot(&dag).await;
+    let mut attempt = attempt_unavailable(0);
+    attempt.event_refs = vec![dag.events[1]];
+    let attempt = AttemptV1::new(attempt, &limits()).expect("fixed attempt validates");
+    let body = OutcomeLedgerBodyV1::new(
+        dag.context,
+        refs,
+        TaskBindingV1::new(
+            hash_text_of(b"oc01-unterminated-task"),
+            None,
+            None,
+            &limits(),
+        )
+        .unwrap(),
+        TerminalV1::Unterminated {
+            reason: UnterminatedReason::CancelledBeforeTerminal,
+        },
+        OutcomeRecordV1::new(
+            OutcomeValue::Unknown,
+            vec![],
+            mechanism_named("caller.example"),
+            &limits(),
+        )
+        .unwrap(),
+        QualityV1::new(
+            QualityV1::Unavailable {
+                reason: "no recorded rubric".to_owned(),
+                provenance: mechanism_named("caller.example"),
+            },
+            &limits(),
+        )
+        .unwrap(),
+        cost_ledger_unavailable(),
+        vec![attempt],
+        vec![],
+        vec![],
+        vec![],
+        TimestampText::parse("2026-08-21T00:00:00Z").unwrap(),
+        issuer.author(),
+        limits(),
+    )
+    .unwrap();
+    let ledger = SignedOutcomeLedgerV1::issue(&issuer, &dag.store, body, limits())
+        .await
+        .expect("fixed unterminated ledger issues");
+    (dag, ledger)
 }
 
 // ---------------------------------------------------------------------------
@@ -377,9 +536,9 @@ fn pointer_set(value: &mut Value, path: &str, replacement: Value) {
 
 /// OC01-P01: the ID is ordinary BLAKE3 over the literal NUL-terminated ID
 /// domain plus exact JCS body bytes — never derive-key mode.
-#[test]
-fn outcome_id_uses_literal_domain_prefix_hashing() {
-    let ledger = golden_ledger();
+#[tokio::test]
+async fn outcome_id_uses_literal_domain_prefix_hashing() {
+    let ledger = golden_ledger().await;
     let canonical_body = json::jcs(ledger.body()).expect("body JCS renders");
 
     // Literal domain bytes, including the NUL terminator.
@@ -417,10 +576,10 @@ fn outcome_id_uses_literal_domain_prefix_hashing() {
 
 /// OC01-P02: the signature is Ed25519 over the literal signature domain plus
 /// the raw 32-byte ID — never the ID text or body bytes.
-#[test]
-fn signature_covers_domain_and_raw_id_bytes() {
+#[tokio::test]
+async fn signature_covers_domain_and_raw_id_bytes() {
     let identity = identity(GOLDEN_SEED);
-    let ledger = golden_ledger();
+    let ledger = golden_ledger().await;
     let raw_id = ledger.outcome_id().to_bytes();
 
     // Literal domain bytes, including the NUL terminator.
@@ -461,9 +620,9 @@ fn signature_covers_domain_and_raw_id_bytes() {
 
 /// OC01-P03: cross-type IDs, signatures, prefixes, lengths, alphabets,
 /// padding, domains, and authors all reject with stable categories.
-#[test]
-fn cross_domain_typed_encoding_and_author_mismatch_matrix() {
-    let ledger = golden_ledger();
+#[tokio::test]
+async fn cross_domain_typed_encoding_and_author_mismatch_matrix() {
+    let ledger = golden_ledger().await;
     let base = envelope_value(&ledger);
 
     // Cross-type ID prefix (event prefix on an outcome ID).
@@ -520,13 +679,22 @@ fn cross_domain_typed_encoding_and_author_mismatch_matrix() {
     );
 
     // Author mismatch: the declared author is inside the signed body, so
-    // issue() refuses to sign a body owned by another identity.
+    // issue() refuses to sign a body owned by another identity before any
+    // store access.
     let signer = identity(GOLDEN_SEED);
     let other = identity(UNTERMINATED_SEED);
-    assert_eq!(
-        SignedOutcomeLedgerV1::issue(&signer, golden_body(other.author()), limits()).unwrap_err(),
-        OutcomeError::IdMismatch
-    );
+    let mismatch = SignedOutcomeLedgerV1::issue(
+        &signer,
+        &empty_store().await,
+        golden_body(other.author()),
+        limits(),
+    )
+    .await
+    .expect_err("author mismatch must reject issuance");
+    assert!(matches!(
+        mismatch,
+        OutcomeOperationError::Artifact(OutcomeError::IdMismatch)
+    ));
 
     // Cross-domain: a signature made under the ID domain never verifies
     // under the signature domain.
@@ -542,9 +710,9 @@ fn cross_domain_typed_encoding_and_author_mismatch_matrix() {
 
 /// OC01-P04: tampering with any signed or derived component rejects, and no
 /// repaired or re-sorted artifact is ever returned.
-#[test]
-fn tamper_matrix_rejects_every_signed_or_derived_component() {
-    let ledger = golden_ledger();
+#[tokio::test]
+async fn tamper_matrix_rejects_every_signed_or_derived_component() {
+    let ledger = golden_ledger().await;
     let wire = ledger.to_wire(limits()).expect("wire renders");
     let base = envelope_value(&ledger);
 
@@ -604,7 +772,7 @@ fn tamper_matrix_rejects_every_signed_or_derived_component() {
         // Attribution-mark tamper.
         (
             "/body/attribution_marks/0/label",
-            json!("supporting-candidate"),
+            json!("load-bearing-candidate"),
         ),
         // Author tamper.
         (
@@ -634,9 +802,9 @@ fn tamper_matrix_rejects_every_signed_or_derived_component() {
 /// OC01-P06: structural parse/verify is store-free, claim-bounded, and
 /// freezes the precedence wire bound -> parse -> schema -> canonicality ->
 /// ID -> signature.
-#[test]
-fn structural_verify_is_store_free_claim_bounded_and_precedence_exact() {
-    let ledger = golden_ledger();
+#[tokio::test]
+async fn structural_verify_is_store_free_claim_bounded_and_precedence_exact() {
+    let ledger = golden_ledger().await;
 
     // Store-free: a valid immutable artifact verifies with no Store access;
     // the only inputs are the artifact and caller limits.
@@ -706,10 +874,11 @@ fn structural_verify_is_store_free_claim_bounded_and_precedence_exact() {
 }
 
 /// OC01-P09: reconstruction equals the committed terminal-event golden
-/// fixture byte-for-byte, including the typed ID and signature.
-#[test]
-fn terminal_golden_fixture_matches_bytes_id_and_signature() {
-    let ledger = golden_ledger();
+/// fixture byte-for-byte, including the typed ID and signature, then passes
+/// both immutable-DAG and current-input verification against its fixed DAG.
+#[tokio::test]
+async fn terminal_golden_fixture_matches_bytes_id_and_signature() {
+    let (dag, ledger) = admitted_terminal_fixture().await;
     let wire = ledger.to_wire(limits()).expect("wire renders");
     let committed = std::fs::read(GOLDEN_FIXTURE)
         .expect("committed golden fixture exists; see the ignored generator for change control");
@@ -720,13 +889,22 @@ fn terminal_golden_fixture_matches_bytes_id_and_signature() {
     assert_eq!(parsed.outcome_id(), ledger.outcome_id());
     assert_eq!(parsed.signature().to_bytes(), ledger.signature().to_bytes());
     assert_eq!(parsed.body().version(), 1);
+    parsed
+        .verify_against_dag(&dag.store, limits())
+        .await
+        .expect("fixed DAG verifies");
+    parsed
+        .verify_current_inputs(&dag.store, limits())
+        .await
+        .expect("fixed refs are current");
 }
 
 /// OC01-P10: reconstruction equals the committed unterminated golden
-/// fixture byte-for-byte, including the typed ID and signature.
-#[test]
-fn unterminated_golden_fixture_matches_bytes_id_and_signature() {
-    let ledger = unterminated_ledger();
+/// fixture byte-for-byte, including the typed ID and signature, then passes
+/// both immutable-DAG and current-input verification against its fixed DAG.
+#[tokio::test]
+async fn unterminated_golden_fixture_matches_bytes_id_and_signature() {
+    let (dag, ledger) = admitted_unterminated_fixture().await;
     let wire = ledger.to_wire(limits()).expect("wire renders");
     let committed = std::fs::read(UNTERMINATED_FIXTURE)
         .expect("committed unterminated fixture exists; see the ignored generator");
@@ -737,22 +915,25 @@ fn unterminated_golden_fixture_matches_bytes_id_and_signature() {
     assert_eq!(parsed.outcome_id(), ledger.outcome_id());
     assert_eq!(parsed.signature().to_bytes(), ledger.signature().to_bytes());
     assert_eq!(parsed.body().version(), 1);
+    parsed
+        .verify_against_dag(&dag.store, limits())
+        .await
+        .expect("fixed DAG verifies");
+    parsed
+        .verify_current_inputs(&dag.store, limits())
+        .await
+        .expect("fixed refs are current");
 }
 
 /// OC01-P11: golden updates are never automatic — committed vectors are
 /// normal-test inputs and any fixture drift is detected by reconstruction.
-#[test]
-fn golden_generator_is_ignored_and_fixtures_are_immutable_inputs() {
+#[tokio::test]
+async fn golden_generator_is_ignored_and_fixtures_are_immutable_inputs() {
     let committed = std::fs::read(GOLDEN_FIXTURE).expect("golden fixture exists");
 
-    // A different test-only identity reconstructs to different bytes, so the
-    // byte-exact comparison above detects any fixture drift.
-    let other = SignedOutcomeLedgerV1::issue(
-        &identity(UNTERMINATED_SEED),
-        golden_body(identity(UNTERMINATED_SEED).author()),
-        limits(),
-    )
-    .expect("issues");
+    // The two committed fixtures are distinct fixed-DAG vectors under
+    // different published fixture issuer identities.
+    let (_, other) = admitted_unterminated_fixture().await;
     assert_ne!(other.to_wire(limits()).expect("renders"), committed);
 
     // The two committed fixtures are distinct vectors.
@@ -766,19 +947,18 @@ fn golden_generator_is_ignored_and_fixtures_are_immutable_inputs() {
 /// change control, never automatic regeneration. The generator and the
 /// comparison tests intentionally share one construction path, so a committed
 /// fixture can only change when this file changes.
-#[test]
+#[tokio::test]
 #[ignore = "fixture regeneration requires explicit human change control"]
-fn generate_golden_fixtures() {
+async fn generate_golden_fixtures() {
     let directory = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures");
     std::fs::create_dir_all(directory).expect("fixture directory exists");
-    std::fs::write(
-        GOLDEN_FIXTURE,
-        golden_ledger().to_wire(limits()).expect("renders"),
-    )
-    .expect("golden fixture written");
+    let (_, golden) = admitted_terminal_fixture().await;
+    std::fs::write(GOLDEN_FIXTURE, golden.to_wire(limits()).expect("renders"))
+        .expect("golden fixture written");
+    let (_, unterminated) = admitted_unterminated_fixture().await;
     std::fs::write(
         UNTERMINATED_FIXTURE,
-        unterminated_ledger().to_wire(limits()).expect("renders"),
+        unterminated.to_wire(limits()).expect("renders"),
     )
     .expect("unterminated fixture written");
 }

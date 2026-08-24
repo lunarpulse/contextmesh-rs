@@ -9,7 +9,7 @@ use contextmesh::model::{AuthorId, ContextId};
 use serde::Serialize;
 use serde_json::Value;
 
-use crate::error::OutcomeError;
+use crate::error::{OutcomeError, OutcomeOperationError};
 use crate::json;
 use crate::types::{
     AttemptV1, AttributionMarkV1, CostLedgerV1, DeadEndV1, InputRefSnapshotV1, OUTCOME_ID_DOMAIN,
@@ -242,15 +242,34 @@ pub struct SignedOutcomeLedgerV1 {
 }
 
 impl SignedOutcomeLedgerV1 {
-    /// Validates, derives, signs, and self-verifies a body owned by `identity`.
-    pub fn issue(
+    /// Issues a signed outcome ledger against a live admitted store.
+    ///
+    /// Order (spec §9.1): validate the body and author match; load and
+    /// strictly verify every referenced, input-ref, and terminal event with
+    /// exact context match; compare the embedded ref snapshot against a
+    /// fresh capture (`stale-input` on drift); derive the typed ID from
+    /// exact JCS body bytes; domain-sign the raw ID bytes; independently
+    /// self-verify the complete envelope including the store check before
+    /// returning. The store is never mutated.
+    ///
+    /// # Errors
+    /// Fails closed with [`OutcomeOperationError`]; never returns a partial
+    /// artifact after any DAG finding or failed step.
+    pub async fn issue(
         identity: &SigningIdentity,
+        store: &contextmesh::store::Store,
         body: OutcomeLedgerBodyV1,
         limits: OutcomeLimits,
-    ) -> Result<Self, OutcomeError> {
+    ) -> Result<Self, OutcomeOperationError> {
         body.validate(limits)?;
         if body.author() != identity.author() {
-            return Err(OutcomeError::IdMismatch);
+            return Err(OutcomeError::IdMismatch.into());
+        }
+        crate::verify::verify_references(&body, store, limits).await?;
+        let fresh =
+            crate::types::InputRefSnapshotV1::capture(store, body.context(), limits).await?;
+        if fresh != *body.input_refs() {
+            return Err(OutcomeError::StaleInput.into());
         }
         let outcome_id = derive_outcome_id(&body, limits)?;
         let raw_signature =
@@ -263,7 +282,7 @@ impl SignedOutcomeLedgerV1 {
             body,
             signature: OutcomeSignature::from_bytes(raw_signature),
         };
-        ledger.verify(limits)?;
+        ledger.verify_against_dag(store, limits).await?;
         Ok(ledger)
     }
 

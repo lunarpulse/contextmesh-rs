@@ -824,10 +824,20 @@ artifact-signer allowlist, revocation, or historical policy is inferred.
 Store authorization result and is not fabricated from currently public APIs.
 
 `verify_current_inputs` performs full DAG verification and captures the current
-local+remote ref snapshot. Any name/head addition, removal, or movement, or a
-fingerprint mismatch, returns `stale-input`. Ordinary artifact re-verification
-may remain valid after refs move because immutable referenced events still
-verify; any execution or freshness-sensitive consumer must call
+local+remote ref snapshot. A structurally valid embedded snapshot that differs
+from the fresh capture—including name/head/peer addition or movement, or an
+externally observable removal—returns `stale-input`. An invalid caller-supplied
+embedded fingerprint is rejected before artifact construction as `id-mismatch`;
+it never reaches `verify_current_inputs`. OC-01 v1's public `Store` API has no
+local/remote ref-removal transition; therefore D09 executable coverage is
+limited to public API-representable additions/movements, the direct invalid-
+fingerprint `id-mismatch` precedence vector, and fresh-capture `stale-input`
+vectors. This does not weaken runtime detection: if a future or external store
+implementation returns a snapshot with a removed ref, the exact snapshot
+comparison returns `stale-input`. A future approved public removal API reopens
+D09 to add transition coverage. Ordinary artifact
+re-verification may remain valid after refs move because immutable referenced
+events still verify; any execution or freshness-sensitive consumer must call
 `verify_current_inputs` immediately before use.
 
 ## 10. Import/export
