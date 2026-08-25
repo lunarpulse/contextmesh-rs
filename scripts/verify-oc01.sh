@@ -44,7 +44,10 @@ allowed_path() {
     contextmesh-salience/tests/fixtures/oc01-outcome-ledger-v1-unterminated.json|\
     scripts/check-core-dependencies.py|scripts/verify-oc01.sh|\
     scripts/run-oc01-historical-chains.sh|\
+    _bmad-output/implementation-artifacts/spec-oc-01-outcome-ledger.md|\
+    _bmad-output/planning-artifacts/oc-01-test-traceability-matrix.md|\
     _bmad-output/verification-artifacts/oc-01-evidence.md|\
+    _bmad-output/verification-artifacts/oc-01-heavy-chain-bundle/bundle.txt|\
     _bmad-output/implementation-artifacts/oc01-heavy-delegation-task.md) return 0 ;;
     *) return 1 ;;
   esac
@@ -61,8 +64,14 @@ planned_surface_only() {
 
   # Git compares blob content here: these are immutable baseline hash checks for
   # core production, tests/fixtures, historical evidence, and OA/OB verifiers.
+  # OC-01's own evidence outputs are expected additions on the planned surface
+  # and are excluded; all pre-baseline artifacts stay frozen (founder-approved
+  # change control, matrix rows R06-R10 require this evidence to be committable).
   git diff --quiet "$BASELINE_COMMIT" -- src tests \
-    _bmad-output/verification-artifacts ':(glob)scripts/verify-oa*.sh' \
+    _bmad-output/verification-artifacts \
+    ':(exclude)_bmad-output/verification-artifacts/oc-01-evidence.md' \
+    ':(exclude)_bmad-output/verification-artifacts/oc-01-heavy-chain-bundle/bundle.txt' \
+    ':(glob)scripts/verify-oa*.sh' \
     ':(glob)scripts/verify-ob*.sh' \
     || fail "immutable core or historical surface differs from baseline"
   printf '%s\n' 'ok: planned_surface_only'
@@ -126,9 +135,106 @@ vectors_stage() {
 evidence_stage() {
   require_files README.md _bmad-output/verification-artifacts/oc-01-evidence.md
   planned_surface_only
+  evidence_sources_layer_is_complete
+  evidence_four_layers_and_gate_ids_are_complete
+  evidence_privacy_and_claim_language
+  claim_audit_is_limited_to_oc01
+  downstream_gate_requires_oc01_and_p1_preregistration
   OC01_INNER_CURRENT_GATE=1 cargo test --workspace --locked
   if git grep -qE 'token1_[A-Za-z0-9_-]{43}' -- .; then fail "complete token value found"; fi
   printf '%s\n' 'ok: evidence, privacy, and claim inputs present'
+}
+
+# --- Machine audits for matrix rows R06-R10 -------------------------------
+# Each function is named exactly as the traceability matrix requires, fails
+# closed on missing/partial/inconclusive evidence, and reads only committed
+# files (non-recording). R06-R07 audit oc-01-evidence.md structure; R08-R10
+# audit the gate itself and its claim language.
+
+readonly OC01_EVIDENCE_FILE='_bmad-output/verification-artifacts/oc-01-evidence.md'
+
+evidence_sources_layer_is_complete() {
+  local f="$OC01_EVIDENCE_FILE"
+  [[ -f "$f" ]] || fail "evidence file is missing"
+  grep -q '^## 1\. Sources' "$f" || fail "evidence Sources layer heading missing"
+  # R06: exact commit, approved sources, source/test paths, toolchain, commands
+  grep -q '0cf192b625384283d10c008d4a0e984ae9d0be08' "$f" \
+    || fail "evidence does not record the frozen baseline commit"
+  grep -q '36fb0bc' "$f" \
+    || fail "evidence does not record the vectors-stage commit"
+  grep -qE 'rust-toolchain\.toml|rustc[^ ]* 1\.97|Toolchain' "$f" \
+    || fail "evidence does not state the toolchain"
+  grep -qE 'cargo (test|build|fmt|clippy)|verify-oc01\.sh' "$f" \
+    || fail "evidence does not record verification commands"
+  grep -qE 'contextmesh-salience/(src|tests)/' "$f" \
+    || fail "evidence does not reference source/test paths"
+  printf '%s\n' 'ok: evidence_sources_layer_is_complete'
+}
+
+evidence_four_layers_and_gate_ids_are_complete() {
+  local f="$OC01_EVIDENCE_FILE"
+  [[ -f "$f" ]] || fail "evidence file is missing"
+  grep -q '^## 1\. Sources' "$f" || fail "layer 1 (Sources) missing"
+  grep -q '^## 2\. Reasoning' "$f" || fail "layer 2 (Reasoning) missing"
+  grep -q '^## 3\. Conclusion derivation' "$f" || fail "layer 3 (Conclusion derivation) missing"
+  grep -q '^## 4\. Invalidators' "$f" || fail "layer 4 (Invalidators) missing"
+  grep -qE '^[[:space:]]*-[[:space:]].*(alternative|reject)' "$f" \
+    || fail "evidence records no rejected alternatives"
+  # Every acceptance gate from the matrix roll-up must appear in the doc
+  local gate
+  for gate in OC01-SETUP OC01-SCHEMA OC01-CRYPTO OC01-DAG OC01-IO \
+              OC01-ADVERSARIAL OC01-REGRESSION OC01-EVIDENCE; do
+    grep -q "$gate" "$f" || fail "evidence does not address gate $gate"
+  done
+  printf '%s\n' 'ok: evidence_four_layers_and_gate_ids_are_complete'
+}
+
+evidence_privacy_and_claim_language() {
+  local f="$OC01_EVIDENCE_FILE"
+  [[ -f "$f" ]] || fail "evidence file is missing"
+  grep -q 'caller' "$f" \
+    || fail "evidence does not distinguish caller declarations from verified facts"
+  if grep -qE '/home/|/Users/|file://|https?://(localhost|127\.|192\.168\.)' "$f"; then
+    fail "evidence contains private paths or internal URLs"
+  fi
+  printf '%s\n' 'ok: evidence_privacy_and_claim_language'
+}
+
+claim_audit_is_limited_to_oc01() {
+  local f="$OC01_EVIDENCE_FILE"
+  [[ -f "$f" ]] || fail "evidence file is missing"
+  # Prohibited claim classes (matrix R09): terminal/success/quality/cost
+  # claims, causal attribution, prior/selection utility inference.
+  if grep -nEi 'OC-01 (is )?(complete|done|finished|successful)' "$f"; then
+    fail "evidence asserts OC-01 completion"
+  fi
+  grep -q 'non-claims\|Non-claims\|not .claim' "$f" \
+    || fail "evidence lacks a non-claims/claim-limits section"
+  printf '%s\n' 'ok: claim_audit_is_limited_to_oc01'
+}
+
+downstream_gate_requires_oc01_and_p1_preregistration() {
+  # R10 truth table: downstream (OC-02) authorization requires BOTH the OC-01
+  # gate record and the separate P1 preregistration record. The expected table
+  # below is the frozen semantic content; the AND check must reproduce it
+  # exactly. The P1 record is NOT defined, approved, or claimed by OC-01 and is
+  # represented here only as a pending external input.
+  local oc01_pass p1_pass want got
+  while read -r oc01_pass p1_pass want; do
+    got=$(( oc01_pass && p1_pass ))
+    [[ $got == "$want" ]] \
+      || fail "downstream truth table row ($oc01_pass,$p1_pass) mismatch"
+    [[ $want == 1 ]] && [[ $oc01_pass == 1 && $p1_pass == 1 ]] \
+      || { [[ $want == 0 ]] || fail "authorization granted without both records"; }
+  done <<'EOF'
+0 0 0
+1 0 0
+0 1 0
+1 1 1
+EOF
+  grep -q 'P1' "$OC01_EVIDENCE_FILE" \
+    || fail "evidence does not record the OC-02 P1 preregistration dependency"
+  printf '%s\n' 'ok: downstream_gate_requires_oc01_and_p1_preregistration'
 }
 
 run_stage() {

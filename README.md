@@ -5,9 +5,33 @@ frozen OA-01 signed-event contract, OA-02 transactional local store, OA-03
 semantic-free DAG operations, deterministic projection, strict bounded
 Bundle v1 transfer, full-store integrity verification, OA-04 authenticated
 pull-only HTTP/1 synchronization, OA-05 provider recording with a stable
-automation CLI, the OA-06 reproducible two-node demonstration, and the
-OA-07 release evidence with the A1-A8 completion verdict. OA-00's Rust
+automation CLI, OA-06 reproducible two-node demonstration, and the OA-07
+release evidence with the A1-A8 completion verdict. OA-00's Rust
 1.97/Turso baseline remains intact.
+
+**OC-01** adds the `contextmesh-salience` workspace package: a frozen
+`OutcomeLedgerV1` that records a caller-supplied outcome attempt as a
+domain-signed, canonically-encoded artifact with bounded import/export and
+DAG-anchored provenance verification. Its capability is limited to
+artifact integrity and provenance recording — see "OC-01 claims and
+non-claims" below. It is a one-way path dependency of the core package
+and adds no external dependency.
+
+## OC-01 claims and non-claims
+
+**Claims (bounded):** exact v1 schema/order/bounds; domain-separated ID and
+signature; store-aware fail-closed issuance; same-context DAG verification;
+freshness (`stale-input`) checks; bounded regular-file import/export; stable
+non-disclosing error categories; committed golden/adversarial vectors; full
+regression of Option A/B surfaces.
+
+**Non-claims:** no causal attribution, prior grounding, selection utility,
+comprehension, cost accuracy, or outcome-quality claim (C2–C5). Attribution
+marks are caller-supplied candidates, never causal evidence. OC-01 does not
+authorize OC-02; the separate P1 preregistration gate still applies.
+Verify with `bash scripts/verify-oc01.sh` (offline, non-recording); see
+`_bmad-output/verification-artifacts/oc-01-evidence.md` for the four-layer
+evidence record.
 
 ## Toolchain and verification
 
