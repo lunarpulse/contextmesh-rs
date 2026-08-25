@@ -1,0 +1,67 @@
+{
+  "preregistration_id": "P1-PREREG-SALIENCE-EVAL-V1",
+  "version": 1,
+  "scope": "salience evaluation configuration frozen before OC-02 implementation and before any test-label inspection; policy-only, no status fields",
+  "evaluation": {
+    "sample_strata": [
+      "terminal_with_full_cost",
+      "terminal_with_partial_cost",
+      "unterminated",
+      "strict_all_gold_tf0"
+    ],
+    "labels": ["required", "supporting", "irrelevant", "dead_end", "uncertain"],
+    "family_split": "temporal parent-family split with no parent or descendant of a test family in train",
+    "extractor_versions": {
+      "m0_extractor_version": "oc-prototype-m0-v1-compatible",
+      "m1_extractor_version": "oc-1-m1n-v1",
+      "m2_extractor_version": "oc-2-m2-v1",
+      "prior_extractor_version": "oc-3-prior-v1"
+    },
+    "budgets": {
+      "candidate_shortlist_cap": 32,
+      "m3_judge_calls_per_session_cap": 8,
+      "m4_shapley_samples_per_candidate_cap": 64,
+      "m4_judge_calls_per_session_cap": 128
+    },
+    "metrics": {
+      "primary": "nDCG@12",
+      "secondary": ["Any-hit@12", "recall@12", "precision@12"],
+      "shortlist_recall": "recorded separately from causal-verifier recall so a missed nomination is never mislabeled a causal-verifier failure",
+      "judge_call_economics": ["judge_calls_per_session"]
+    },
+    "family_bootstrap_detail": {
+      "cluster_level": "parent-family",
+      "confidence_level": 0.95,
+      "iterations": 10000,
+      "random_seed": 20260820
+    },
+    "score_normalization": {
+      "method": "per-arm min-max to [0, 1000000] ppm",
+      "clip_above_ppm": 1000000,
+      "clip_below_ppm": 0
+    }
+  },
+  "selection_pipeline": {
+    "candidate_generation": "bounded lexical candidates plus bounded positive-prior candidates, generated independently",
+    "union_rule": "deterministic EventId-deduplicated union",
+    "rerank_formula": "score_ppm = lexical_ppm + prior_ppm",
+    "tie_break": "canonical EventId ascending",
+    "per_arm_caps": {
+      "lexical_arm_cap": 64,
+      "prior_arm_cap": 30
+    },
+    "deduplication": "EventId",
+    "overflow_policy": "checked arithmetic; widen to u128; fail closed on any overflow or out-of-range final value"
+  },
+  "prior_definition": {
+    "prior_channel": "positive-only SaliencePriorV1",
+    "prior_range_ppb": [0, 1000000000],
+    "thorn": "disabled pending D-C-10 independent gate"
+  },
+  "non_claims": [
+    "no causal C2 claim without causal/human/B8 evidence",
+    "no C3 prior/Thorn completion claim",
+    "preregistration does not approve, define, or claim OC-02 implementation",
+    "preregistration freezes evaluation policy only; it does not claim any evaluation result"
+  ]
+}
