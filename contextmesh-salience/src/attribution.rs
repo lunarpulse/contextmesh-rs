@@ -283,6 +283,22 @@ pub fn m0_nominate(
     referenced_events: &[&str],
     config: &AttributionConfigV1,
 ) -> Result<Option<M0Nomination>, OutcomeError> {
+    if let Some(n) = m0_nominate_inner(event, payload, outcome_evidence, referenced_events, config)?
+    {
+        return Ok(Some(n));
+    }
+    Ok(None)
+}
+
+/// Shared inner nomination used by M0 and (via re-tagging) M1 tests;
+/// keeps the domain gate and overlap detection in one place.
+fn m0_nominate_inner(
+    event: &str,
+    payload: &str,
+    outcome_evidence: &str,
+    referenced_events: &[&str],
+    config: &AttributionConfigV1,
+) -> Result<Option<M0Nomination>, OutcomeError> {
     config.validate_frozen()?;
     if !referenced_events.contains(&event) {
         return Err(OutcomeError::UnauthorizedEvent);
@@ -315,4 +331,225 @@ pub fn m0_nominate(
         evidence_kind: EvidenceKind::Overlap,
         evidence_fingerprint: evidence_fingerprint(&evidence),
     }))
+}
+
+/// Maximum absolute magnitude for normalized numeric values (spec §5:
+/// ≤ 10^18 absolute; u128 widened intermediate; out-of-range → the
+/// nomination is skipped and recorded, never an error).
+pub const NUMERIC_MAGNITUDE_LIMIT: u128 = 1_000_000_000_000_000_000;
+
+/// A normalized scalar extracted from one token (A06/A07/A08).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NormalizedValue {
+    /// A dimensionless number within the magnitude bound.
+    Number(u128),
+    /// A percentage in basis points (e.g. "9.5%" → 950 bps).
+    Percent(u128),
+    /// A filesystem-like path with trailing-slash and duplicate-slash
+    /// folding already applied ("/a//b/" and "/a/b" are equal).
+    Path(String),
+}
+
+impl NormalizedValue {
+    /// Canonical text form used for equality comparison and evidence
+    /// bytes (Number → decimal, Percent → "<bps>bps", Path as-is).
+    pub fn canonical(&self) -> String {
+        match self {
+            NormalizedValue::Number(n) => n.to_string(),
+            NormalizedValue::Percent(b) => format!("{b}bps"),
+            NormalizedValue::Path(p) => p.clone(),
+        }
+    }
+}
+
+/// Parse one token into a normalized value (A06/A08). Recognizes:
+/// integer or simple decimal with optional unit suffix k/M/B/G
+/// (case-insensitive), optionally percent ("%"); plain percent values
+/// ("12.5%"); and path-like tokens (containing "/") with slash folding.
+/// Returns None for non-numeric, non-path tokens and for values outside
+/// the magnitude bound (callers record the skip — A07).
+pub fn parse_normalized(token: &str) -> Option<NormalizedValue> {
+    // Path folding: any token containing '/' is treated as a path.
+    if token.contains('/') {
+        return Some(NormalizedValue::Path(fold_path(token)));
+    }
+    // Split off a trailing percent sign if present. Percent values are
+    // canonicalized to basis points (1% = 100bps), so the numeric part
+    // scales by 100 ("9.5%" → 950bps; "50%" → 5000bps). Unit-suffixed
+    // percent is not a recognized form (percent takes plain decimals).
+    let (body, is_percent) = match token.strip_suffix('%') {
+        Some(b) => (b, true),
+        None => (token, false),
+    };
+    let lower = body.to_ascii_lowercase();
+    if is_percent {
+        let scaled = parse_decimal_to_scaled_u128(&lower, 100)?;
+        if scaled > NUMERIC_MAGNITUDE_LIMIT {
+            return None;
+        }
+        return Some(NormalizedValue::Percent(scaled));
+    }
+    // Split off a unit suffix (case-insensitive k/M/B/G).
+    let (num_part, multiplier): (&str, u128) = if let Some(n) = lower.strip_suffix('k') {
+        (n, 1_000)
+    } else if let Some(n) = lower.strip_suffix('m') {
+        (n, 1_000_000)
+    } else if let Some(n) = lower.strip_suffix('b') {
+        (n, 1_000_000_000)
+    } else if let Some(n) = lower.strip_suffix('g') {
+        (n, 1_000_000_000_000)
+    } else {
+        (lower.as_str(), 1)
+    };
+    let scaled = parse_decimal_to_scaled_u128(num_part, multiplier)?;
+    // Magnitude bound: ≤ 10^18 absolute (A07); out-of-range → None.
+    if scaled > NUMERIC_MAGNITUDE_LIMIT {
+        return None;
+    }
+    Some(NormalizedValue::Number(scaled))
+}
+
+/// Fold a path token: lowercase, collapse duplicate slashes, drop the
+/// trailing slash ("/A//b/" → "/a/b"). Deterministic (A08).
+pub fn fold_path(token: &str) -> String {
+    let lower = token.to_ascii_lowercase();
+    let mut folded = String::with_capacity(lower.len());
+    let mut prev_slash = false;
+    for ch in lower.chars() {
+        if ch == '/' {
+            if !prev_slash {
+                folded.push(ch);
+            }
+            prev_slash = true;
+        } else {
+            folded.push(ch);
+            prev_slash = false;
+        }
+    }
+    while folded.len() > 1 && folded.ends_with('/') {
+        folded.pop();
+    }
+    folded
+}
+
+/// Parse an integer or one-dot decimal string into u128 scaled by
+/// `multiplier`. Digits before the dot scale by `multiplier`; digits
+/// after the dot contribute d*multiplier/10^(i+1) with integer
+/// arithmetic (deterministic truncation). Returns None for empty,
+/// signs, exponents, multiple dots, or u128 overflow (fail-closed).
+pub fn parse_decimal_to_scaled_u128(s: &str, multiplier: u128) -> Option<u128> {
+    if s.is_empty() {
+        return None;
+    }
+    let (int_part, frac_part) = match s.split_once('.') {
+        Some((i, f)) => (i, f),
+        None => (s, ""),
+    };
+    if int_part.is_empty() && frac_part.is_empty() {
+        return None;
+    }
+    if !int_part.chars().all(|c| c.is_ascii_digit())
+        || !frac_part.chars().all(|c| c.is_ascii_digit())
+    {
+        return None;
+    }
+    let int_val: u128 = if int_part.is_empty() {
+        0
+    } else {
+        int_part.parse().ok()?
+    };
+    // u128 checked multiply/add (fail-closed to None on overflow).
+    let base = int_val.checked_mul(multiplier)?;
+    if frac_part.is_empty() {
+        return Some(base);
+    }
+    let mut acc = base;
+    let mut denom_pow = 10u128;
+    for ch in frac_part.chars() {
+        let d = (ch as u8 - b'0') as u128;
+        let add = d.checked_mul(multiplier)?.checked_div(denom_pow);
+        acc = acc.checked_add(add?)?;
+        denom_pow = denom_pow.checked_mul(10)?;
+    }
+    Some(acc)
+}
+
+/// Stage 2C (spec §3): M1 normalized-equality nomination (A06). For one
+/// referenced event payload, if any payload token normalizes to the same
+/// canonical value as any evidence token, nominate the event with an M1
+/// tag. Numeric-looking payload tokens that fail to normalize
+/// (out-of-magnitude — A07) are returned in `skipped` (recorded, not an
+/// error). Deterministic: same inputs → same nomination.
+pub fn m1_nominate(
+    event: &str,
+    payload: &str,
+    outcome_evidence: &str,
+    referenced_events: &[&str],
+    config: &AttributionConfigV1,
+) -> Result<(Option<M0Nomination>, Vec<String>), OutcomeError> {
+    config.validate_frozen()?;
+    if !referenced_events.contains(&event) {
+        return Err(OutcomeError::UnauthorizedEvent);
+    }
+    let (tokens, _t_skip) = extract_tokens(payload);
+    let mut evidence_canonical: Vec<String> = Vec::new();
+    for et in outcome_evidence.split_whitespace() {
+        if let Some(v) = parse_normalized(et) {
+            let c = v.canonical();
+            if !evidence_canonical.contains(&c) {
+                evidence_canonical.push(c);
+            }
+        }
+    }
+    let mut matched: Vec<String> = Vec::new();
+    let mut skipped: Vec<String> = Vec::new();
+    for t in &tokens {
+        match parse_normalized(t) {
+            Some(v) => {
+                let c = v.canonical();
+                if evidence_canonical.contains(&c) && !matched.contains(&c) {
+                    matched.push(c);
+                }
+            }
+            None => {
+                if looks_numericish(t) {
+                    let raw = t.to_string();
+                    if !skipped.contains(&raw) {
+                        skipped.push(raw);
+                    }
+                }
+            }
+        }
+    }
+    if matched.is_empty() {
+        return Ok((None, skipped));
+    }
+    let mut evidence = Vec::new();
+    evidence.extend_from_slice(matched.len().to_string().as_bytes());
+    for c in &matched {
+        evidence.push(0u8);
+        evidence.extend_from_slice(c.as_bytes());
+    }
+    let nom = M0Nomination {
+        event: event.to_string(),
+        mechanism: AttributionMechanismTag {
+            mechanism: Mechanism::M1,
+            extractor_version: versions::M1,
+            config_hash: config.config_hash()?,
+        },
+        evidence_kind: EvidenceKind::Normalized,
+        evidence_fingerprint: evidence_fingerprint(&evidence),
+    };
+    Ok((Some(nom), skipped))
+}
+
+/// Heuristic: does this token look like it was meant as a number or
+/// percent (so a normalization failure means out-of-magnitude or
+/// malformed)? Used only to decide skip-recording (A07).
+fn looks_numericish(t: &str) -> bool {
+    let core = t.strip_suffix('%').unwrap_or(t);
+    let core = core
+        .strip_suffix(|c: char| matches!(c, 'k' | 'K' | 'm' | 'M' | 'b' | 'B' | 'g' | 'G'))
+        .unwrap_or(core);
+    !core.is_empty() && core.chars().all(|c| c.is_ascii_digit() || c == '.')
 }

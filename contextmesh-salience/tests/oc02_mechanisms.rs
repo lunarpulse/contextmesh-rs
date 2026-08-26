@@ -151,3 +151,139 @@ fn m0_deterministic_reproduction() {
     assert_eq!(format!("{a:?}"), format!("{b:?}"));
     assert!(a.is_some());
 }
+
+#[test]
+fn m1_normalized_numeric_nominates() {
+    // A06: "9.5M" in the payload equals "9500000" in the evidence —
+    // M1 must nominate (the M0 blind spot, now covered).
+    use contextmesh_salience::attribution::m1_nominate;
+    let (nom, skipped) = m1_nominate(
+        "evt-val",
+        "market size 9.5M units",
+        "the verified figure is 9500000 exactly",
+        &["evt-val"],
+        &cfg(),
+    )
+    .unwrap();
+    assert!(skipped.is_empty());
+    let nom = nom.expect("9.5M ↔ 9500000 must nominate via M1");
+    assert_eq!(nom.event, "evt-val");
+    assert_eq!(nom.mechanism.mechanism, Mechanism::M1);
+    assert_eq!(nom.mechanism.extractor_version, "oc-1-m1n-v1");
+    assert_eq!(nom.evidence_kind, EvidenceKind::Normalized);
+    assert!(
+        nom.evidence_fingerprint
+            .starts_with(EVIDENCE_FINGERPRINT_PREFIX)
+    );
+
+    // Cross-check the M0 blind spot still holds on the same vectors.
+    let m0 = m0_nominate(
+        "evt-val",
+        "market size 9.5M units",
+        "the verified figure is 9500000 exactly",
+        &["evt-val"],
+        &cfg(),
+    )
+    .unwrap();
+    assert!(m0.is_none(), "M0 stays blind; only M1 catches it");
+}
+
+#[test]
+fn m1_magnitude_bound() {
+    // A07: 10^18 is the inclusive bound; 10^18+1 normalizes out of
+    // range → recorded-skip, no error, no edge.
+    use contextmesh_salience::attribution::{
+        NUMERIC_MAGNITUDE_LIMIT, NormalizedValue, m1_nominate, parse_normalized,
+    };
+    assert_eq!(NUMERIC_MAGNITUDE_LIMIT, 1_000_000_000_000_000_000u128);
+    assert_eq!(
+        parse_normalized("1000000000000000000"),
+        Some(NormalizedValue::Number(1_000_000_000_000_000_000))
+    );
+    // 1000000G = 10^18 exactly — still in range.
+    assert_eq!(
+        parse_normalized("1000000G"),
+        Some(NormalizedValue::Number(1_000_000_000_000_000_000))
+    );
+    // 10^18 + 1 → out of range.
+    assert_eq!(parse_normalized("1000000000000000001"), None);
+    // 1000000.1G > 10^18 → out of range.
+    assert_eq!(parse_normalized("1000000.1G"), None);
+
+    // Recorded-skip behavior through m1_nominate: the oversized token is
+    // reported in `skipped`, nomination proceeds without error.
+    let (nom, skipped) = m1_nominate(
+        "evt-huge",
+        "value 1000000000000000001 also 9.5M",
+        "figure 9500000 confirmed",
+        &["evt-huge"],
+        &cfg(),
+    )
+    .unwrap();
+    assert!(nom.is_some(), "the in-range 9.5M still nominates");
+    assert_eq!(skipped, vec!["1000000000000000001".to_string()]);
+
+    // Over the bound with no in-range match: no nomination, skip only.
+    let (nom, skipped) = m1_nominate(
+        "evt-edge",
+        "1000000000000000001",
+        "nothing numeric here at all",
+        &["evt-edge"],
+        &cfg(),
+    )
+    .unwrap();
+    assert!(nom.is_none());
+    assert_eq!(skipped.len(), 1);
+}
+
+#[test]
+fn m1_folding_rules() {
+    // A08: case/whitespace/path folding is deterministic — a fixture
+    // set of fold pairs must compare equal after normalization.
+    use contextmesh_salience::attribution::{NormalizedValue, fold_path, parse_normalized};
+    // Unit-suffix case folding: 9.5M == 9.5m == 9500000.
+    assert_eq!(
+        parse_normalized("9.5M"),
+        Some(NormalizedValue::Number(9_500_000))
+    );
+    assert_eq!(
+        parse_normalized("9.5m"),
+        Some(NormalizedValue::Number(9_500_000))
+    );
+    assert_eq!(
+        parse_normalized("9500000"),
+        Some(NormalizedValue::Number(9_500_000))
+    );
+    // Percent: "9.5%" == "950bps" canonical.
+    assert_eq!(
+        parse_normalized("9.5%"),
+        Some(NormalizedValue::Percent(950))
+    );
+    assert_eq!(
+        parse_normalized("9.5%").map(|v| v.canonical()),
+        Some("950bps".to_string())
+    );
+    // Path folding: duplicate + trailing slashes and case collapse.
+    assert_eq!(fold_path("/A//b/"), "/a/b");
+    assert_eq!(fold_path("/a/b"), "/a/b");
+    assert_eq!(fold_path("/a/b///c//"), "/a/b/c");
+    assert_eq!(
+        parse_normalized("/A//b/"),
+        Some(NormalizedValue::Path("/a/b".into()))
+    );
+    assert_eq!(
+        parse_normalized("/a/b"),
+        Some(NormalizedValue::Path("/a/b".into()))
+    );
+    // Determinism: folding is a pure function of the token.
+    for t in ["/A//b/", "9.5M", "9.5%", "12.5k"] {
+        let a = parse_normalized(t);
+        let b = parse_normalized(t);
+        assert_eq!(a, b);
+    }
+    // Non-numeric words stay None (no false normalization).
+    assert_eq!(parse_normalized("alpha"), None);
+    assert_eq!(parse_normalized("M"), None);
+    assert_eq!(parse_normalized("-5"), None);
+    assert_eq!(parse_normalized("1e9"), None);
+}
