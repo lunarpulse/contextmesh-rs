@@ -12,6 +12,7 @@
 
 #![warn(missing_docs)]
 
+pub mod attribution;
 pub mod error;
 pub mod io;
 pub mod json;
