@@ -3,7 +3,7 @@
 
 use contextmesh_salience::attribution::{
     AttributionConfigV1, EVIDENCE_FINGERPRINT_PREFIX, EvidenceKind, Mechanism, extract_tokens,
-    m0_nominate, versions,
+    m0_nominate, m2_nominate, versions,
 };
 use contextmesh_salience::error::OutcomeError;
 
@@ -286,4 +286,225 @@ fn m1_folding_rules() {
     assert_eq!(parse_normalized("M"), None);
     assert_eq!(parse_normalized("-5"), None);
     assert_eq!(parse_normalized("1e9"), None);
+}
+
+// ---- Stage 2D: M2 explicit structural extractor (A09–A17) ----
+
+/// Deterministic canonical EventId-shaped string for tests (valid shape:
+/// `evt1_` + 43 base64url chars). Same trick for rcpt/ocout.
+fn eid(n: u8) -> String {
+    format!("evt1_{}{}", "A".repeat(42), n)
+}
+fn rid(n: u8) -> String {
+    format!("rcpt1_{}{}", "B".repeat(42), n)
+}
+fn aid(n: u8) -> String {
+    format!("ocout1_{}{}", "C".repeat(42), n)
+}
+
+#[test]
+fn m2_eventid_citation_positive() {
+    // A09: a canonical EventId present in the referenced universe,
+    // appearing in the payload → citation edge.
+    use contextmesh_salience::attribution::{M2Structure, m2_extract, m2_nominate};
+    let cited = eid(1);
+    let ext = m2_extract(
+        &format!("analysis based on {cited} and prior work"),
+        &[cited.as_str()],
+        &[],
+        &[],
+    );
+    assert_eq!(ext.forged, Vec::<String>::new());
+    assert_eq!(
+        ext.structures,
+        vec![M2Structure::EventIdCitation(cited.clone())]
+    );
+    let edges = m2_nominate("evt-a", &ext, &cfg()).unwrap();
+    assert_eq!(edges.len(), 1);
+    assert_eq!(edges[0].mechanism.mechanism, Mechanism::M2);
+    assert_eq!(edges[0].mechanism.extractor_version, "oc-2-m2-v1");
+    assert_eq!(edges[0].evidence_kind, EvidenceKind::Citation);
+}
+
+#[test]
+fn m2_forged_link_negative() {
+    // A10: a canonical-shaped EventId NOT in the referenced universe is
+    // recorded as forged, rejected, and produces no edge.
+    use contextmesh_salience::attribution::{m2_extract, m2_nominate};
+    let real = eid(1);
+    let fake = eid(9);
+    let ext = m2_extract(
+        &format!("see {real} and also {fake}"),
+        &[real.as_str()],
+        &[],
+        &[],
+    );
+    assert_eq!(ext.forged, vec![fake.clone()]);
+    // Only the real citation became a structure; the forged one did not.
+    assert_eq!(ext.structures.len(), 1);
+    let edges = m2_nominate("evt-b", &ext, &cfg()).unwrap();
+    assert_eq!(edges.len(), 1); // forged → no edge
+}
+
+#[test]
+fn m2_provider_linkage_positive() {
+    // A11: linkage comes ONLY from core public metadata pairs, never
+    // from prose. Prose mention of ids yields no linkage.
+    use contextmesh_salience::attribution::{M2Structure, m2_extract};
+    // Prose-only: no metadata pairs → no linkage structure.
+    let ext = m2_extract("request req-42 produced result res-99", &[], &[], &[]);
+    assert!(
+        ext.structures
+            .iter()
+            .all(|s| !matches!(s, M2Structure::ProviderLinkage { .. }))
+    );
+
+    // Metadata pair supplied → exactly one linkage structure.
+    let ext = m2_extract("irrelevant prose", &[], &[("req-42", "res-99")], &[]);
+    assert_eq!(
+        ext.structures,
+        vec![M2Structure::ProviderLinkage {
+            request_id: "req-42".into(),
+            result_id: "res-99".into()
+        }]
+    );
+}
+
+#[test]
+fn m2_receipt_reference_positive() {
+    // A12: Option B receipt reference (`rcpt1_…`) → receipt edge.
+    use contextmesh_salience::attribution::{M2Structure, m2_extract, m2_nominate};
+    let receipt = rid(7);
+    let ext = m2_extract(&format!("handed off per {receipt}"), &[], &[], &[]);
+    assert_eq!(
+        ext.structures,
+        vec![M2Structure::ReceiptReference(receipt.clone())]
+    );
+    let edges = m2_nominate("evt-c", &ext, &cfg()).unwrap();
+    assert_eq!(edges.len(), 1);
+    assert_eq!(edges[0].evidence_kind, EvidenceKind::Receipt);
+}
+
+#[test]
+fn m2_summary_coverage_positive() {
+    // A13: enumeration covering listed (referenced) events → summary.
+    use contextmesh_salience::attribution::{M2Structure, m2_extract};
+    let e1 = eid(1);
+    let e2 = eid(2);
+    let ext = m2_extract(
+        "summary covers:",
+        &[e1.as_str(), e2.as_str()],
+        &[],
+        &[e1.as_str(), e2.as_str()],
+    );
+    assert_eq!(
+        ext.structures,
+        vec![M2Structure::SummaryCoverage(vec![e1.clone(), e2.clone()])]
+    );
+
+    // Negative: an enumeration naming a non-referenced event records
+    // nothing (all-entries-must-be-referenced rule).
+    let ghost = eid(3);
+    let ext = m2_extract("", &[e1.as_str()], &[], &[e1.as_str(), ghost.as_str()]);
+    assert!(ext.structures.is_empty());
+}
+
+#[test]
+fn m2_signed_artifact_reference_positive() {
+    // A14: `ocout1_…` reference → artifact edge.
+    use contextmesh_salience::attribution::{M2Structure, m2_extract, m2_nominate};
+    let artifact = aid(5);
+    let ext = m2_extract(&format!("output recorded as {artifact}"), &[], &[], &[]);
+    assert_eq!(
+        ext.structures,
+        vec![M2Structure::ArtifactReference(artifact.clone())]
+    );
+    let edges = m2_nominate("evt-d", &ext, &cfg()).unwrap();
+    assert_eq!(edges.len(), 1);
+    assert_eq!(edges[0].evidence_kind, EvidenceKind::Artifact);
+}
+
+#[test]
+fn m2_exactly_five_structures() {
+    // A15: exactly the five structures recognize; near-miss text does
+    // not. Five positives + paraphrase/citation-like negatives.
+    use contextmesh_salience::attribution::{canonical_id_kind, m2_extract};
+    let e1 = eid(1);
+    // Positive pass: all five in one extraction.
+    let ext = m2_extract(
+        &format!("{} {} {}", e1, rid(2), aid(3)),
+        &[e1.as_str()],
+        &[("rq", "rs")],
+        &[e1.as_str()],
+    );
+    assert_eq!(ext.structures.len(), 5);
+    let kinds: Vec<_> = ext.structures.iter().map(|s| s.evidence_kind()).collect();
+    for k in [
+        EvidenceKind::Citation,
+        EvidenceKind::Linkage,
+        EvidenceKind::Receipt,
+        EvidenceKind::Summary,
+        EvidenceKind::Artifact,
+    ] {
+        assert!(kinds.contains(&k), "missing kind {k:?}");
+    }
+
+    // Near-miss negatives: prose wrapping, wrong length, wrong prefix.
+    assert_eq!(canonical_id_kind(&format!("cites {e1}")), None);
+    assert_eq!(canonical_id_kind("evt1_short"), None);
+    assert_eq!(canonical_id_kind("evv1_AAAA"), None);
+    assert_eq!(canonical_id_kind(&format!("{}x", e1)), None);
+    // Paraphrased citation prose recognizes nothing.
+    let ext = m2_extract(
+        "the analysis cites the earlier event informally",
+        &[],
+        &[],
+        &[],
+    );
+    assert!(ext.structures.is_empty());
+    assert!(ext.forged.is_empty());
+}
+
+#[test]
+fn m2_provenance_on_every_edge() {
+    // A16: every edge carries extractor identity, version, config hash.
+    use contextmesh_salience::attribution::m2_extract;
+    let e1 = eid(1);
+    let ext = m2_extract(
+        &format!("{e1} {} {}", rid(2), aid(3)),
+        &[e1.as_str()],
+        &[("rq", "rs")],
+        &[e1.as_str()],
+    );
+    let edges = m2_nominate("evt-e", &ext, &cfg()).unwrap();
+    assert_eq!(edges.len(), 5);
+    for edge in &edges {
+        assert_eq!(edge.mechanism.mechanism, Mechanism::M2);
+        assert_eq!(edge.mechanism.extractor_version, "oc-2-m2-v1");
+        assert!(edge.mechanism.config_hash.starts_with("ocattrcfg1_"));
+        assert!(
+            edge.evidence_fingerprint
+                .starts_with(EVIDENCE_FINGERPRINT_PREFIX)
+        );
+    }
+}
+
+#[test]
+fn m2_no_rederivation_during_verify() {
+    // A17: the verify path reads recorded edges only — m2_nominate
+    // consumes a stored extraction and never re-scans payload text
+    // (it takes no payload argument at all). D-C-07: LLM-inferred
+    // citations are a future adapter; nothing re-derives them here.
+    use contextmesh_salience::attribution::m2_extract;
+    let e1 = eid(1);
+    let ext = m2_extract(&format!("based on {e1}"), &[e1.as_str()], &[], &[]);
+    // "Verify": rebuild edges from the RECORDED extraction only.
+    let first = m2_nominate("evt-f", &ext, &cfg()).unwrap();
+    let second = m2_nominate("evt-f", &ext, &cfg()).unwrap();
+    assert_eq!(first.len(), second.len());
+    for (a, b) in first.iter().zip(second.iter()) {
+        assert_eq!(format!("{a:?}"), format!("{b:?}"));
+    }
+    // The nomination API surface itself cannot re-derive: no payload
+    // parameter exists to re-scan (compile-time guarantee).
 }

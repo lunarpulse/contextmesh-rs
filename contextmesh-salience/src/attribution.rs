@@ -553,3 +553,218 @@ fn looks_numericish(t: &str) -> bool {
         .unwrap_or(core);
     !core.is_empty() && core.chars().all(|c| c.is_ascii_digit() || c == '.')
 }
+
+/// Typed-token shape check for one of the canonical identifier forms
+/// (`evt1_`/`rcpt1_`/`ocout1_` + 43 base64url-no-pad chars = 32 bytes).
+/// Returns the prefix when the token matches, else None (A09/A12/A14).
+pub fn canonical_id_kind(token: &str) -> Option<&'static str> {
+    for (prefix, _) in [("evt1_", 43usize), ("rcpt1_", 43), ("ocout1_", 43)] {
+        if token.len() == prefix.len() + 43
+            && token.starts_with(prefix)
+            && token[prefix.len()..]
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+        {
+            return Some(match prefix {
+                "evt1_" => "event",
+                "rcpt1_" => "receipt",
+                _ => "artifact",
+            });
+        }
+    }
+    None
+}
+
+/// Stage 2D (spec §3, D-C-07): the M2 v1 explicit structural extractor
+/// recognizes EXACTLY five verifiable structures. This enum enumerates
+/// them; `m2_extract` is the only producer (A15: near-miss text —
+/// paraphrases, citation-like prose, unparseable IDs — yields nothing).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum M2Structure {
+    /// 1. Explicit canonical EventId citation (`evt1_…` in payload).
+    EventIdCitation(String),
+    /// 2. Provider request/result linkage from core public metadata
+    ///    (a matched request-id/result-id pair supplied by the caller
+    ///    from event metadata — never inferred from prose).
+    ProviderLinkage {
+        /// The core public request identifier.
+        request_id: String,
+        /// The core public result identifier.
+        result_id: String,
+    },
+    /// 3. Option B receipt/handoff reference (`rcpt1_…`).
+    ReceiptReference(String),
+    /// 4. Summary coverage enumeration (a `covers:[…]`-style list whose
+    ///    entries are all canonical EventIds present in the referenced
+    ///    set — an enumeration that names events it covers).
+    SummaryCoverage(Vec<String>),
+    /// 5. Signed artifact reference (`ocout1_…`).
+    ArtifactReference(String),
+}
+
+/// Outcome of one M2 extraction pass over a single event payload.
+#[derive(Debug, Clone)]
+pub struct M2Extraction {
+    /// The structures recognized in this payload.
+    pub structures: Vec<M2Structure>,
+    /// Canonical-id-shaped tokens whose referent does not exist in the
+    /// caller-provided universe — recorded as forged, no edge (A10).
+    pub forged: Vec<String>,
+}
+
+impl M2Structure {
+    /// The evidence kind wire value for this structure (§7.2).
+    pub fn evidence_kind(&self) -> EvidenceKind {
+        match self {
+            M2Structure::EventIdCitation(_) => EvidenceKind::Citation,
+            M2Structure::ProviderLinkage { .. } => EvidenceKind::Linkage,
+            M2Structure::ReceiptReference(_) => EvidenceKind::Receipt,
+            M2Structure::SummaryCoverage(_) => EvidenceKind::Summary,
+            M2Structure::ArtifactReference(_) => EvidenceKind::Artifact,
+        }
+    }
+
+    /// Deterministic canonical bytes for the evidence fingerprint.
+    fn evidence_bytes(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        let tag = match self {
+            M2Structure::EventIdCitation(_) => b"c",
+            M2Structure::ProviderLinkage { .. } => b"l",
+            M2Structure::ReceiptReference(_) => b"r",
+            M2Structure::SummaryCoverage(_) => b"s",
+            M2Structure::ArtifactReference(_) => b"a",
+        };
+        out.extend_from_slice(tag);
+        match self {
+            M2Structure::EventIdCitation(id)
+            | M2Structure::ReceiptReference(id)
+            | M2Structure::ArtifactReference(id) => {
+                out.push(0);
+                out.extend_from_slice(id.as_bytes());
+            }
+            M2Structure::ProviderLinkage {
+                request_id,
+                result_id,
+            } => {
+                out.push(0);
+                out.extend_from_slice(request_id.as_bytes());
+                out.push(0);
+                out.extend_from_slice(result_id.as_bytes());
+            }
+            M2Structure::SummaryCoverage(ids) => {
+                out.extend_from_slice(ids.len().to_string().as_bytes());
+                for id in ids {
+                    out.push(0);
+                    out.extend_from_slice(id.as_bytes());
+                }
+            }
+        }
+        out
+    }
+}
+
+/// Extract the exactly-five M2 structures from one payload (A09–A15).
+///
+/// * `referenced_events` — the caller-provided universe of ledger-
+///   referenced EventIds (the nomination domain; unknown `evt1_` IDs
+///   are recorded as forged and produce no edge — A10).
+/// * `metadata_pairs` — core public provider request/result pairs from
+///   event metadata (structure 2 reads ONLY these, never prose).
+/// * `summary_enumeration` — when the payload carries a summary-
+///   coverage list, the caller supplies its entries here; every entry
+///   must be a canonical referenced EventId (else nothing is recorded).
+///
+/// Near-miss text recognizes nothing (A15): paraphrases with no
+/// literal canonical id, wrong-length ids, and wrong prefixes. A
+/// canonical id embedded in prose IS recognized (extraction is
+/// whitespace-token based — see A09's "analysis based on <id> and
+/// prior work"), which is intended behavior.
+pub fn m2_extract(
+    payload: &str,
+    referenced_events: &[&str],
+    metadata_pairs: &[(&str, &str)],
+    summary_enumeration: &[&str],
+) -> M2Extraction {
+    let mut structures = Vec::new();
+    let mut forged = Vec::new();
+
+    let mut seen_citations: Vec<String> = Vec::new();
+    let mut seen_receipts: Vec<String> = Vec::new();
+    let mut seen_artifacts: Vec<String> = Vec::new();
+    for token in payload.split_whitespace() {
+        let trimmed = token.trim_matches(|c: char| matches!(c, ',' | ';' | '.' | ')' | ']' | '"'));
+        let kind = canonical_id_kind(trimmed);
+        match (kind, trimmed) {
+            (Some("event"), id) => {
+                if referenced_events.contains(&id) {
+                    if !seen_citations.iter().any(|s| s == id) {
+                        seen_citations.push(id.to_string());
+                        structures.push(M2Structure::EventIdCitation(id.to_string()));
+                    }
+                } else if !forged.contains(&id.to_string()) {
+                    forged.push(id.to_string());
+                }
+            }
+            (Some("receipt"), id) => {
+                if !seen_receipts.iter().any(|s| s == id) {
+                    seen_receipts.push(id.to_string());
+                    structures.push(M2Structure::ReceiptReference(id.to_string()));
+                }
+            }
+            (Some("artifact"), id) if !seen_artifacts.iter().any(|s| s == id) => {
+                seen_artifacts.push(id.to_string());
+                structures.push(M2Structure::ArtifactReference(id.to_string()));
+            }
+            _ => {}
+        }
+    }
+
+    // Structure 2: provider linkage from public metadata only.
+    for (req, res) in metadata_pairs {
+        structures.push(M2Structure::ProviderLinkage {
+            request_id: (*req).to_string(),
+            result_id: (*res).to_string(),
+        });
+    }
+
+    // Structure 4: summary coverage enumeration — every entry must be
+    // a canonical EventId inside the referenced universe.
+    if !summary_enumeration.is_empty()
+        && summary_enumeration
+            .iter()
+            .all(|e| referenced_events.contains(e))
+    {
+        structures.push(M2Structure::SummaryCoverage(
+            summary_enumeration.iter().map(|e| e.to_string()).collect(),
+        ));
+    }
+
+    M2Extraction { structures, forged }
+}
+
+/// Build the M2-tagged nomination edges for one event from an
+/// extraction (A16: every edge records extractor identity, version,
+/// and configuration hash). Unverifiable links were already withheld
+/// by `m2_extract` (nothing here re-derives anything — D-C-07, A17).
+pub fn m2_nominate(
+    event: &str,
+    extraction: &M2Extraction,
+    config: &AttributionConfigV1,
+) -> Result<Vec<M0Nomination>, OutcomeError> {
+    config.validate_frozen()?;
+    let config_hash = config.config_hash()?;
+    let mut out = Vec::new();
+    for s in &extraction.structures {
+        out.push(M0Nomination {
+            event: event.to_string(),
+            mechanism: AttributionMechanismTag {
+                mechanism: Mechanism::M2,
+                extractor_version: versions::M2,
+                config_hash: config_hash.clone(),
+            },
+            evidence_kind: s.evidence_kind(),
+            evidence_fingerprint: evidence_fingerprint(&s.evidence_bytes()),
+        });
+    }
+    Ok(out)
+}
