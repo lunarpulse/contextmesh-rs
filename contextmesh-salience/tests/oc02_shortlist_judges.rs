@@ -361,6 +361,13 @@ impl OutcomeJudge for SpyJudge {
             Ok(AblationDeltaV1::Unchanged)
         }
     }
+
+    fn coalition(
+        &self,
+        _req: CoalitionRequestV1<'_>,
+    ) -> Result<CoalitionOutcomeV1, JudgeUnavailable> {
+        Ok(CoalitionOutcomeV1::NotContributing)
+    }
 }
 
 #[test]
@@ -554,6 +561,13 @@ impl OutcomeJudge for IdentityCountingJudge {
         self.calls.set(self.calls.get() + 1);
         Ok(AblationDeltaV1::Changed)
     }
+
+    fn coalition(
+        &self,
+        _req: CoalitionRequestV1<'_>,
+    ) -> Result<CoalitionOutcomeV1, JudgeUnavailable> {
+        Ok(CoalitionOutcomeV1::NotContributing)
+    }
 }
 
 #[test]
@@ -618,4 +632,213 @@ fn caps_counted_per_session_definition() {
             .count(),
         8
     );
+}
+
+// ---- Stage 2G M4 adapter tests (matrix rows J07–J11) ----
+
+use contextmesh_salience::judge::{
+    CoalitionOutcomeV1, CoalitionRequestV1, M4AdapterStatus, M4UncertaintyMarker, run_m4,
+};
+
+/// Flexible spy: coalition answers Contributing exactly when the target's
+/// shortlist-position bit is set in the mask; ablation can be pinned to
+/// Unchanged for selected events (redundant-carrier blind spot).
+struct M4Spy {
+    identity: MechanismRecordV1,
+    events: Vec<EventId>,
+    calls: RefCell<Vec<(EventId, u32)>>,
+    unchanged_ablate: Vec<EventId>,
+}
+
+impl M4Spy {
+    fn new(identity: MechanismRecordV1, events: Vec<EventId>) -> Self {
+        Self {
+            identity,
+            events,
+            calls: RefCell::new(Vec::new()),
+            unchanged_ablate: Vec::new(),
+        }
+    }
+}
+
+impl OutcomeJudge for M4Spy {
+    fn identity(&self) -> MechanismRecordV1 {
+        self.identity.clone()
+    }
+
+    fn ablate(&self, req: AblationRequestV1<'_>) -> Result<AblationDeltaV1, JudgeUnavailable> {
+        if self.unchanged_ablate.contains(&req.event()) {
+            Ok(AblationDeltaV1::Unchanged)
+        } else {
+            Ok(AblationDeltaV1::Changed)
+        }
+    }
+
+    fn coalition(
+        &self,
+        req: CoalitionRequestV1<'_>,
+    ) -> Result<CoalitionOutcomeV1, JudgeUnavailable> {
+        self.calls.borrow_mut().push((req.target(), req.mask()));
+        let bit = self
+            .events
+            .iter()
+            .position(|event| event == &req.target())
+            .unwrap();
+        if req.mask() & (1 << bit) != 0 {
+            Ok(CoalitionOutcomeV1::Contributing)
+        } else {
+            Ok(CoalitionOutcomeV1::NotContributing)
+        }
+    }
+}
+
+fn m4_spy(count: usize) -> M4Spy {
+    let events: Vec<EventId> = (0..count)
+        .map(|index| typed_event(u8::try_from(index + 1).unwrap()))
+        .collect();
+    M4Spy::new(judge_record("m4-judge", "1", 9), events)
+}
+
+#[test]
+fn m4_shortlist_only_execution() {
+    let shortlist = typed_shortlist(2);
+    let before = shortlist.canonical_bytes().unwrap();
+    let session = session(4, 5);
+    let spy = m4_spy(2);
+
+    let section = run_m4(&session, &shortlist, Some(&spy), &cfg()).unwrap();
+
+    assert_eq!(section.status(), M4AdapterStatus::Complete);
+    assert_eq!(section.judge_calls(), 4);
+    let allowed: Vec<EventId> = shortlist
+        .entries
+        .iter()
+        .map(|entry| entry.event.parse().unwrap())
+        .collect();
+    for (target, mask) in spy.calls.borrow().iter() {
+        assert!(
+            allowed.contains(target),
+            "coalition target outside shortlist"
+        );
+        assert!(*mask & 0b11u32 == *mask, "mask bit beyond shortlist length");
+    }
+    assert_eq!(shortlist.canonical_bytes().unwrap(), before);
+}
+
+#[test]
+fn m4_sample_cap_boundaries() {
+    // One candidate: the only fitting masks are the single-bit masks, so the
+    // schedule consumes every mask naming the candidate (n=1 → 1 mask).
+    let shortlist = typed_shortlist(1);
+    let spy = m4_spy(1);
+
+    let section = run_m4(&session(6, 7), &shortlist, Some(&spy), &cfg()).unwrap();
+
+    assert_eq!(section.status(), M4AdapterStatus::Complete);
+    assert_eq!(section.judge_calls(), 1);
+    let shares = section.m4();
+    assert_eq!(shares.len(), 1);
+    assert_eq!(shares[0].samples(), 1);
+    assert_eq!(shares[0].share_ppm(), 1_000_000);
+
+    // The per-candidate sample cap: with n=2 each candidate has only 2
+    // fitting masks (cap 64 never binds here — see m4_call_cap_boundaries
+    // where n=10 makes each candidate's 64-call cap bind exactly). This
+    // block pins the schedule shape; the cap itself binds in J09.
+    let wide = typed_shortlist(2);
+    let wide_spy = m4_spy(2);
+    let wide_section = run_m4(&session(8, 9), &wide, Some(&wide_spy), &cfg()).unwrap();
+    assert_eq!(wide_section.status(), M4AdapterStatus::Complete);
+    assert_eq!(wide_section.judge_calls(), 4);
+    assert_eq!(wide_section.m4()[0].samples(), 2);
+    assert_eq!(wide_section.m4()[1].samples(), 2);
+    for (_, mask) in wide_spy.calls.borrow().iter() {
+        assert!(*mask & !0b11u32 == 0, "mask bit beyond shortlist length");
+    }
+}
+
+#[test]
+fn m4_call_cap_boundaries() {
+    // n=10: each candidate's fitting masks exceed 64, so the schedule takes
+    // exactly 64 calls per candidate; the 128-call session cap lands at the
+    // end of the second candidate, and the third is never started.
+    let shortlist = typed_shortlist(10);
+    let spy = m4_spy(10);
+
+    let section = run_m4(&session(10, 11), &shortlist, Some(&spy), &cfg()).unwrap();
+
+    assert_eq!(spy.calls.borrow().len(), 128);
+    assert_eq!(section.judge_calls(), 128);
+    assert_eq!(section.status(), M4AdapterStatus::Unavailable);
+    assert_eq!(section.failure(), Some(OutcomeError::MechanismUnavailable));
+    assert!(
+        section
+            .uncertainty_markers()
+            .contains(&M4UncertaintyMarker::M4CallCap)
+    );
+    assert_eq!(
+        section
+            .uncertainty_markers()
+            .iter()
+            .map(|marker| marker.as_str())
+            .collect::<Vec<_>>(),
+        vec!["m4_call_cap"]
+    );
+    // Shares exist only for the two candidates fully sampled before the cap,
+    // in exact shortlist prefix order.
+    let expected: Vec<EventId> = shortlist
+        .entries
+        .iter()
+        .take(2)
+        .map(|entry| entry.event.parse().unwrap())
+        .collect();
+    assert_eq!(
+        section
+            .m4()
+            .iter()
+            .map(|share| share.event())
+            .collect::<Vec<_>>(),
+        expected
+    );
+}
+
+#[test]
+fn m4_redundant_pair_credit_split() {
+    let shortlist = typed_shortlist(2);
+    let spy = m4_spy(2);
+
+    let section = run_m4(&session(12, 13), &shortlist, Some(&spy), &cfg()).unwrap();
+
+    assert_eq!(section.status(), M4AdapterStatus::Complete);
+    let shares = section.m4();
+    assert_eq!(shares.len(), 2);
+    let total: u128 = shares.iter().map(|share| share.share_ppm()).sum();
+    assert!(shares[0].share_ppm() > 0);
+    assert!(shares[1].share_ppm() > 0);
+    assert!(total <= 1_000_000);
+}
+
+#[test]
+fn m3_undermarks_redundant_by_design() {
+    let shortlist = typed_shortlist(2);
+    let events: Vec<EventId> = shortlist
+        .entries
+        .iter()
+        .map(|entry| entry.event.parse().unwrap())
+        .collect();
+    let second = events[1];
+    let mut spy = m4_spy(2);
+    spy.unchanged_ablate = vec![second];
+
+    let m3 = run_m3(&session(14, 15), &shortlist, Some(&spy), &cfg()).unwrap();
+    assert_eq!(m3.status(), M3AdapterStatus::Complete);
+    assert_eq!(m3.m3()[0].delta_kind(), M3DeltaKind::Changed);
+    assert_eq!(m3.m3()[1].delta_kind(), M3DeltaKind::Unchanged);
+
+    let m4 = run_m4(&session(14, 15), &shortlist, Some(&spy), &cfg()).unwrap();
+    assert_eq!(m4.status(), M4AdapterStatus::Complete);
+    let shares = m4.m4();
+    assert_eq!(shares.len(), 2);
+    assert!(shares[0].share_ppm() > 0);
+    assert!(shares[1].share_ppm() > 0);
 }

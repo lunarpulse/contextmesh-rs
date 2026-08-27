@@ -463,3 +463,37 @@ review; they are never silently normalized in code.
   successful partial-section semantics are frozen as §7.4.1, and the
   coalition method remains deferred to Stage 2G. No existing wire, cap,
   error enum, dependency direction, or Option A/B contract changed.
+- 2026-08-28: **Lunarpulse approved the minimal Stage 2G M4 freeze
+  clarification** (Discord message `1542555983090557129`), frozen as
+  spec §7.4.2: shortlist-only coalition requests (typed target EventId +
+  32-bit subset mask), judge answers exactly
+  `contributing | not_contributing`, u128-checked `share_ppm` summing to
+  ≤1,000,000 ppm with unallocated remainder recorded, deterministic
+  lexicographic permutation sampling under the frozen caps, exact marker
+  `m4_call_cap`, M4 partial-section status
+  `complete | unavailable | no_nominations`, and typed-M4-partial-only
+  ownership for Stage 2G (CausalSectionV1 assembly and J12 stay Stage
+  2H-owned). Row count and gate IDs are unchanged.
+
+### §7.4.2 Stage 2G typed M4 adapter contract (frozen 2026-08-28)
+
+- `CoalitionRequestV1<'a>` is privately constructed by the validated
+  adapter only: borrowed session key, one typed target `EventId` from
+  the shortlist, and a bounded 32-bit subset mask selecting shortlist
+  positions. It carries no transcript, payload, path, credential,
+  wall-clock, I/O handle, or model client.
+- The judge's coalition response is exactly `contributing |
+  not_contributing`. `JudgeUnavailable` reuse and all fail-closed
+  semantics (None, mid-run, cap) mirror §7.4.1.
+- Every recorded M4 share flattens the returned `MechanismRecordV1`
+  into judge identity, version, and config hash, and carries the
+  sample count actually consumed (≤64).
+- `share_ppm` arithmetic is u128-checked; recorded shares sum to at
+  most 1,000,000 ppm; any unallocated remainder is recorded data, never
+  fabricated.
+- Sampling order is a fixed lexicographic permutation schedule,
+  identical across runs (byte-reproducible), bounded by the frozen caps
+  so the 129th judge call in a session is never made.
+- The M4 partial section and its share fields are privately constructed
+  and exposed read-only; it never emits full causal `computed`; the
+  exact cap marker string is `m4_call_cap`.
