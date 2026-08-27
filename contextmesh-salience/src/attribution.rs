@@ -902,7 +902,7 @@ impl ShortlistV1 {
         Ok(json.into_bytes())
     }
 
-    fn validate(&self) -> Result<(), OutcomeError> {
+    pub(crate) fn validate(&self) -> Result<(), OutcomeError> {
         let eligible_limit =
             u128::try_from(MAX_OUTCOME_EVENT_REFERENCES).map_err(|_| OutcomeError::Malformed)?;
         if self.cap != caps::SHORTLIST

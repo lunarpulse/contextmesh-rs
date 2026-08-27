@@ -73,18 +73,18 @@
 | Row | Requirement | Test name | File | Evidence |
 |---|---|---|---|---|
 | OC02-J01 | M3 executes only on shortlist entries | `m3_shortlist_only_execution` | tests/oc02_shortlist_judges.rs | Non-shortlist ablation request rejected by construction |
-| OC02-J02 | M3 call cap 8/session at 0/8/9 | `m3_call_cap_boundaries` | tests/oc02_shortlist_judges.rs | 9th call → `MechanismUnavailable` with cap marker, deterministic tier intact |
+| OC02-J02 | M3 call cap 8/session at 0/8/9 | `m3_call_cap_boundaries` | tests/oc02_shortlist_judges.rs | 9th call is never made → successful unavailable partial section, `MechanismUnavailable`, exact `m3_call_cap` marker, deterministic tier intact |
 | OC02-J03 | M3 records judge identity/version/config hash per call | `m3_call_provenance` | tests/oc02_shortlist_judges.rs | Every delta carries 3 provenance fields |
-| OC02-J04 | Judge None → causal tier unavailable, deterministic tier completes | `judge_none_fail_closed` | tests/oc02_shortlist_judges.rs | Report status `unavailable`, marker `judge_unavailable`, shortlist intact |
+| OC02-J04 | Judge None → causal tier unavailable, deterministic tier completes | `judge_none_fail_closed` | tests/oc02_shortlist_judges.rs | Stage 2F typed partial section status `unavailable`, exact marker `judge_unavailable`, shortlist intact; full report assembly is Stage 2H-owned |
 | OC02-J05 | JudgeUnavailable mid-run → same fail-closed, partial M3 results recorded | `judge_unavailable_midrun` | tests/oc02_shortlist_judges.rs | Completed deltas kept; remaining `unavailable` |
-| OC02-J06 | Unavailable paths contain no causal claim vocabulary | `unavailable_no_causal_vocabulary` | tests/oc02_shortlist_judges.rs | Grep-scan of report bytes for claim words = 0 |
+| OC02-J06 | Unavailable paths contain no causal claim vocabulary | `unavailable_no_causal_vocabulary` | tests/oc02_shortlist_judges.rs | Stage 2F typed partial section contains enums/provenance only and no free-form causal prose; Stage 2H owns report-byte scan |
 | OC02-J07 | M4 executes only on shortlist | `m4_shortlist_only_execution` | tests/oc02_shortlist_judges.rs | Same construction proof |
 | OC02-J08 | M4 samples/candidate cap 64 at 0/64/65 | `m4_sample_cap_boundaries` | tests/oc02_shortlist_judges.rs | 65th sample → capped recorded |
 | OC02-J09 | M4 judge-call cap 128/session at 0/128/129 | `m4_call_cap_boundaries` | tests/oc02_shortlist_judges.rs | 129th → `MechanismUnavailable` cap marker |
 | OC02-J10 | M4 splits credit on redundant pair | `m4_redundant_pair_credit_split` | tests/oc02_shortlist_judges.rs | Redundant-carrier fixture: shares sum ≤ 1e6 ppm, both > 0 |
 | OC02-J11 | M3 under-marks redundant pair by design; both outcomes recorded | `m3_undermarks_redundant_by_design` | tests/oc02_shortlist_judges.rs | M3 `unchanged` on one-of-pair; recorded alongside M4 split |
-| OC02-J12 | Adapter tier records judge transcript verbatim; verify never re-queries | `adapter_tier_verbatim_transcript` | tests/oc02_shortlist_judges.rs | Verify compares bytes to transcript; judge handle not called on verify |
-| OC02-J13 | Judge identity is recorded, never inferred | `judge_identity_recorded_not_inferred` | tests/oc02_shortlist_judges.rs | Trait object without identity metadata rejected at type level |
+| OC02-J12 | Adapter tier records judge transcript verbatim; verify never re-queries | `adapter_tier_verbatim_transcript` | tests/oc02_shortlist_judges.rs | Stage 2H-owned: verify compares bytes to transcript; judge handle not called on verify |
+| OC02-J13 | Judge identity is recorded, never inferred | `judge_identity_recorded_not_inferred` | tests/oc02_shortlist_judges.rs | Mandatory trait method supplies identity at type level; runtime records it verbatim and rejects invalid returned identity before ablation |
 | OC02-J14 | Session definition: caps counted per (ledger, context) | `caps_counted_per_session_definition` | tests/oc02_shortlist_judges.rs | Two ledgers same store: independent counters |
 
 ## Report assembly and verification
@@ -147,3 +147,4 @@
 - 2026-08-26: quality REJECT fixed (81 rows verified; ADVERSARIAL gate added) → re-review APPROVE; compliance GO.
 - 2026-08-26: **Lunarpulse approved the spec and this matrix (81 rows) for freezing** (Discord message `1541934459069145168`). Implementation authorized in spec §3 dependency order.
 - 2026-08-27: **Lunarpulse approved the minimal S03/S04 Stage 2E freeze clarification** (Discord message `1542499082533343264`): boolean M0–M2 nominees score exactly 1,000,000 ppm; Stage 2E emits the `no_nominations` marker/status while Stage 2H owns complete causal-section assembly. Row count and gate IDs are unchanged.
+- 2026-08-27: **Lunarpulse approved the minimal Stage 2F Judge/M3 freeze clarification** (Discord message `1542525263240364093`): Stage 2F owns J01–J06/J13–J14, Stage 2G owns J07–J11, and Stage 2H owns J12 full replay; exact session, provenance, unavailable, cap, and partial-section semantics are frozen in spec §7.4.1. Row count and gate IDs are unchanged.

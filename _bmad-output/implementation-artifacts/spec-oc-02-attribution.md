@@ -108,7 +108,12 @@ the next begins:
    each call recorded with judge identity/version/config hash;
    judge-unavailable → `MechanismUnavailable` (reserved OC-01 category,
    no new categories), causal section emitted with uncertainty marker,
-   M0/M1/M2 marks retained, no causal claim text produced.
+   M0/M1/M2 marks retained, no causal claim text produced. Stage 2F owns
+   J01–J06 and J13–J14. It emits a typed partial M3 adapter section;
+   Stage 2H owns complete `CausalSectionV1` assembly and canonical report
+   bytes. J12's full transcript replay/verification evidence therefore
+   lands with Stage 2H. Stage 2G owns J07–J11 and adds the final coalition
+   method plus its request/response types to the judge surface.
 8. **Stage 2G — M4 adapter bound.** Shapley-sampling coalition
    attribution over the shortlist; ≤ 64 samples/candidate and ≤ 128
    judge calls/session; redundant-carrier credit split verified against
@@ -216,6 +221,45 @@ ascending determines their relative order and cap-boundary retention.
 `judge_unavailable`; no causal claim vocabulary appears in any
 `computed`-status output text beyond measured deltas.
 
+#### 7.4.1 Stage 2F typed M3 adapter contract
+
+- `JudgeIdentity` is the existing OC-01 `MechanismRecordV1`; its frozen
+  bounds and typed `Blake3HashText` configuration hash are reused rather
+  than redefined.
+- `AttributionSessionKeyV1` is exactly `(OutcomeId, ContextId)`. A fresh
+  `run_m3` invocation owns a fresh local call counter, so caps are counted
+  independently per ledger/context computation.
+- `AblationRequestV1<'a>` contains only a borrowed session key and the
+  typed shortlist `EventId`. It carries no transcript, payload, path,
+  credential, wall-clock, I/O handle, or model client; an out-of-tree
+  judge implementation owns any execution context it needs.
+- The judge's ablation response is exactly `changed|unchanged`.
+  `unavailable` is adapter-recorded data, never a judge-invented causal
+  claim. Every recorded M3 delta flattens the returned
+  `MechanismRecordV1` into judge identity, version, and config hash.
+- Empty shortlist returns `no_nominations` with zero calls. For a
+  nonempty shortlist and `judge: None`, return a successful typed adapter
+  result with status `unavailable`, failure category
+  `MechanismUnavailable`, exact marker `judge_unavailable`, and the
+  deterministic shortlist left untouched.
+- A mid-run `JudgeUnavailable` keeps completed deltas, records the current
+  and remaining shortlist entries as `unavailable`, stops all further
+  calls, and returns the same category/marker semantics.
+- The ninth requested M3 call is never made. After eight calls, remaining
+  entries are recorded `unavailable`, status is `unavailable`, failure
+  category is `MechanismUnavailable`, and the exact marker is
+  `m3_call_cap`.
+- Stage 2F's typed partial section has no free-form causal prose and no
+  canonical report serializer. Stage 2H maps it into the frozen §7.4
+  fields and owns byte-level claim scans and transcript replay.
+- The partial section uses the M3-specific status enum
+  `complete|unavailable|no_nominations`; it never emits the full causal
+  status `computed`. Stage 2H may map to `CausalStatus::Computed` only
+  after every required adapter tier, including M4, has completed.
+- M3 partial-section and delta fields are privately constructed by the
+  validated adapter and exposed read-only. External callers cannot forge
+  authoritative-looking combinations for later Stage 2H consumption.
+
 ### 7.5 AttributionReportV1 (envelope)
 ```json
 {"version": 1, "report_id": "ocattr1_…", "ledger_id": "ocout1_…",
@@ -241,9 +285,9 @@ impl AttributionConfigV1 {
 }
 
 pub trait OutcomeJudge {
-    fn identity(&self) -> JudgeIdentity;           // recorded, never inferred
-    fn ablate(&self, req: AblationRequest<'_>) -> Result<AblationDelta, JudgeUnavailable>;
-    fn coalition(&self, req: CoalitionRequest<'_>) -> Result<CoalitionSample, JudgeUnavailable>;
+    fn identity(&self) -> MechanismRecordV1;       // recorded, never inferred
+    fn ablate(&self, req: AblationRequestV1<'_>) -> Result<AblationDeltaV1, JudgeUnavailable>;
+    // Stage 2G adds the final coalition method and its exact types.
 }
 
 pub fn compute_attribution(
@@ -411,3 +455,11 @@ review; they are never silently normalized in code.
   marker/status value while Stage 2H owns complete `CausalSectionV1`
   assembly and serialization. No cap, wire member, mechanism, error
   category, or Option A/B contract changed.
+- 2026-08-27: **Lunarpulse approved the minimal Stage 2F Judge/M3 freeze
+  clarification** (Discord message `1542525263240364093`): J01–J06 and
+  J13–J14 are Stage 2F-owned; J07–J11 are Stage 2G-owned; J12 full replay
+  is Stage 2H-owned. Judge provenance reuses `MechanismRecordV1`, session
+  identity is `(OutcomeId, ContextId)`, exact unavailable/cap markers and
+  successful partial-section semantics are frozen as §7.4.1, and the
+  coalition method remains deferred to Stage 2G. No existing wire, cap,
+  error enum, dependency direction, or Option A/B contract changed.

@@ -280,3 +280,342 @@ fn shortlist_byte_reproduction() {
     );
     assert_eq!(third.recall_basis.eligible, 2);
 }
+
+use std::cell::{Cell, RefCell};
+
+use contextmesh::model::{ContextId, EventId};
+use contextmesh_salience::judge::{
+    AblationDeltaV1, AblationRequestV1, AttributionSessionKeyV1, JudgeUnavailable, M3AdapterStatus,
+    M3DeltaKind, M3UncertaintyMarker, OutcomeJudge, run_m3,
+};
+use contextmesh_salience::types::{Blake3HashText, MechanismRecordV1, OutcomeId, OutcomeLimits};
+
+fn typed_event(index: u8) -> EventId {
+    EventId::from_bytes([index; 32])
+}
+
+fn typed_shortlist(count: usize) -> ShortlistV1 {
+    let ids: Vec<String> = (0..count)
+        .map(|index| typed_event(u8::try_from(index + 1).unwrap()).to_string())
+        .collect();
+    let nominations: Vec<_> = ids.iter().map(|id| nomination(id, Mechanism::M0)).collect();
+    build_shortlist(&nominations, &refs(&ids), &cfg()).unwrap()
+}
+
+fn session(outcome_byte: u8, context_byte: u8) -> AttributionSessionKeyV1 {
+    AttributionSessionKeyV1 {
+        outcome: OutcomeId::from_bytes([outcome_byte; 32]),
+        context: ContextId::from_bytes([context_byte; 32]),
+    }
+}
+
+fn judge_record(identity: &str, version: &str, hash_byte: u8) -> MechanismRecordV1 {
+    MechanismRecordV1::new(
+        identity.to_owned(),
+        version.to_owned(),
+        Blake3HashText::from_digest([hash_byte; 32]),
+        &OutcomeLimits::default(),
+    )
+    .unwrap()
+}
+
+struct SpyJudge {
+    identity: MechanismRecordV1,
+    requests: RefCell<Vec<(AttributionSessionKeyV1, EventId)>>,
+    unavailable_at: Option<usize>,
+}
+
+impl SpyJudge {
+    fn available(identity: MechanismRecordV1) -> Self {
+        Self {
+            identity,
+            requests: RefCell::new(Vec::new()),
+            unavailable_at: None,
+        }
+    }
+
+    fn unavailable_at(identity: MechanismRecordV1, call: usize) -> Self {
+        Self {
+            identity,
+            requests: RefCell::new(Vec::new()),
+            unavailable_at: Some(call),
+        }
+    }
+}
+
+impl OutcomeJudge for SpyJudge {
+    fn identity(&self) -> MechanismRecordV1 {
+        self.identity.clone()
+    }
+
+    fn ablate(&self, req: AblationRequestV1<'_>) -> Result<AblationDeltaV1, JudgeUnavailable> {
+        let call = self.requests.borrow().len();
+        self.requests
+            .borrow_mut()
+            .push((req.session().clone(), req.event()));
+        if self.unavailable_at == Some(call) {
+            Err(JudgeUnavailable)
+        } else if call.is_multiple_of(2) {
+            Ok(AblationDeltaV1::Changed)
+        } else {
+            Ok(AblationDeltaV1::Unchanged)
+        }
+    }
+}
+
+#[test]
+fn m3_shortlist_only_execution() {
+    let shortlist = typed_shortlist(3);
+    let before = shortlist.canonical_bytes().unwrap();
+    let session = session(1, 2);
+    let judge = SpyJudge::available(judge_record("judge-spy", "1", 3));
+
+    let section = run_m3(&session, &shortlist, Some(&judge), &cfg()).unwrap();
+
+    let allowed: Vec<EventId> = shortlist
+        .entries
+        .iter()
+        .map(|entry| entry.event.parse().unwrap())
+        .collect();
+    assert_eq!(section.judge_calls(), 3);
+    assert!(
+        judge
+            .requests
+            .borrow()
+            .iter()
+            .all(|(seen_session, event)| seen_session == &session && allowed.contains(event))
+    );
+    assert_eq!(shortlist.canonical_bytes().unwrap(), before);
+}
+
+#[test]
+fn m3_call_cap_boundaries() {
+    for count in [0usize, 8] {
+        let shortlist = typed_shortlist(count);
+        let judge = SpyJudge::available(judge_record("cap-judge", "1", 4));
+        let section = run_m3(&session(2, 3), &shortlist, Some(&judge), &cfg()).unwrap();
+        assert_eq!(section.judge_calls(), count);
+        assert_eq!(judge.requests.borrow().len(), count);
+        assert_eq!(section.failure(), None);
+        assert!(section.uncertainty_markers().is_empty());
+        assert_eq!(
+            section.status(),
+            if count == 0 {
+                M3AdapterStatus::NoNominations
+            } else {
+                M3AdapterStatus::Complete
+            }
+        );
+    }
+
+    let shortlist = typed_shortlist(9);
+    let judge = SpyJudge::available(judge_record("cap-judge", "1", 4));
+    let section = run_m3(&session(2, 3), &shortlist, Some(&judge), &cfg()).unwrap();
+    assert_eq!(section.judge_calls(), 8);
+    assert_eq!(judge.requests.borrow().len(), 8);
+    assert_eq!(section.status(), M3AdapterStatus::Unavailable);
+    assert_eq!(section.failure(), Some(OutcomeError::MechanismUnavailable));
+    assert_eq!(
+        section.uncertainty_markers(),
+        vec![M3UncertaintyMarker::M3CallCap]
+    );
+    assert_eq!(M3UncertaintyMarker::M3CallCap.as_str(), "m3_call_cap");
+    assert_eq!(section.m3()[8].delta_kind(), M3DeltaKind::Unavailable);
+    let expected_events: Vec<EventId> = shortlist
+        .entries
+        .iter()
+        .map(|entry| entry.event.parse().unwrap())
+        .collect();
+    assert_eq!(
+        section
+            .m3()
+            .iter()
+            .map(|delta| delta.event())
+            .collect::<Vec<_>>(),
+        expected_events
+    );
+}
+
+#[test]
+fn m3_call_provenance() {
+    let shortlist = typed_shortlist(2);
+    let identity = judge_record("explicit-judge", "v7", 5);
+    let judge = SpyJudge::available(identity.clone());
+    let section = run_m3(&session(3, 4), &shortlist, Some(&judge), &cfg()).unwrap();
+
+    for delta in section.m3() {
+        assert_eq!(delta.judge(), identity.identity.as_str());
+        assert_eq!(delta.judge_version(), identity.version.as_str());
+        assert_eq!(delta.judge_config_hash(), &identity.config_hash);
+    }
+}
+
+#[test]
+fn judge_none_fail_closed() {
+    let shortlist = typed_shortlist(2);
+    let before = shortlist.canonical_bytes().unwrap();
+    let section = run_m3(&session(4, 5), &shortlist, None, &cfg()).unwrap();
+
+    assert_eq!(section.status(), M3AdapterStatus::Unavailable);
+    assert_eq!(section.failure(), Some(OutcomeError::MechanismUnavailable));
+    assert_eq!(section.judge_calls(), 0);
+    assert_eq!(
+        section.uncertainty_markers(),
+        vec![M3UncertaintyMarker::JudgeUnavailable]
+    );
+    assert_eq!(
+        M3UncertaintyMarker::JudgeUnavailable.as_str(),
+        "judge_unavailable"
+    );
+    assert!(section.m3().is_empty());
+    assert_eq!(shortlist.canonical_bytes().unwrap(), before);
+}
+
+#[test]
+fn judge_unavailable_midrun() {
+    let shortlist = typed_shortlist(4);
+    let identity = judge_record("flaky-judge", "2", 6);
+    let judge = SpyJudge::unavailable_at(identity.clone(), 2);
+    let section = run_m3(&session(5, 6), &shortlist, Some(&judge), &cfg()).unwrap();
+
+    assert_eq!(section.judge_calls(), 3);
+    assert_eq!(judge.requests.borrow().len(), 3);
+    assert_eq!(section.status(), M3AdapterStatus::Unavailable);
+    assert_eq!(section.failure(), Some(OutcomeError::MechanismUnavailable));
+    assert_eq!(
+        section.uncertainty_markers(),
+        vec![M3UncertaintyMarker::JudgeUnavailable]
+    );
+    assert_eq!(section.m3()[0].delta_kind(), M3DeltaKind::Changed);
+    assert_eq!(section.m3()[1].delta_kind(), M3DeltaKind::Unchanged);
+    assert!(
+        section.m3()[2..]
+            .iter()
+            .all(|delta| delta.delta_kind() == M3DeltaKind::Unavailable)
+    );
+    assert!(section.m3().iter().all(|delta| {
+        delta.judge() == identity.identity
+            && delta.judge_version() == identity.version
+            && delta.judge_config_hash() == &identity.config_hash
+    }));
+    let expected_events: Vec<EventId> = shortlist
+        .entries
+        .iter()
+        .map(|entry| entry.event.parse().unwrap())
+        .collect();
+    assert_eq!(
+        section
+            .m3()
+            .iter()
+            .map(|delta| delta.event())
+            .collect::<Vec<_>>(),
+        expected_events
+    );
+}
+
+#[test]
+fn unavailable_no_causal_vocabulary() {
+    let shortlist = typed_shortlist(1);
+    let section = run_m3(&session(6, 7), &shortlist, None, &cfg()).unwrap();
+
+    assert_eq!(section.status().as_str(), "unavailable");
+    assert_eq!(
+        section.failure().unwrap().stable_category(),
+        "mechanism-unavailable"
+    );
+    assert_eq!(
+        section.uncertainty_markers()[0].as_str(),
+        "judge_unavailable"
+    );
+    let typed_surface = format!(
+        "{} {} {}",
+        section.status().as_str(),
+        section.failure().unwrap().stable_category(),
+        section.uncertainty_markers()[0].as_str()
+    );
+    for causal_claim in ["caused", "because", "credit", "load-bearing"] {
+        assert!(!typed_surface.contains(causal_claim));
+    }
+}
+
+struct IdentityCountingJudge {
+    identities: Cell<usize>,
+    calls: Cell<usize>,
+    identity: MechanismRecordV1,
+}
+
+impl OutcomeJudge for IdentityCountingJudge {
+    fn identity(&self) -> MechanismRecordV1 {
+        self.identities.set(self.identities.get() + 1);
+        self.identity.clone()
+    }
+
+    fn ablate(&self, _req: AblationRequestV1<'_>) -> Result<AblationDeltaV1, JudgeUnavailable> {
+        self.calls.set(self.calls.get() + 1);
+        Ok(AblationDeltaV1::Changed)
+    }
+}
+
+#[test]
+fn judge_identity_recorded_not_inferred() {
+    let identity = judge_record("returned-by-identity-method", "exact-version", 7);
+    let judge = IdentityCountingJudge {
+        identities: Cell::new(0),
+        calls: Cell::new(0),
+        identity: identity.clone(),
+    };
+    let section = run_m3(&session(7, 8), &typed_shortlist(1), Some(&judge), &cfg()).unwrap();
+
+    assert_eq!(judge.identities.get(), 1);
+    assert_eq!(judge.calls.get(), 1);
+    assert_eq!(section.m3()[0].judge(), identity.identity);
+    assert_eq!(section.m3()[0].judge_version(), identity.version);
+    assert_eq!(section.m3()[0].judge_config_hash(), &identity.config_hash);
+
+    // A malformed identity is rejected before any ablation call and no
+    // partial authoritative section is returned.
+    let mut malformed_identity = judge_record("valid-first", "1", 9);
+    malformed_identity.identity.clear();
+    let malformed_judge = IdentityCountingJudge {
+        identities: Cell::new(0),
+        calls: Cell::new(0),
+        identity: malformed_identity,
+    };
+    let error = run_m3(
+        &session(7, 8),
+        &typed_shortlist(1),
+        Some(&malformed_judge),
+        &cfg(),
+    )
+    .unwrap_err();
+    assert_eq!(error, OutcomeError::Malformed);
+    assert_eq!(malformed_judge.identities.get(), 1);
+    assert_eq!(malformed_judge.calls.get(), 0);
+}
+
+#[test]
+fn caps_counted_per_session_definition() {
+    let shortlist = typed_shortlist(9);
+    let judge = SpyJudge::available(judge_record("session-judge", "1", 8));
+    let first_key = session(8, 9);
+    let second_key = session(10, 11);
+
+    let first = run_m3(&first_key, &shortlist, Some(&judge), &cfg()).unwrap();
+    let second = run_m3(&second_key, &shortlist, Some(&judge), &cfg()).unwrap();
+
+    assert_eq!(first.judge_calls(), 8);
+    assert_eq!(second.judge_calls(), 8);
+    let requests = judge.requests.borrow();
+    assert_eq!(requests.len(), 16);
+    assert_eq!(
+        requests.iter().filter(|(key, _)| key == &first_key).count(),
+        8
+    );
+    assert_eq!(
+        requests
+            .iter()
+            .filter(|(key, _)| key == &second_key)
+            .count(),
+        8
+    );
+}
