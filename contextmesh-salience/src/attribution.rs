@@ -7,7 +7,9 @@
 //! Change control: spec §15 — founder approval required for any change.
 
 use crate::error::OutcomeError;
+use crate::types::MAX_OUTCOME_EVENT_REFERENCES;
 use blake3::Hasher;
+use std::collections::{BTreeMap, BTreeSet, btree_map::Entry};
 
 /// The mechanism ladder is exactly these five variants (spec §5).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -767,4 +769,321 @@ pub fn m2_nominate(
         });
     }
     Ok(out)
+}
+
+/// Binary deterministic nomination score used by OC-02 Stage 2E.
+///
+/// OC-03 priors and OC-04 lexical scoring are intentionally outside this
+/// policy: every event nominated by at least one of M0–M2 receives this score.
+pub const NOMINATION_SCORE_PPM: u32 = 1_000_000;
+
+/// Frozen causal-section statuses (§7.4).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CausalStatus {
+    /// Causal adapters completed (not produced by the shortlist stage).
+    Computed,
+    /// A required causal adapter was unavailable.
+    Unavailable,
+    /// No deterministic nomination exists, so no causal computation applies.
+    NoNominations,
+}
+
+impl CausalStatus {
+    /// Stable wire spelling.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Computed => "computed",
+            Self::Unavailable => "unavailable",
+            Self::NoNominations => "no_nominations",
+        }
+    }
+}
+
+/// Counts used to measure shortlist nomination recall separately from later
+/// causal-verifier recall (§7.3; D-C-06 #3).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RecallBasisV1 {
+    /// Unique referenced events nominated before applying the cap.
+    pub nominated: u128,
+    /// Unique events in the caller-provided referenced universe.
+    pub eligible: u128,
+}
+
+/// One EventId-deduplicated deterministic shortlist entry (§7.3).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShortlistEntryV1 {
+    /// Canonical ledger-referenced EventId.
+    pub event: String,
+    /// One-based rank after sorting and applying the cap.
+    pub rank: u128,
+    /// Unique nominating mechanism values in canonical M0, M1, M2 order.
+    pub nominating_mechanisms: Vec<Mechanism>,
+    /// Binary deterministic nomination score in parts per million.
+    pub score_ppm: u32,
+}
+
+/// OC-02 Stage 2E deterministic shortlist artifact (§7.3).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShortlistV1 {
+    /// Retained entries after deterministic sorting and cap application.
+    pub entries: Vec<ShortlistEntryV1>,
+    /// Frozen shortlist cap.
+    pub cap: usize,
+    /// Frozen deduplication key description.
+    pub dedup: &'static str,
+    /// Frozen ordering description.
+    pub order: &'static str,
+    /// Separate pre-cap nomination and eligible-universe counts.
+    pub recall_basis: RecallBasisV1,
+}
+
+impl ShortlistV1 {
+    /// Derive overflow as nominated unique events minus retained entries.
+    /// Arithmetic is widened to u128 and checked, failing closed if a malformed
+    /// manually-constructed value violates the invariant.
+    pub fn overflow_count(&self) -> Result<u128, OutcomeError> {
+        self.validate()?;
+        let retained = u128::try_from(self.entries.len()).map_err(|_| OutcomeError::Malformed)?;
+        self.recall_basis
+            .nominated
+            .checked_sub(retained)
+            .ok_or(OutcomeError::Malformed)
+    }
+
+    /// Return the only causal status Stage 2E may assert: an explicit
+    /// `no_nominations` marker for an empty shortlist. A non-empty shortlist
+    /// returns `None`; it does not claim that causal output was computed.
+    /// Manually constructed invalid values fail closed before producing a marker.
+    pub fn causal_status_marker(&self) -> Result<Option<CausalStatus>, OutcomeError> {
+        self.validate()?;
+        if self.entries.is_empty() {
+            Ok(Some(CausalStatus::NoNominations))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Deterministic strict compact JSON with the exact §7.3 members.
+    /// Top-level and nested object keys are emitted in lexicographic order.
+    pub fn canonical_bytes(&self) -> Result<Vec<u8>, OutcomeError> {
+        self.validate()?;
+        let mut json = String::new();
+        json.push_str("{\"cap\":");
+        json.push_str(&self.cap.to_string());
+        json.push_str(",\"dedup\":");
+        push_json_string(&mut json, self.dedup);
+        json.push_str(",\"entries\":[");
+        for (index, entry) in self.entries.iter().enumerate() {
+            if index != 0 {
+                json.push(',');
+            }
+            json.push_str("{\"event\":");
+            push_json_string(&mut json, &entry.event);
+            json.push_str(",\"nominating_mechanisms\":[");
+            for (mechanism_index, mechanism) in entry.nominating_mechanisms.iter().enumerate() {
+                if mechanism_index != 0 {
+                    json.push(',');
+                }
+                push_json_string(&mut json, mechanism.as_str());
+            }
+            json.push_str("],\"rank\":");
+            json.push_str(&entry.rank.to_string());
+            json.push_str(",\"score_ppm\":");
+            json.push_str(&entry.score_ppm.to_string());
+            json.push('}');
+        }
+        json.push_str("],\"order\":");
+        push_json_string(&mut json, self.order);
+        json.push_str(",\"recall_basis\":{\"eligible\":");
+        json.push_str(&self.recall_basis.eligible.to_string());
+        json.push_str(",\"nominated\":");
+        json.push_str(&self.recall_basis.nominated.to_string());
+        json.push_str("}}");
+        Ok(json.into_bytes())
+    }
+
+    fn validate(&self) -> Result<(), OutcomeError> {
+        let eligible_limit =
+            u128::try_from(MAX_OUTCOME_EVENT_REFERENCES).map_err(|_| OutcomeError::Malformed)?;
+        if self.cap != caps::SHORTLIST
+            || self.dedup != "EventId"
+            || self.order != "score_ppm desc, EventId asc"
+            || self.entries.len() > self.cap
+            || self.recall_basis.nominated > self.recall_basis.eligible
+            || self.recall_basis.eligible > eligible_limit
+        {
+            return Err(OutcomeError::Malformed);
+        }
+        let retained = u128::try_from(self.entries.len()).map_err(|_| OutcomeError::Malformed)?;
+        let cap = u128::try_from(self.cap).map_err(|_| OutcomeError::Malformed)?;
+        if retained != self.recall_basis.nominated.min(cap) {
+            return Err(OutcomeError::Malformed);
+        }
+        let mut previous_event: Option<&str> = None;
+        for (index, entry) in self.entries.iter().enumerate() {
+            let rank = u128::try_from(index)
+                .map_err(|_| OutcomeError::Malformed)?
+                .checked_add(1)
+                .ok_or(OutcomeError::Malformed)?;
+            if entry.rank != rank
+                || entry.score_ppm != NOMINATION_SCORE_PPM
+                || canonical_id_kind(&entry.event) != Some("event")
+                || entry.nominating_mechanisms.is_empty()
+                || entry
+                    .nominating_mechanisms
+                    .iter()
+                    .any(|m| !matches!(m, Mechanism::M0 | Mechanism::M1 | Mechanism::M2))
+                || entry
+                    .nominating_mechanisms
+                    .windows(2)
+                    .any(|pair| pair[0] >= pair[1])
+                || previous_event.is_some_and(|previous| previous >= entry.event.as_str())
+            {
+                return Err(OutcomeError::Malformed);
+            }
+            previous_event = Some(&entry.event);
+        }
+        Ok(())
+    }
+}
+
+/// Build the Stage 2E union from recorded M0/M1/M2 nomination edges.
+///
+/// Nominations outside `referenced_events` are filtered before deduplication.
+/// Referenced events are unique-counted for the recall basis, and must use the
+/// canonical `evt1_` textual shape. The frozen config is validated before its
+/// cap is consumed.
+pub fn build_shortlist(
+    nominations: &[M0Nomination],
+    referenced_events: &[&str],
+    config: &AttributionConfigV1,
+) -> Result<ShortlistV1, OutcomeError> {
+    config.validate_frozen()?;
+    let expected_config_hash = config.config_hash()?;
+
+    let mut referenced = BTreeSet::new();
+    let mut eligible = 0u128;
+    for event in referenced_events {
+        if canonical_id_kind(event) != Some("event") {
+            return Err(OutcomeError::Malformed);
+        }
+        if referenced.insert(*event) {
+            eligible = eligible.checked_add(1).ok_or(OutcomeError::Malformed)?;
+            if referenced.len() > MAX_OUTCOME_EVENT_REFERENCES {
+                return Err(OutcomeError::Malformed);
+            }
+        }
+    }
+
+    let mut union: BTreeMap<String, BTreeSet<Mechanism>> = BTreeMap::new();
+    let mut nominated = 0u128;
+    for nomination in nominations {
+        if !referenced.contains(nomination.event.as_str()) {
+            continue;
+        }
+        let mechanism = nomination.mechanism.mechanism;
+        let provenance_valid = match mechanism {
+            Mechanism::M0 => {
+                nomination.mechanism.extractor_version == versions::M0
+                    && nomination.evidence_kind == EvidenceKind::Overlap
+            }
+            Mechanism::M1 => {
+                nomination.mechanism.extractor_version == versions::M1
+                    && nomination.evidence_kind == EvidenceKind::Normalized
+            }
+            Mechanism::M2 => {
+                nomination.mechanism.extractor_version == versions::M2
+                    && matches!(
+                        nomination.evidence_kind,
+                        EvidenceKind::Citation
+                            | EvidenceKind::Linkage
+                            | EvidenceKind::Receipt
+                            | EvidenceKind::Summary
+                            | EvidenceKind::Artifact
+                    )
+            }
+            Mechanism::M3 | Mechanism::M4 => false,
+        };
+        if !provenance_valid
+            || nomination.mechanism.config_hash != expected_config_hash
+            || !valid_evidence_fingerprint(&nomination.evidence_fingerprint)
+        {
+            return Err(OutcomeError::Malformed);
+        }
+        match union.entry(nomination.event.clone()) {
+            Entry::Vacant(entry) => {
+                nominated = nominated.checked_add(1).ok_or(OutcomeError::Malformed)?;
+                let mut mechanisms = BTreeSet::new();
+                mechanisms.insert(mechanism);
+                entry.insert(mechanisms);
+            }
+            Entry::Occupied(mut entry) => {
+                entry.get_mut().insert(mechanism);
+            }
+        }
+    }
+
+    let mut entries = Vec::new();
+    for (event, mechanisms) in union.into_iter().take(config.shortlist_cap) {
+        let rank = u128::try_from(entries.len())
+            .map_err(|_| OutcomeError::Malformed)?
+            .checked_add(1)
+            .ok_or(OutcomeError::Malformed)?;
+        entries.push(ShortlistEntryV1 {
+            event,
+            rank,
+            nominating_mechanisms: mechanisms.into_iter().collect(),
+            score_ppm: NOMINATION_SCORE_PPM,
+        });
+    }
+
+    let shortlist = ShortlistV1 {
+        entries,
+        cap: config.shortlist_cap,
+        dedup: "EventId",
+        order: "score_ppm desc, EventId asc",
+        recall_basis: RecallBasisV1 {
+            nominated,
+            eligible,
+        },
+    };
+    shortlist.validate()?;
+    Ok(shortlist)
+}
+
+/// Validate the exact typed lowercase-hex BLAKE3 evidence-fingerprint shape.
+fn valid_evidence_fingerprint(value: &str) -> bool {
+    value
+        .strip_prefix(EVIDENCE_FINGERPRINT_PREFIX)
+        .is_some_and(|hex| {
+            hex.len() == 64
+                && hex
+                    .bytes()
+                    .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        })
+}
+
+/// Append one JSON string with RFC 8259 escaping and no unnecessary spaces.
+fn push_json_string(output: &mut String, value: &str) {
+    output.push('"');
+    for ch in value.chars() {
+        match ch {
+            '"' => output.push_str("\\\""),
+            '\\' => output.push_str("\\\\"),
+            '\u{08}' => output.push_str("\\b"),
+            '\u{0c}' => output.push_str("\\f"),
+            '\n' => output.push_str("\\n"),
+            '\r' => output.push_str("\\r"),
+            '\t' => output.push_str("\\t"),
+            control if control <= '\u{1f}' => {
+                output.push_str("\\u00");
+                let byte = control as u8;
+                const HEX: &[u8; 16] = b"0123456789abcdef";
+                output.push(char::from(HEX[usize::from(byte >> 4)]));
+                output.push(char::from(HEX[usize::from(byte & 0x0f)]));
+            }
+            other => output.push(other),
+        }
+    }
+    output.push('"');
 }

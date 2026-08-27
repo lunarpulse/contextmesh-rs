@@ -96,7 +96,13 @@ the next begins:
    EventId-deduplicated, deterministic ordering, cap 32 (0/32/33
    boundaries), empty shortlist recorded as `no nominations` (success,
    not error), shortlist recall computed and recorded separately from
-   causal-verifier recall (D-C-06 #3).
+   causal-verifier recall (D-C-06 #3). Because M0–M2 are frozen boolean
+   nominators, every uniquely nominated event has `score_ppm = 1000000`
+   in OC-02; therefore EventId ascending is the effective Stage 2E
+   tie-break. OC-03/OC-04 prior or lexical scores never enter this stage.
+   Stage 2E emits the exact `CausalStatus::NoNominations` marker/status
+   value for an empty shortlist; Stage 2H owns assembly and canonical
+   serialization of the complete `CausalSectionV1` containing that value.
 7. **Stage 2F — Judge trait and M3 adapter bound.** `OutcomeJudge` trait
    (ablation); M3 runs only on shortlist entries, ≤ 8 calls/session,
    each call recorded with judge identity/version/config hash;
@@ -191,6 +197,11 @@ bytes (never raw transcript content).
  "recall_basis": {"nominated": 0, "eligible": 0}}
 ```
 Deterministic order: score desc, then canonical EventId ascending.
+For OC-02, M0/M1/M2 are boolean nominators: every EventId present in
+their deduplicated union has `score_ppm = 1000000`. No mechanism weight,
+prior score, lexical score, or caller-supplied score is inferred here.
+Consequently all Stage 2E entries tie on score and canonical EventId
+ascending determines their relative order and cap-boundary retention.
 
 ### 7.4 CausalSectionV1
 ```json
@@ -393,3 +404,10 @@ review; they are never silently normalized in code.
   verbatim** (Discord message `1541934459069145168`). Status is now
   `approved-for-implementation`. Implementation proceeds in §3
   dependency order.
+- 2026-08-27: **Lunarpulse approved the minimal Stage 2E freeze
+  clarification** (Discord message `1542499082533343264`): boolean
+  M0–M2 nominations score exactly 1,000,000 ppm with EventId ascending
+  as the effective tie-break; Stage 2E emits the `no_nominations`
+  marker/status value while Stage 2H owns complete `CausalSectionV1`
+  assembly and serialization. No cap, wire member, mechanism, error
+  category, or Option A/B contract changed.

@@ -61,8 +61,8 @@
 |---|---|---|---|---|
 | OC02-S01 | Union of M0–M2 nominations EventId-deduplicated | `shortlist_union_dedup` | tests/oc02_shortlist_judges.rs | Multi-mechanism same-event → single entry, mechanisms merged |
 | OC02-S02 | Cap 32 at boundaries 0/32/33 | `shortlist_cap_boundaries` | tests/oc02_shortlist_judges.rs | 0 ok; 32 ok; 33 → capped deterministically, overflow recorded |
-| OC02-S03 | Deterministic order score desc, EventId asc | `shortlist_order_deterministic` | tests/oc02_shortlist_judges.rs | Tie-score pair ordered by EventId |
-| OC02-S04 | Empty shortlist recorded `no nominations`, not error | `shortlist_empty_recorded` | tests/oc02_shortlist_judges.rs | Marker + causal section `no_nominations` |
+| OC02-S03 | Deterministic order score desc, EventId asc; boolean M0–M2 nominees score exactly 1,000,000 ppm | `shortlist_order_deterministic` | tests/oc02_shortlist_judges.rs | Tie-score pair ordered by EventId; no OC-03/OC-04 score channel |
+| OC02-S04 | Empty shortlist recorded `no nominations`, not error | `shortlist_empty_recorded` | tests/oc02_shortlist_judges.rs | Stage 2E emits exact `CausalStatus::NoNominations` marker/status; complete `CausalSectionV1` assembly/serialization is Stage 2H-owned |
 | OC02-S05 | Shortlist recall computed separately from verifier recall | `shortlist_recall_recorded_separately` | tests/oc02_shortlist_judges.rs | recall_basis {nominated, eligible} present and correct (D-C-06 #3) |
 | OC02-S06 | Shortlist cap arithmetic checked (no overflow at bounds) | `shortlist_arithmetic_checked` | tests/oc02_shortlist_judges.rs | u128 widened path |
 | OC02-S07 | Shortlist never includes non-ledger-referenced events | `shortlist_domain_purity` | tests/oc02_shortlist_judges.rs | Injected foreign event absent |
@@ -146,3 +146,4 @@
 - 2026-08-26: draft created alongside spec; dual independent review and founder approval pending. No implementation authorized.
 - 2026-08-26: quality REJECT fixed (81 rows verified; ADVERSARIAL gate added) → re-review APPROVE; compliance GO.
 - 2026-08-26: **Lunarpulse approved the spec and this matrix (81 rows) for freezing** (Discord message `1541934459069145168`). Implementation authorized in spec §3 dependency order.
+- 2026-08-27: **Lunarpulse approved the minimal S03/S04 Stage 2E freeze clarification** (Discord message `1542499082533343264`): boolean M0–M2 nominees score exactly 1,000,000 ppm; Stage 2E emits the `no_nominations` marker/status while Stage 2H owns complete causal-section assembly. Row count and gate IDs are unchanged.
