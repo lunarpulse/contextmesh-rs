@@ -354,6 +354,30 @@ fn record(event: EventId, delta_kind: M3DeltaKind, identity: &MechanismRecordV1)
     }
 }
 
+impl M3DeltaV1 {
+    /// Public constructor for verification-side transcript assembly
+    /// (spec §9.4): a recorded answer plus the judge provenance that was
+    /// validated alongside it. Refuses the `Unavailable` marker kind —
+    /// transcripts record only answers the judge actually gave.
+    pub fn from_transcript_entry(
+        event: EventId,
+        delta_kind: M3DeltaKind,
+        identity: &MechanismRecordV1,
+    ) -> Result<Self, OutcomeError> {
+        if delta_kind == M3DeltaKind::Unavailable {
+            return Err(OutcomeError::Malformed);
+        }
+        identity.validate(&OutcomeLimits::default())?;
+        Ok(Self {
+            event,
+            delta_kind,
+            judge: identity.identity.clone(),
+            judge_version: identity.version.clone(),
+            judge_config_hash: identity.config_hash.clone(),
+        })
+    }
+}
+
 // ---- Stage 2G: shortlist-bound M4 coalition adapter (spec §7.4.2) ----
 
 /// Exact judge response to one coalition sampling query.
