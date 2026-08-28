@@ -92,7 +92,7 @@
 | Row | Requirement | Test name | File | Evidence |
 |---|---|---|---|---|
 | OC02-R01 | Report ID flips on any byte change (tamper matrix) | `report_id_tamper_matrix` | tests/oc02_reports.rs | Flip each top-level member → different report_id; original re-renders |
-| OC02-R02 | Deterministic tier rebuild byte-exact from (ledger, events, config) | `deterministic_tier_byte_rebuild` | tests/oc02_reports.rs | Rebuild equals committed fixture bytes |
+| OC02-R02 | Deterministic tier rebuild byte-exact from (ledger, events, config) | `deterministic_tier_byte_rebuild` | tests/oc02_reports.rs | Deterministic-tier bytes are byte-identical across judge presence and reruns; committed-fixture byte equality is owned by R07 |
 | OC02-R03 | Adapter tier equals recorded transcript on replay | `adapter_tier_transcript_replay` | tests/oc02_reports.rs | Replayed judge transcript → identical adapter bytes |
 | OC02-R04 | Cross-ledger report rejected | `cross_ledger_report_rejected` | tests/oc02_reports.rs | Report referencing other ledger_id → verification failure |
 | OC02-R05 | Cross-context event rejection at report level | `cross_context_report_rejected` | tests/oc02_reports.rs | Foreign-context event in edges → reject, no partial artifact |

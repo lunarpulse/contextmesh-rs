@@ -317,8 +317,15 @@ pub fn compute_attribution(
    transcript, `compute_attribution` reproduces byte-identical
    deterministic-tier bytes; the adapter tier reproduces byte-identical
    bytes when the judge transcript is replayed verbatim.
-2. `report_id` = BLAKE3(`oc-02-attr-report-v1` + NUL + canonical full
-   report bytes), typed `ocattr1_`. Flipping any byte invalidates.
+2. `report_id` = BLAKE3(`oc-02-attr-report-v1` + NUL + canonical report
+   bytes with the `report_id` member set to its fixed derivation
+   placeholder — the literal string `"report_id"`); the derived value is
+   then substituted into exactly that position in the sealed bytes,
+   making construction the only writer of the ID. Flipping any byte of
+   the sealed bytes invalidates. (Clarified 2026-08-29: the frozen
+   wording "canonical full report bytes" omitted the placeholder
+   substitution that breaks the self-reference; implementation behavior
+   and all derived IDs are unchanged.)
 3. Every nomination edge, M3 delta, and M4 share carries mechanism tag,
    extractor/judge identity, version, and configuration hash (C2 intent).
 4. Verification rebuilds the deterministic tier and compares bytes;
@@ -474,6 +481,22 @@ review; they are never silently normalized in code.
   `complete | unavailable | no_nominations`, and typed-M4-partial-only
   ownership for Stage 2G (CausalSectionV1 assembly and J12 stay Stage
   2H-owned). Row count and gate IDs are unchanged.
+- 2026-08-29: **Lunarpulse approved the Plan A wording-only corrections
+  for the two unresolved change-control items** (Discord message
+  `1543000276221427912`): (1) spec §9.2 rule 2 now states that
+  `report_id` is derived over canonical bytes with the `report_id`
+  member set to its fixed derivation placeholder — closing the
+  specification gap where the frozen wording ("canonical full report
+  bytes") omitted the placeholder substitution that breaks the
+  self-reference; implementation behavior, all derived IDs, and the
+  golden fixture are unchanged. (2) Matrix row OC02-R02's evidence
+  column now states the test's actual assertion scope: rebuild is
+  byte-identical across judge presence and reruns; committed-fixture
+  byte equality is owned by OC02-R07. Both edits are wording-only;
+  no code, test, cap, wire member, mechanism, or Option A/B contract
+  changed. Clarification eligibility test recorded: each edit stands
+  with zero code/test changes — verified by `git diff --stat` showing
+  only the two document files.
 
 ### §7.4.2 Stage 2G typed M4 adapter contract (frozen 2026-08-28)
 
