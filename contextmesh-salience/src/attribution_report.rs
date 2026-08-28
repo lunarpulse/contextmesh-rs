@@ -382,7 +382,10 @@ pub async fn verify_report(
     ledger.verify(OutcomeLimits::default())?;
     config.validate_frozen()?;
 
-    // Strict, exact-shape parse of the committed bytes.
+    // Strict, exact-shape, canonical-only parse of the committed bytes:
+    // whitespace, reordered keys, or alternate spellings reject outright
+    // (X10 non-canonical rejection, OC-01 I26 pattern).
+    parse_report_bytes(bytes)?;
     let value = crate::json::parse_strict(bytes)?;
     crate::json::require_exact_keys(&value, &REPORT_MEMBERS)?;
     let object = value.as_object().ok_or(Error::Malformed)?;
@@ -508,7 +511,13 @@ impl OutcomeJudge for ReplayJudge<'_> {
 fn parse_report_bytes(bytes: &[u8]) -> Result<Vec<u8>, Error> {
     let value = crate::json::parse_strict(bytes)?;
     crate::json::require_exact_keys(&value, &REPORT_MEMBERS)?;
-    crate::json::jcs(&value)
+    let canonical = crate::json::jcs(&value)?;
+    // Non-canonical bytes (whitespace, reordered keys, numeric spellings)
+    // must be rejected outright — only exact canonical bytes verify.
+    if canonical != bytes {
+        return Err(Error::Noncanonical);
+    }
+    Ok(canonical)
 }
 
 /// Derives the domain-separated typed report ID (spec §9.2).
