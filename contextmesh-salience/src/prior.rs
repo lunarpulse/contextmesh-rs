@@ -1049,3 +1049,167 @@ pub fn derive_seeds(
     let _ = terminal_status; // consumed by the 3F envelope assembly, not the seed set
     Ok((seed_set, dropped_seeds))
 }
+
+// ── Stage 3E: integer fixed-point PPR propagation (spec §7.6) ─────────────
+
+/// PPR propagation outcome: the final mass vector plus convergence facts.
+///
+/// The vector lists only entities with mass > 0, in entity byte order
+/// (§7.6: "entries > 0 form the vector"). All values are ppb integers.
+#[derive(Debug, Clone)]
+pub struct PprOutcome {
+    vector: Vec<(String, u128)>,
+    iterations: u32,
+    converged: bool,
+    residual_ppb: u128,
+}
+
+impl PprOutcome {
+    /// Read-only: positive-mass entries in entity byte order.
+    #[must_use]
+    pub fn vector(&self) -> &[(String, u128)] {
+        &self.vector
+    }
+    /// Read-only: iterations executed.
+    #[must_use]
+    pub const fn iterations(&self) -> u32 {
+        self.iterations
+    }
+    /// Read-only: whether the L∞ threshold was reached within the cap.
+    #[must_use]
+    pub const fn converged(&self) -> bool {
+        self.converged
+    }
+    /// Read-only: final-iteration flooring loss per the exact §7.6 formula.
+    #[must_use]
+    pub const fn residual_ppb(&self) -> u128 {
+        self.residual_ppb
+    }
+}
+
+/// Run the integer fixed-point Personalized PageRank recurrence over the
+/// bounded entity graph (spec §7.6). No floats anywhere; all arithmetic is
+/// u128 checked and a checked overflow fails closed with
+/// [`OutcomeError::Malformed`] (prereg overflow policy).
+///
+/// * `teleport(e) = floor(s(e) × DAMPING_PPM / 1e6)` — computed once.
+/// * `m_0 = teleport`; `prop_t(e) = Σ_{u∈nbr(e)} floor(m_t(u)·C/(1e12·out(u)))`
+///   summed in neighbor byte order; `m_{t+1} = teleport + prop_t`.
+/// * Stops at L∞ ≤ `EPSILON_PPB` (`converged = true`) or 64 iterations
+///   (`converged = false` — recorded fact, never an error).
+/// * `residual_ppb = floor(Σ_{u:out>0} (n_u mod d_u) / 1e12)` over the
+///   final iteration, with `n_u = m_final(u)·C`, `d_u = 1e12·out(u)`.
+pub fn run_ppr(
+    graph: &EntityGraphV1,
+    seeds: &PriorSeedSetV1,
+    config: &PriorConfigV1,
+) -> Result<PprOutcome, OutcomeError> {
+    config.validate_frozen()?;
+    // Seed lookup by entity (seeds are already byte-ordered and deduped).
+    let seed_of = |entity: &str| -> u128 {
+        seeds
+            .seeds()
+            .iter()
+            .find(|s| s.entity() == entity)
+            .map_or(0, |s| s.ppb())
+    };
+
+    // Adjacency in canonical byte order (entities() is byte-sorted; edges()
+    // are (a,b)-sorted, so neighbor lists inherit canonical order).
+    let entities: Vec<&str> = graph.entities().iter().map(String::as_str).collect();
+    let index_of = |entity: &str| -> Option<usize> { entities.iter().position(|e| *e == entity) };
+    let mut neighbors: Vec<Vec<usize>> = vec![Vec::new(); entities.len()];
+    for edge in graph.edges() {
+        let (a, b) = (edge.a(), edge.b());
+        if let (Some(ai), Some(bi)) = (index_of(a), index_of(b)) {
+            neighbors[ai].push(bi);
+            neighbors[bi].push(ai);
+        }
+    }
+
+    let c = 1_000_000_000_000u128
+        .checked_sub(config.damping_ppm * 1_000_000u128)
+        .ok_or(OutcomeError::Malformed)?;
+    // Teleport, computed once (m_0 = teleport).
+    let teleport: Vec<u128> = entities
+        .iter()
+        .map(|e| {
+            seed_of(e)
+                .checked_mul(config.damping_ppm)
+                .and_then(|v| v.checked_div(1_000_000))
+                .ok_or(OutcomeError::Malformed)
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+
+    let mut mass = teleport.clone();
+    let mut iterations = 0u32;
+    let mut converged = false;
+    for step in 0..config.max_iterations {
+        iterations = step + 1;
+        // prop_t(e) = Σ floor(m_t(u)·C / (1e12·out(u))) in neighbor order.
+        let mut next: Vec<u128> = teleport.clone();
+        let mut delta: u128 = 0;
+        for (i, entity_neighbors) in neighbors.iter().enumerate() {
+            let mut prop = 0u128;
+            for &u in entity_neighbors {
+                let out_u =
+                    u128::try_from(neighbors[u].len()).map_err(|_| OutcomeError::Malformed)?;
+                let n_u = mass[u].checked_mul(c).ok_or(OutcomeError::Malformed)?;
+                let d_u = 1_000_000_000_000u128
+                    .checked_mul(out_u)
+                    .ok_or(OutcomeError::Malformed)?;
+                let term = n_u / d_u;
+                prop = prop.checked_add(term).ok_or(OutcomeError::Malformed)?;
+            }
+            let m_next = teleport[i]
+                .checked_add(prop)
+                .ok_or(OutcomeError::Malformed)?;
+            let diff = m_next.abs_diff(mass[i]);
+            delta = delta.max(diff);
+            next[i] = m_next;
+        }
+        mass = next;
+        if delta <= config.epsilon_ppb {
+            converged = true;
+            break;
+        }
+    }
+
+    // residual_ppb over the final iteration (exact §7.6 identity).
+    let mut remainder_sum = 0u128;
+    for (i, entity_neighbors) in neighbors.iter().enumerate() {
+        if entity_neighbors.is_empty() {
+            continue; // out=0 entities contribute nothing
+        }
+        let out_u = u128::try_from(entity_neighbors.len()).map_err(|_| OutcomeError::Malformed)?;
+        let n_u = mass[i].checked_mul(c).ok_or(OutcomeError::Malformed)?;
+        let d_u = 1_000_000_000_000u128
+            .checked_mul(out_u)
+            .ok_or(OutcomeError::Malformed)?;
+        remainder_sum = remainder_sum
+            .checked_add(n_u % d_u)
+            .ok_or(OutcomeError::Malformed)?;
+    }
+    let residual_ppb = remainder_sum / 1_000_000_000_000;
+
+    // Vector: entries > 0 in entity byte order; range asserted anyway.
+    let mut vector = Vec::new();
+    for (i, m) in mass.iter().enumerate() {
+        if *m > 0 {
+            if *m > caps::PRIOR_MAX_PPB {
+                // Reachable: hub concentration can exceed 1e9 even from
+                // per-seed-clamped legal seeds (e.g. 32 max seeds on a
+                // degree-32 hub concentrate ≈4.17e9). The prior range is a
+                // hard fail-closed gate, never a silent clamp.
+                return Err(OutcomeError::Malformed);
+            }
+            vector.push((entities[i].to_owned(), *m));
+        }
+    }
+    Ok(PprOutcome {
+        vector,
+        iterations,
+        converged,
+        residual_ppb,
+    })
+}

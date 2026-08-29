@@ -223,8 +223,10 @@ by 1e12 yields the exact total ppb lost to flooring in the final iteration,
 computable entirely in u128. Entities with `out=0` distribute nothing: their
 mass is exactly `teleport(e)`, fully retained in the vector, and they
 contribute zero residual. Final `m` values are already ppb integers; entries
->0 form the vector. Any value >`PRIOR_MAX_PPB` (impossible by construction;
-asserted anyway) fails closed.
+>0 form the vector. Any value >`PRIOR_MAX_PPB` fails closed (reachable:
+hub concentration can exceed 1e9 even when every seed is individually
+clamped — e.g. 32 max seeds on a degree-32 hub concentrate ≈4.17e9; the
+range is a hard rejection, never a silent clamp).
 
 ## 8. Public API semantics
 
@@ -381,3 +383,12 @@ silently normalized in code.
   measuring the M1 renderer). Eligibility: stands with zero code/test
   changes — no OC-03 entity-key code existed at correction time (Stage 3C
   had not started; working tree clean at `43c8813`).
+- 2026-08-29: **Stage 3E Quality review found §7.6's "impossible by
+  construction" range claim false** (reviewer-verified counterexample: 32
+  per-seed-clamped max seeds concentrating ≈4.17e9 on a degree-32 hub —
+  fully caps-legal input exceeds PRIOR_MAX_PPB). Wording corrected to
+  "reachable via hub concentration; hard fail-closed rejection, never a
+  silent clamp". Normative behavior unchanged (Err, not clamp); matrix
+  P01/P05/P08/P11 evidence cells aligned; P08 strengthened to exercise the
+  reachable Err path with the star-graph fixture. A10 test added for
+  adversarial coverage of the same path.

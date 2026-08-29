@@ -42,17 +42,17 @@ Total: **52 rows** — T8 + G12 + P14 + A10 + X8.
 
 | Row | Requirement | Test name | File | Evidence |
 |---|---|---|---|---|
-| OC03-P01 | Teleport = floor(seed × 850000/1e6) | `ppr_teleport_floor` | tests/oc03_propagation.rs | Known seeds → exact integer teleport values |
+| OC03-P01 | Teleport = floor(seed × 850000/1e6) | `ppr_teleport_floor` | tests/oc03_propagation.rs | Known seeds → mass ≥ teleport floor (exactness owned by P06) |
 | OC03-P02 | Propagation term floor per neighbor | `ppr_neighbor_floor` | tests/oc03_propagation.rs | Hand-computed neighbor term matches floored output |
 | OC03-P03 | Summation order canonical (neighbor byte order) | `ppr_summation_order` | tests/oc03_propagation.rs | Permuted input graph → identical output bytes |
 | OC03-P04 | Convergence: delta ≤ 1e6 ppb stops with converged=true | `ppr_convergence_stop` | tests/oc03_propagation.rs | Delta sequence reaches threshold, flag true |
-| OC03-P05 | Iteration cap 64 → converged=false, marker, no error | `ppr_iteration_cap` | tests/oc03_propagation.rs | Non-converging fixture → 64 iterations, false |
+| OC03-P05 | Iteration cap 64 | `ppr_iteration_cap` | tests/oc03_propagation.rs | Bound contract: iterations ≤ 64, no error; converged flag recorded honestly (no non-converging fixture exists within frozen caps — monotone masses decay to floor-zero) |
 | OC03-P06 | Degree-0 entity retains teleport only | `ppr_isolated_entity` | tests/oc03_propagation.rs | No neighbors → mass = teleport |
 | OC03-P07 | Degree-0 entity contributes no outflow to any neighbor | `ppr_isolated_no_outflow` | tests/oc03_propagation.rs | Removing an isolated entity leaves all other masses byte-identical |
-| OC03-P08 | All arithmetic u128 checked; overflow → Err | `ppr_overflow_fail_closed` | tests/oc03_propagation.rs | Extreme values → Err, no partial artifact |
+| OC03-P08 | All arithmetic u128 checked; range violation → Err | `ppr_overflow_fail_closed` | tests/oc03_propagation.rs | Hub-concentrated legal seeds drive one vector entry >1e9 → Err(Malformed), no partial artifact |
 | OC03-P09 | No float anywhere in the propagation path | `ppr_no_float` | tests/oc03_propagation.rs | Test reads src/prior.rs via include_str! and asserts no f32/f64 tokens in non-comment lines |
 | OC03-P10 | Vector lists ppb>0 only, entity byte order | `ppr_vector_ordering` | tests/oc03_propagation.rs | Zero-mass entities absent from vector |
-| OC03-P11 | Values ≤ PRIOR_MAX_PPB asserted | `ppr_range_assert` | tests/oc03_propagation.rs | Max value ≤1e9; impossible-by-construction asserted anyway |
+| OC03-P11 | Values ≤ PRIOR_MAX_PPB asserted | `ppr_range_assert` | tests/oc03_propagation.rs | Max value ≤1e9 on well-formed artifacts; the >1e9 rejection path is owned by P08 |
 | OC03-P12 | Empty seeds → empty vector, valid artifact | `ppr_empty_seeds` | tests/oc03_propagation.rs | All-unavailable corpus → empty vector, warnings present |
 | OC03-P13 | Deterministic rerun byte-identical | `ppr_determinism` | tests/oc03_propagation.rs | 20 reruns → identical canonical bytes |
 | OC03-P14 | Quantization residual equals the exact §7.6 formula | `ppr_residual_recorded` | tests/oc03_propagation.rs | residual_ppb equals hand-computed ⌊Σ r_u / 1e12⌋ over final iteration |
