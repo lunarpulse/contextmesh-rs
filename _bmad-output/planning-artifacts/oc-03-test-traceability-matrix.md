@@ -26,7 +26,7 @@ Total: **52 rows** — T8 + G12 + P14 + A10 + X8.
 | Row | Requirement | Test name | File | Evidence |
 |---|---|---|---|---|
 | OC03-G01 | Entity keys: canonical M2 ID recognized | `entity_key_canonical_id` | tests/oc03_graph_seeds.rs | evt1_/rcpt1_/ocout1_ 43-char keys extracted |
-| OC03-G02 | Entity keys: M1 normalized value spellings | `entity_key_normalized` | tests/oc03_graph_seeds.rs | path:/pct:/count:/amt: keys extracted via M1 |
+| OC03-G02 | Entity keys: M1 normalized value spellings | `entity_key_normalized` | tests/oc03_graph_seeds.rs | path:/pct:/num: keys extracted via M1, one per NormalizedValue variant |
 | OC03-G03 | Entity keys: M0 token fallback ≤1024 bytes | `entity_key_token` | tests/oc03_graph_seeds.rs | Long token truncated/rejected per cap |
 | OC03-G04 | Per-event cap 8, byte-sorted, deduped | `entity_key_event_cap` | tests/oc03_graph_seeds.rs | 9 keys → 8 kept sorted, drop counted |
 | OC03-G05 | Graph edges undirected, a<b, sorted, deduped | `graph_canonical_edges` | tests/oc03_graph_seeds.rs | Co-occurrence renders canonical edge list |

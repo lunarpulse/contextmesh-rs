@@ -127,8 +127,9 @@ Exactly these members, these names, this order (lexicographic in bytes).
 An entity key is exactly one of, in canonical precedence order:
 (a) a canonical ID string recognized by frozen M2 `canonical_id_kind`
 (`evt1_…`/`rcpt1_…`/`ocout1_…`, 43 base64url chars), or
-(b) a normalized value rendered by frozen M1 `parse_normalized` — `path:…`,
-`pct:…`, `count:…`, `amt:…` spellings, or
+(b) a normalized value rendered by frozen M1 `parse_normalized` with a
+spelling prefix, exactly one per `NormalizedValue` variant —
+`path:<folded-path>`, `pct:<bps>`, `num:<decimal>` — or
 (c) an M0 extract token ≤1,024 bytes.
 Per event: dedup, sort by byte order, truncate to 8 (drop tail; overflow
 counted). No new extractor semantics are introduced.
@@ -370,3 +371,13 @@ silently normalized in code.
   (Discord message `1543029704192434197`). Status is now
   `approved-for-implementation`. Implementation proceeds in §3
   dependency order.
+- 2026-08-29: **Lunarpulse approved the Plan A minimal clarification of
+  §7.1 entity-key M1 spellings** (Discord message `1543059606077575190`):
+  the draft listed four spellings (`path:`/`pct:`/`count:`/`amt:`) but the
+  frozen M1 `NormalizedValue` has exactly three variants — the section is
+  corrected to one spelling per variant: `path:<folded-path>`,
+  `pct:<bps>`, `num:<decimal>`; matrix row OC03-G02's evidence cell is
+  corrected to match. Cause: specification gap (draft written without
+  measuring the M1 renderer). Eligibility: stands with zero code/test
+  changes — no OC-03 entity-key code existed at correction time (Stage 3C
+  had not started; working tree clean at `43c8813`).
