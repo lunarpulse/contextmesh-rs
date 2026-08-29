@@ -17,6 +17,8 @@
 use base64::Engine as _;
 use blake3::Hasher;
 
+use std::collections::{BTreeMap, BTreeSet};
+
 use crate::error::OutcomeError;
 
 /// Frozen prior extractor version strings (spec §5).
@@ -337,6 +339,44 @@ impl EntityGraphV1 {
         self.truncated_edges
     }
 
+    /// Privately-validated graph assembly (spec §8 construction discipline).
+    /// Canonicalizes: entities byte-sorted (capped by the caller), edges
+    /// `a < b` sorted deduplicated, and stamps the config hash.
+    pub(crate) fn assemble(
+        entities: Vec<String>,
+        edges: Vec<EntityEdgeV1>,
+        truncated_entities: u128,
+        truncated_edges: u128,
+        config: &PriorConfigV1,
+    ) -> Result<Self, OutcomeError> {
+        let mut sorted_entities = entities;
+        sorted_entities.sort();
+        sorted_entities.dedup();
+        let mut sorted_edges = edges;
+        sorted_edges
+            .sort_by(|x, y| (x.a.as_str(), x.b.as_str()).cmp(&(y.a.as_str(), y.b.as_str())));
+        sorted_edges.dedup_by(|x, y| x.a == y.a && x.b == y.b);
+        if sorted_entities.len() > caps::MAX_ENTITIES {
+            return Err(OutcomeError::Malformed);
+        }
+        for edge in &sorted_edges {
+            if edge.a >= edge.b {
+                return Err(OutcomeError::Malformed);
+            }
+            if !sorted_entities.contains(&edge.a) || !sorted_entities.contains(&edge.b) {
+                return Err(OutcomeError::Malformed);
+            }
+        }
+        Ok(Self {
+            version: 1,
+            entities: sorted_entities,
+            edges: sorted_edges,
+            truncated_entities,
+            truncated_edges,
+            config_hash: config.config_hash()?,
+        })
+    }
+
     /// Read-only accessor for the bound config hash.
     #[must_use]
     pub fn config_hash(&self) -> &str {
@@ -633,4 +673,152 @@ fn push_json_string(output: &mut String, value: &str) {
         }
     }
     output.push('"');
+}
+
+// ── Stage 3C: entity keys and bounded entity graph (spec §7.1–§7.2) ──────
+
+/// Derive bounded entity keys from one event payload (spec §7.1).
+///
+/// Precedence per token (frozen extractors reused verbatim):
+/// (a) M2 canonical ID (`canonical_id_kind`) → token as-is;
+/// (b) M1 normalized value → `"path:"`/`"pct:"`/`"num:"` + `canonical()`,
+///     exactly one spelling per `NormalizedValue` variant (clarified
+///     2026-08-29, commit `83cd7af`);
+/// (c) raw token if ≤ 1,024 bytes (already enforced by `extract_tokens`).
+/// Keys are deduplicated, byte-sorted, then truncated to the 8
+/// byte-smallest (`caps::ENTITIES_PER_EVENT`; the sorted tail is dropped).
+#[must_use]
+pub fn derive_entity_keys(payload: &str) -> Vec<String> {
+    use crate::attribution::{
+        NormalizedValue, canonical_id_kind, extract_tokens, parse_normalized,
+    };
+    let (tokens, _skipped) = extract_tokens(payload);
+    let mut keys: Vec<String> = Vec::new();
+    for token in tokens {
+        let key = if canonical_id_kind(token).is_some() {
+            (*token).to_owned()
+        } else if let Some(value) = parse_normalized(token) {
+            match value {
+                NormalizedValue::Path(_) => format!("path:{}", value.canonical()),
+                NormalizedValue::Percent(_) => format!("pct:{}", value.canonical()),
+                NormalizedValue::Number(_) => format!("num:{}", value.canonical()),
+            }
+        } else {
+            (*token).to_owned()
+        };
+        if !keys.contains(&key) {
+            keys.push(key);
+        }
+    }
+    keys.sort();
+    keys.truncate(caps::ENTITIES_PER_EVENT);
+    keys
+}
+
+/// One session's payload bundle: the event payloads referenced by one
+/// verified ledger (one ledger = one session, OC-02 §2 precedent).
+#[derive(Debug, Clone)]
+pub struct SessionPayloads<'a> {
+    payloads: Vec<&'a str>,
+}
+
+impl<'a> SessionPayloads<'a> {
+    /// Wrap caller-owned payload slices (order irrelevant; keys are set-folded).
+    #[must_use]
+    pub fn from_payloads(payloads: Vec<&'a str>) -> Self {
+        Self { payloads }
+    }
+
+    /// Read-only view.
+    #[must_use]
+    pub fn payloads(&self) -> &[&'a str] {
+        &self.payloads
+    }
+
+    fn entity_set(&self) -> BTreeSet<String> {
+        let mut set = BTreeSet::new();
+        for payload in &self.payloads {
+            for key in derive_entity_keys(payload) {
+                set.insert(key);
+            }
+        }
+        set
+    }
+}
+
+/// Build the bounded entity graph from session payload bundles (spec §7.2).
+///
+/// Co-occurrence: two entity keys appearing in the same session are
+/// adjacent. Parent-ledger sessions contribute adjacency the same way —
+/// callers pass each parent bundle as another element of `sessions`
+/// (propagation over parent edges). Canonicalization: entities byte-sorted
+/// capped at `MAX_ENTITIES`; edges `a < b` bytewise, sorted, deduplicated,
+/// per-entity capped at `MAX_EDGES_PER_ENTITY` keeping the first edges in
+/// canonical list order. Both truncations are recorded counters, never
+/// errors.
+///
+/// Ordering note (§7.2): the entity cap is applied first; edges whose
+/// endpoints fall outside the capped entity set are excluded before the
+/// per-entity edge cap runs and are not counted in `truncated_edges`
+/// (that counter is defined by §7.2 as the remainder of the 32-per-entity
+/// cap over surviving endpoints).
+pub fn build_entity_graph(
+    sessions: &[SessionPayloads<'_>],
+    config: &PriorConfigV1,
+) -> Result<EntityGraphV1, OutcomeError> {
+    config.validate_frozen()?;
+
+    // Union of per-session entity sets → candidate entity universe.
+    let mut universe: BTreeSet<String> = BTreeSet::new();
+    let session_sets: Vec<BTreeSet<String>> =
+        sessions.iter().map(SessionPayloads::entity_set).collect();
+    for set in &session_sets {
+        universe.extend(set.iter().cloned());
+    }
+
+    // Entity cap: keep first MAX_ENTITIES in byte order, count the rest.
+    let all_entities: Vec<String> = universe.into_iter().collect();
+    let truncated_entities =
+        u128::try_from(all_entities.len().saturating_sub(caps::MAX_ENTITIES)).unwrap_or(u128::MAX);
+    let entities: Vec<String> = all_entities
+        .into_iter()
+        .take(caps::MAX_ENTITIES)
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect();
+
+    // Co-occurrence edges over the capped entity set only.
+    let mut pair_set: BTreeSet<(String, String)> = BTreeSet::new();
+    for set in &session_sets {
+        let members: Vec<&String> = set.iter().filter(|e| entities.contains(e)).collect();
+        for (i, a) in members.iter().enumerate() {
+            for b in &members[i + 1..] {
+                let (lo, hi) = if a.as_str() < b.as_str() {
+                    ((*a).clone(), (*b).clone())
+                } else {
+                    ((*b).clone(), (*a).clone())
+                };
+                pair_set.insert((lo, hi));
+            }
+        }
+    }
+
+    // Per-entity edge cap: keep the first MAX_EDGES_PER_ENTITY edges in
+    // canonical list order for each entity; count every dropped edge.
+    let mut edges: Vec<EntityEdgeV1> = Vec::new();
+    let mut degree: BTreeMap<String, usize> = BTreeMap::new();
+    let mut truncated_edges: u128 = 0;
+    for (a, b) in pair_set {
+        let da = degree.get(&a).copied().unwrap_or(0);
+        let db = degree.get(&b).copied().unwrap_or(0);
+        if da >= caps::MAX_EDGES_PER_ENTITY || db >= caps::MAX_EDGES_PER_ENTITY {
+            truncated_edges += 1;
+            continue;
+        }
+        degree.insert(a.clone(), da + 1);
+        degree.insert(b.clone(), db + 1);
+        edges.push(EntityEdgeV1::new_for_test(&a, &b));
+    }
+
+    EntityGraphV1::assemble(entities, edges, truncated_entities, truncated_edges, config)
 }
