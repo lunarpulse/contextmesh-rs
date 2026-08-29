@@ -1,7 +1,8 @@
-# OC-04 Test Traceability Matrix — DRAFT v11 (pre-freeze)
+# OC-04 Test Traceability Matrix — FROZEN v12
 
-51 rows: S11 + U8 + R9 + E11 + X12 (X09/X10/E04c added: canonicalization-gate
-rejection, orphan bound; count verified programmatically). Every test
+57 rows: S12 + U8 + R9 + E14 + X14 (post-freeze v12 additions per Codex contract
+review: S03b prereg-path split, E09/E10/E11 failure-surface rows, X11/X11b +
+X12/X12b atomicity splits; count verified programmatically). Every test
 name verbatim; evidence cells describe ONE executable assertion each.
 
 | Row | Requirement | Test name | File | Evidence |
@@ -9,6 +10,7 @@ name verbatim; evidence cells describe ONE executable assertion each.
 | OC04-S01 | InfluenceV1 body renders 6 JCS members lexicographic | `influence_jcs_render` | tests/oc04_schema.rs | Exact byte compare vs hand-rendered canonical |
 | OC04-S02 | ExecutionV1 body renders 19 JCS members lexicographic | `execution_jcs_render` | tests/oc04_schema.rs | Exact byte compare |
 | OC04-S03 | Config consumes P1 prereg selection_pipeline verbatim | `config_prereg_verbatim` | tests/oc04_schema.rs | Each constant equals the JSON value loaded at test time |
+| OC04-S03b | Config consumes P1 prereg evaluation.score_normalization verbatim | `config_score_normalization_verbatim` | tests/oc04_schema.rs | Normalization constants equal the JSON values under evaluation.score_normalization |
 | OC04-S04 | Non-default config mutation → Err | `config_validate_rejects_mutation` | tests/oc04_schema.rs | Loop over every config member mutation → all Err |
 | OC04-S05 | ID derivation placeholder discipline | `id_placeholder_derivation` | tests/oc04_schema.rs | BLAKE3 over placeholder bytes; `oc04inf1_`/`oc04exec1_` prefixes |
 | OC04-S06 | Forged ID prefix rejected | `id_prefix_rejected` | tests/oc04_schema.rs | Wrong prefix → Err |
@@ -45,6 +47,9 @@ name verbatim; evidence cells describe ONE executable assertion each.
 | OC04-E06b | Budget: over-budget bytes → refusal | `budget_bytes_refusal` | tests/oc04_exec.rs | max_bytes exceeded alone → Err + reason |
 | OC04-E07 | VerifiedPrior token privacy (compile gate) | `verified_prior_compile_gate` | tests/oc04_adversarial.rs (harness; snippet source: tests/compile/oc04_token_privacy.rs) | rustc-compile-fail: privacy-violating snippet exit-fail + expected E0xxx; runtime forgery → Err in X01 |
 | OC04-E08 | Full-pipeline golden fixture (committed bytes + sha256) | `execution_golden` | tests/oc04_exec.rs | #[ignore] generator + committed fixture compared (generator run IS the pipeline) |
+| OC04-E09 | B7 non-convergence → no artifact, Err | `b7_nonconvergence_no_artifact` | tests/oc04_exec.rs | Non-converging driver → bind_execution Err, no SignedExecutionV1 emitted |
+| OC04-E10 | B8 simulate failure → no artifact, Err | `b8_failure_no_artifact` | tests/oc04_exec.rs | simulate fail fixture → bind_execution Err, no SignedExecutionV1 emitted |
+| OC04-E11 | Checked-u128 overflow/out-of-range → Err (fail-closed) | `checked_overflow_rejected` | tests/oc04_exec.rs | score_ppm overflow via u128 checked add fixture → Err, not clamp |
 | OC04-X01 | Unverifiable prior bytes → VerifiedPrior::verify Err | `unverified_prior_rejected` | tests/oc04_adversarial.rs | Tampered prior bytes → verify Err (runtime; privacy itself is E07 compile gate) |
 | OC04-X02 | Forged influence with re-derived id → Err | `forged_influence_rejected` | tests/oc04_adversarial.rs | Self-consistent forgery caught by rebuild divergence |
 | OC04-X03 | Tampered execution signature → Err | `forged_execution_rejected` | tests/oc04_adversarial.rs | Body tamper with original sig → Err (wrong-key case covered by S10 domain isolation) |
@@ -55,5 +60,7 @@ name verbatim; evidence cells describe ONE executable assertion each.
 | OC04-X08 | Stale-state handoff mismatch → no artifact, no handoff | `stale_state_no_artifact` | tests/oc04_adversarial.rs | Recipient head drift → Err |
 | OC04-X09 | Non-canonical prior payload → VerifiedPrior::verify Err | `noncanonical_prior_payload_rejected` | tests/oc04_adversarial.rs | Equivalent JSON with non-canonical formatting → verify Err |
 | OC04-X10 | Orphan count > 1024 → Err | `orphan_bound_fail_closed` | tests/oc04_adversarial.rs | 1,025 orphan entities fixture → union Err |
-| OC04-X11 | Verifier replay: fresh driver, scratch-history isolation, wrong recorded handoff_hash → Err | `verifier_replay_integrity` | tests/oc04_adversarial.rs | bind→verify Ok on same chain; production history unchanged; tampered handoff_hash in envelope → verify Err |
-| OC04-X12 | ScratchHistoryGuard rejects same-path and pre-existing file | `scratch_guard_fail_closed` | tests/oc04_adversarial.rs | scratch path == production path → Err; existing file at scratch path → Err (create_new reservation) |
+| OC04-X11 | Verifier replay: bind→verify Ok on same chain, production history unchanged | `verifier_replay_positive` | tests/oc04_adversarial.rs | bind→verify Ok; production RepairHistory bytes identical before/after |
+| OC04-X11b | Verifier replay: tampered recorded handoff_hash → Err | `verifier_replay_wrong_hash` | tests/oc04_adversarial.rs | Envelope with falsified handoff_hash → verify Err |
+| OC04-X12 | ScratchHistoryGuard rejects same-path as production history | `scratch_guard_same_path_rejected` | tests/oc04_adversarial.rs | scratch path == repair_history.path() → Err |
+| OC04-X12b | ScratchHistoryGuard rejects pre-existing file | `scratch_guard_existing_file_rejected` | tests/oc04_adversarial.rs | Existing file at scratch path → Err (create_new reservation) |

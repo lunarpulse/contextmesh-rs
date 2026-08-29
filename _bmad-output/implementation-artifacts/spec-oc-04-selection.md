@@ -1,12 +1,14 @@
 # OC-04 — Prior-Assisted Selection Integration (P3 / C4)
 
-**Status:** DRAFT v11 — pre-freeze. Not approved. Not implemented.
+**Status:** FROZEN v12 — approved 2026-08-29 (commit `99c9ee6`, v11); post-freeze
+corrections v12 applied same day per independent Codex contract review (§17),
+before any implementation started. Frozen values unchanged except as logged.
 **Created:** 2026-08-29 · **Owner:** Engineering (agent) / Founder (lunarpulse_)
 **Upstream spec:** `spec-option-c-salience-provenance-layer.md` §C4 (frozen),
 `option-c-priority-and-gate-plan.md` §P3 (frozen gate P3-GO).
 **Predecessors:** OC-01 ✅, OC-02 ✅, OC-03 ✅ (`6c42523`).
 **Preregistration:** `p1-prereg-config.json` `selection_pipeline` and
-`score_normalization` blocks are consumed VERBATIM in §7 — they are already
+`evaluation.score_normalization` blocks are consumed VERBATIM in §7 — they are already
 frozen and are NOT redefined here.
 
 ---
@@ -42,7 +44,7 @@ float arithmetic; network; new dependencies.
 
 | Stage | Content | Gate |
 |---|---|---|
-| 4A | Workspace gate (exact commands): (1) `git rev-parse HEAD` = `6c42523` on `OC-AttentionLedger`; (2) `git status --porcelain` shows EXACTLY the 2 freeze drafts, nothing else; (3) `grep -rn "oc04" src/ contextmesh-salience/src/` exits 1 (zero new-code refs; spelling `oc04` is the identifier spelling — the pre-existing `OC-04` doc comment at `attribution.rs:776` is a known non-identifier occurrence and is out of scope); (4) `git diff --exit-code HEAD -- Cargo.toml Cargo.lock contextmesh-salience/Cargo.toml` (no dep drift) | invariant check |
+| 4A | Workspace gate (exact commands): (1) `git rev-parse HEAD` = `99c9ee6` (the OC-04 freeze commit; predecessor OC-03 `6c42523`) on `OC-AttentionLedger`; (2) `git status --porcelain` is EMPTY (freeze drafts are committed — implementation starts from a clean tree); (3) `grep -rn "oc04" src/ contextmesh-salience/src/` exits 1 (zero new-code refs; spelling `oc04` is the identifier spelling — the pre-existing `OC-04` doc comment at `attribution.rs:776` is a known non-identifier occurrence and is out of scope); (4) `git diff --exit-code HEAD -- Cargo.toml Cargo.lock contextmesh-salience/Cargo.toml` (no dep drift) | invariant check |
 | 4B | Schema: `Oc04ConfigV1`, `SelectionInfluenceV1`, `SelectionExecutionV1` (body+envelope), signed issuance/verification, **`VerifiedPrior` (implemented + tested HERE — 4C consumes it; 4B gate = S01–S06, S08–S10)** | S-rows GREEN + dual review (S07b deferred to 4E — see note) |
 | 4C | Scored baseline carrier (additive root API, `select` untouched) + prior-arm candidate generation + entity→event reconstruction | U-rows GREEN + dual review |
 | 4D | Union + preregistered normalization/rerank + influence record | R-rows GREEN + dual review |
@@ -70,7 +72,7 @@ float arithmetic; network; new dependencies.
 
 | Constant | Value | Source |
 |---|---|---|
-| normalization | per-arm min-max to `[0, 1_000_000]` ppm, clip above/below | `score_normalization` |
+| normalization | per-arm min-max to `[0, 1_000_000]` ppm, clip above/below | `evaluation.score_normalization` |
 | rerank formula | `score_ppm = lexical_ppm + prior_ppm` | `selection_pipeline.rerank_formula` |
 | tie-break | canonical EventId ascending | `selection_pipeline.tie_break` |
 | `LEXICAL_ARM_CAP` | 64 | `per_arm_caps.lexical_arm_cap` |
@@ -357,17 +359,28 @@ Standard: `OC01_INNER_CURRENT_GATE=1 CARGO_NET_OFFLINE=true cargo test
 
 ## 12. Test Matrix Summary
 
-51 rows: S11 + U8 + R9 + E11 + X12 (full matrix separate artifact; splits:
+57 rows: S12 + U8 + R9 + E14 + X14 (full matrix separate artifact; splits:
 E06→E06/E06b per-field budget, S07→S07/S07b parse vs rejection, R03→R03/
 R03b order vs completeness, E07 compile-fail gate, E04b B6-warnings hash,
-E04c normative marker rule, X09 canonicalization gate, X10 orphan bound, X11 verifier-replay integrity, X12 scratch-guard fail-closed).
+E04c normative marker rule, X09 canonicalization gate, X10 orphan bound, X11/X11b
+verifier-replay split, X12/X12b scratch-guard split, S03b prereg-path split,
+E09/E10/E11 failure-surface rows — v12 Codex additions).
+
+Row atomicity convention (v12, per Codex review): S04/U08/R05/E04c/E06/E06b
+are ACCEPTED as-is — each describes ONE rule whose evidence enumerates the
+rule's exhaustive case set (a rule with enumerated cases is one assertion
+about the rule, not multiple assertions). X11/X12 were split because they
+combined INDEPENDENT assertions; S03 was split because the prereg has two
+distinct authority blocks.
 
 ## 13. Gates
 
 Every stage: focused GREEN → full regression 0 failed → clippy 0 → fmt →
-dual review → founder 승인 → commit/push/graphify. OB regression gate
-(X06) is an external script gate capturing workspace-run output, not a
-marker unit test.
+dual review → founder 승인 → commit/push/graphify. No-new-deps gate (X06)
+is the matrix's mechanism: a unit test in `tests/oc04_adversarial.rs` that
+checks the Cargo.toml/lock diff is empty vs committed (include_str! hash
+pin). OB regression gate: workspace-run `cargo test --workspace` captured
+to a log (file-redirection pattern), EXIT 0 required.
 
 ## 14. Human-Gold Metric Gate (P3-GO)
 
@@ -480,21 +493,6 @@ gate; any dependency-DIRECTION change requires explicit founder approval.
 - 2026-08-29: **EIGHTH RE-VERIFICATION: GO (deleg_93ecf2ca) — 0 blockers,
   1 editorial warning ("FAIR-CLOSED"→"FAIL-CLOSED", fixed same day).
   Spec dual-review + re-verification round CLOSED at v9.**
-- 2026-08-29: **v11 corrections after preflight angle 4 (deleg_f81876b5):
-  FAIL — 3 stage-plan defects, all fixed.** (1) S07b moved from 4B to 4E
-  (forward dependency: needs `verify_execution`); 4B gate now S01–S06,
-  S08–S11. (2) E07 made runnable: zero-dependency rustc harness in
-  oc04_adversarial.rs (temp-file snippet + `RUSTC`-env `std::process::
-  Command`, assert exit-fail + E0xxx) — nested file is snippet source only,
-  trybuild prohibited. (3) 4A gate fully specified: 4 exact commands
-  (HEAD=6c42523, porcelain=2 drafts only, `grep -rn "oc04"` exits 1 with
-  the known `attribution.rs:776` `OC-04` doc-comment occurrence scoped
-  out, dep-manifest diff clean). Bonus: VerifiedPrior ownership pinned to
-  4B; 4G harness/evidence artifacts named (oc04_gold.rs, oc-04-evidence.md).
-  Re-check fixes (deleg_37afbd4d): 4B gate corrected to S01–S06, S08–S10
-  (S11 doesn't exist; S07b is the 11th S-row); 4E gate excludes E07
-  explicitly; E07 matrix File column → oc04_adversarial.rs harness with
-  tests/compile file demoted to snippet source.
 - 2026-08-29: **v10 corrections after preflight angle 3 (deleg_0a6589a5):
   FAIL — 7 wire findings, all fixed.** (1) `version` re-specified as decimal
   JSON integer `1` (OC-02/03 precedent; was string `"1"`). (2)
@@ -513,3 +511,33 @@ gate; any dependency-DIRECTION change requires explicit founder approval.
   §17; (2) changelog reordered to complete v1→v9 with explicit GO
   record; (3) `contextmesh-salience/tests/compile/oc04_token_privacy.rs`
   added to §10 (E07 compile-fail gate file was unnamed).
+- 2026-08-29: **v11 corrections after preflight angle 4 (deleg_f81876b5):
+  FAIL — 3 stage-plan defects, all fixed.** (1) S07b moved from 4B to 4E
+  (forward dependency: needs `verify_execution`); 4B gate now S01–S06,
+  S08–S11. (2) E07 made runnable: zero-dependency rustc harness in
+  oc04_adversarial.rs (temp-file snippet + `RUSTC`-env `std::process::
+  Command`, assert exit-fail + E0xxx) — nested file is snippet source only,
+  trybuild prohibited. (3) 4A gate fully specified: 4 exact commands
+  (HEAD=6c42523, porcelain=2 drafts only, `grep -rn "oc04"` exits 1 with
+  the known `attribution.rs:776` `OC-04` doc-comment occurrence scoped
+  out, dep-manifest diff clean). Bonus: VerifiedPrior ownership pinned to
+  4B; 4G harness/evidence artifacts named (oc04_gold.rs, oc-04-evidence.md).
+  Re-check fixes (deleg_37afbd4d): 4B gate corrected to S01–S06, S08–S10
+  (S11 doesn't exist; S07b is the 11th S-row); 4E gate excludes E07
+  explicitly; E07 matrix File column → oc04_adversarial.rs harness with
+  tests/compile file demoted to snippet source.
+- 2026-08-29: **FROZEN at v11 (commit 99c9ee6, founder 승인).**
+- 2026-08-29: **v12 post-freeze corrections after independent Codex
+  contract-driven review (ChatGPT subscription; 7 blockers):** (1) status
+  headers DRAFT→FROZEN (v11 freeze + v12 corrections recorded; no frozen
+  value changed); (2) §17 chronology fixed (v10 now precedes v11);
+  (3) 4A gate HEAD updated 6c42523→99c9ee6 + porcelain now EMPTY
+  (drafts committed); (4) prereg path corrected to
+  evaluation.score_normalization + S03b row added; (5) X11/X12 split into
+  atomic rows X11/X11b, X12/X12b; (6) E09/E10/E11 failure-surface rows
+  added (B7 non-convergence, B8 failure, checked-u128 overflow);
+  (7) X06 spec/mat conflict resolved (unit-test mechanism per matrix).
+  Warnings accepted: 4G citation pin deferred to 4G; Oc04ConfigV1 member
+  list is pinned at 4B per plan (schema spec-before-code at that stage).
+  Matrix 51→57 rows (S12+U8+R9+E14+X14). Implementation had NOT started —
+  zero code changes, wording-only eligibility satisfied.
