@@ -822,3 +822,230 @@ pub fn build_entity_graph(
 
     EntityGraphV1::assemble(entities, edges, truncated_entities, truncated_edges, config)
 }
+
+// ── Stage 3D: seed derivation from verified reports (spec §7.3) ───────────
+
+/// One verified report contribution: the parsed adapter tier of a single
+/// `AttributionReportV1` whose structural verification has already passed
+/// (callers run `verify_report` first; §1 input contract).
+#[derive(Debug, Clone)]
+pub struct ReportContribution {
+    report_id: String,
+    ledger_id: String,
+    terminal_status: String,
+    section_status: String,
+    /// (event text, share_ppm) pairs from the section's `m4` array.
+    m4_shares: Vec<(String, u128)>,
+}
+
+impl ReportContribution {
+    /// Parse one report envelope's wire bytes into a contribution.
+    ///
+    /// Extracts `report_id`, `ledger_id`, `terminal_status`, the adapter
+    /// tier's section status, and the `m4` share array. Structural
+    /// verification of the report against its ledger is the caller's
+    /// obligation (`verify_report`, §1); this parser only reads.
+    ///
+    /// # Errors
+    /// Returns [`OutcomeError::Malformed`] when the bytes are not a JSON
+    /// object carrying the expected members. This parser is deliberately
+    /// lenient (extra members, key order, and envelope version are not
+    /// checked): structural and canonical verification of the report is
+    /// the caller's obligation (`verify_report`, §1).
+    pub fn from_report_bytes(bytes: &[u8]) -> Result<Self, OutcomeError> {
+        let value: serde_json::Value =
+            serde_json::from_slice(bytes).map_err(|_| OutcomeError::Malformed)?;
+        let object = value.as_object().ok_or(OutcomeError::Malformed)?;
+        let report_id = object
+            .get("report_id")
+            .and_then(serde_json::Value::as_str)
+            .ok_or(OutcomeError::Malformed)?
+            .to_owned();
+        let ledger_id = object
+            .get("ledger_id")
+            .and_then(serde_json::Value::as_str)
+            .ok_or(OutcomeError::Malformed)?
+            .to_owned();
+        let terminal_status = object
+            .get("terminal_status")
+            .and_then(serde_json::Value::as_str)
+            .ok_or(OutcomeError::Malformed)?
+            .to_owned();
+        if terminal_status != "terminal" && terminal_status != "unterminated" {
+            return Err(OutcomeError::Malformed);
+        }
+        let tier_text = object
+            .get("adapter_tier")
+            .and_then(serde_json::Value::as_str)
+            .ok_or(OutcomeError::Malformed)?;
+        let tier: serde_json::Value =
+            serde_json::from_str(tier_text).map_err(|_| OutcomeError::Malformed)?;
+        let tier_object = tier.as_object().ok_or(OutcomeError::Malformed)?;
+        let section_status = tier_object
+            .get("status")
+            .and_then(serde_json::Value::as_str)
+            .ok_or(OutcomeError::Malformed)?
+            .to_owned();
+        let mut m4_shares = Vec::new();
+        if let Some(records) = tier_object.get("m4").and_then(serde_json::Value::as_array) {
+            for record in records {
+                let record_object = record.as_object().ok_or(OutcomeError::Malformed)?;
+                let event = record_object
+                    .get("event")
+                    .and_then(serde_json::Value::as_str)
+                    .ok_or(OutcomeError::Malformed)?
+                    .to_owned();
+                let share_ppm = record_object
+                    .get("share_ppm")
+                    .and_then(serde_json::Value::as_u64)
+                    .ok_or(OutcomeError::Malformed)?;
+                m4_shares.push((event, u128::from(share_ppm)));
+            }
+        }
+        Ok(Self {
+            report_id,
+            ledger_id,
+            terminal_status,
+            section_status,
+            m4_shares,
+        })
+    }
+
+    /// Read-only: the source report id.
+    #[must_use]
+    pub fn report_id(&self) -> &str {
+        &self.report_id
+    }
+
+    /// Read-only: the source ledger id.
+    #[must_use]
+    pub fn ledger_id(&self) -> &str {
+        &self.ledger_id
+    }
+
+    /// Read-only: `terminal` or `unterminated`.
+    #[must_use]
+    pub fn terminal_status(&self) -> &str {
+        &self.terminal_status
+    }
+
+    /// Read-only: the adapter-tier section status wire string.
+    #[must_use]
+    pub fn section_status(&self) -> &str {
+        &self.section_status
+    }
+
+    /// Read-only: the section's `(event, share_ppm)` pairs.
+    #[must_use]
+    pub fn m4_shares(&self) -> &[(String, u128)] {
+        &self.m4_shares
+    }
+}
+
+/// Derive the folded positive seed set from verified report contributions
+/// and the payload of each attributed event (spec §7.3).
+///
+/// Reports whose adapter-tier section status is `computed` contribute
+/// `share_ppm × 1,000` ppb to every entity key of the attributed event
+/// (clamped at `PRIOR_MAX_PPB`); `unavailable`/`no_nominations` sections
+/// contribute zero seeds, with `unavailable` incrementing
+/// `unavailable_reports` (explicit warning). Zero-ppm shares contribute
+/// nothing. Duplicate `report_id`s fold exactly once. Seeds fold per
+/// entity, byte-sort, and cap at `MAX_SEEDS` by descending ppb then entity
+/// ascending; the drop count is returned alongside (it lands in the
+/// envelope's `dropped_seeds` member, §7.4).
+///
+/// # Errors
+/// Returns [`OutcomeError::Malformed`] on config drift or mixed terminal
+/// statuses (a prior derives from a uniform set, §7.4).
+pub fn derive_seeds(
+    contributions: &[ReportContribution],
+    event_payloads: &[(&str, &str)], // (event text, payload), reused for key derivation
+    config: &PriorConfigV1,
+) -> Result<(PriorSeedSetV1, u128), OutcomeError> {
+    config.validate_frozen()?;
+
+    // Uniform terminal-status requirement (§7.4 assembly gate).
+    let mut terminal_status: Option<&str> = None;
+    for contribution in contributions {
+        match terminal_status {
+            None => terminal_status = Some(contribution.terminal_status()),
+            Some(existing) if existing == contribution.terminal_status() => {}
+            Some(_) => return Err(OutcomeError::Malformed),
+        }
+    }
+    let terminal_status = terminal_status.unwrap_or("terminal").to_owned();
+    // Empty contribution set defaults to "terminal" (a choice; §7.4's
+    // mirror-the-ledgers rule says nothing about the empty set).
+
+    // Fold each report exactly once by report_id.
+    let mut seen_report_ids: Vec<&str> = Vec::new();
+    let mut source_report_ids: Vec<String> = Vec::new();
+    let mut unavailable_reports: u128 = 0;
+
+    // Per-entity seed mass accumulation (checked u128, clamped at 1e9).
+    let mut mass: BTreeMap<String, u128> = BTreeMap::new();
+    for contribution in contributions {
+        let report_id = contribution.report_id();
+        if seen_report_ids.contains(&report_id) {
+            continue; // duplicate report_id folds exactly once (§7.3)
+        }
+        seen_report_ids.push(report_id);
+        source_report_ids.push(report_id.to_owned());
+        match contribution.section_status() {
+            "computed" => {
+                for (event, share_ppm) in contribution.m4_shares() {
+                    if *share_ppm == 0 {
+                        continue; // zero-ppm shares contribute nothing
+                    }
+                    let added = share_ppm
+                        .checked_mul(1_000)
+                        .ok_or(OutcomeError::Malformed)?;
+                    // Entity keys of the attributed event.
+                    let payload = event_payloads
+                        .iter()
+                        .find(|(event_text, _)| event_text == event)
+                        .map(|(_, payload)| *payload)
+                        .ok_or(OutcomeError::Malformed)?;
+                    for key in derive_entity_keys(payload) {
+                        let entry = mass.entry(key).or_insert(0);
+                        *entry = (*entry)
+                            .checked_add(added)
+                            .ok_or(OutcomeError::Malformed)?
+                            .min(caps::PRIOR_MAX_PPB);
+                    }
+                }
+            }
+            "unavailable" => {
+                unavailable_reports += 1;
+            }
+            "no_nominations" => {}
+            _ => return Err(OutcomeError::Malformed),
+        }
+    }
+
+    // Cap at MAX_SEEDS: descending ppb, then entity ascending.
+    let mut ranked: Vec<(String, u128)> = mass.into_iter().collect();
+    ranked.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+    let dropped_seeds =
+        u128::try_from(ranked.len().saturating_sub(caps::MAX_SEEDS)).unwrap_or(u128::MAX);
+    ranked.truncate(caps::MAX_SEEDS);
+    // Re-canonicalize to entity byte order (§7.3 rendering order).
+    ranked.sort();
+
+    let seeds: Vec<PriorSeedV1> = ranked
+        .into_iter()
+        .map(|(entity, ppb)| PriorSeedV1::new_for_test(&entity, ppb))
+        .collect();
+    source_report_ids.sort();
+    source_report_ids.dedup();
+
+    let seed_set = PriorSeedSetV1::new_for_test(
+        seeds,
+        source_report_ids,
+        unavailable_reports,
+        config.config_hash()?,
+    );
+    let _ = terminal_status; // consumed by the 3F envelope assembly, not the seed set
+    Ok((seed_set, dropped_seeds))
+}

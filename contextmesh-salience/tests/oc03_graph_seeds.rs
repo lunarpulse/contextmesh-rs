@@ -227,3 +227,155 @@ fn canonical_evt1_helper_is_canonical() {
     assert_eq!(id.len(), 48);
     assert!(id.starts_with("evt1_"));
 }
+
+// ── Stage 3D: seed derivation (matrix rows G09–G12) ──────────────────────
+
+use contextmesh_salience::prior::{ReportContribution, derive_seeds};
+
+/// Build a minimal report envelope with the given section status and m4
+/// shares (adapter tier rendered as an embedded JSON string).
+fn report_json(report_id: &str, status: &str, shares: &[(&str, u128)]) -> String {
+    let m4: Vec<String> = shares
+        .iter()
+        .map(|(event, ppm)| {
+            format!(
+                "{{\"event\":\"{event}\",\"judge\":\"j.example\",\"judge_config_hash\":\"h\",\"judge_version\":\"v1\",\"samples\":64,\"share_ppm\":{ppm}}}"
+            )
+        })
+        .collect();
+    let tier = format!(
+        "{{\"m3\":[],\"m4\":[{}],\"status\":\"{status}\",\"uncertainty_markers\":[]}}",
+        m4.join(",")
+    );
+    format!(
+        "{{\"adapter_tier\":\"{}\",\"config_hash\":\"ocattrcfg1_x\",\"ledger_id\":\"ocout1_a\",\"prereg_reference\":\"be20d8fc\",\"report_id\":\"{report_id}\",\"task_fingerprint\":\"t\",\"input_snapshot_fingerprint\":\"i\",\"deterministic_tier\":\"d\",\"terminal_status\":\"terminal\",\"version\":1}}",
+        tier.replace('\\', "\\\\").replace('"', "\\\"")
+    )
+}
+
+#[test]
+fn seeds_complete_sections_only() {
+    // G09: only `computed` sections yield seeds; unavailable/no_nominations
+    // sections and 0-ppm shares yield zero.
+    let computed = ReportContribution::from_report_bytes(
+        report_json("r1", "computed", &[("evt-a", 500_000)]).as_bytes(),
+    )
+    .unwrap();
+    let unavailable =
+        ReportContribution::from_report_bytes(report_json("r2", "unavailable", &[]).as_bytes())
+            .unwrap();
+    let none =
+        ReportContribution::from_report_bytes(report_json("r3", "no_nominations", &[]).as_bytes())
+            .unwrap();
+    let zero_share = ReportContribution::from_report_bytes(
+        report_json("r4", "computed", &[("evt-a", 0)]).as_bytes(),
+    )
+    .unwrap();
+    let payloads = vec![("evt-a", "alpha beta")];
+    let (set, dropped) = derive_seeds(
+        &[computed, unavailable, none, zero_share],
+        &payloads,
+        &PriorConfigV1::default(),
+    )
+    .unwrap();
+    assert_eq!(dropped, 0);
+    assert_eq!(set.unavailable_reports(), 1, "unavailable counted");
+    // Only r1's 500,000 ppm → 500,000,000 ppb on evt-a's two entity keys.
+    let seeds: Vec<(String, u128)> = set
+        .seeds()
+        .iter()
+        .map(|s| (s.entity().to_owned(), s.ppb()))
+        .collect();
+    assert_eq!(seeds.len(), 2, "{seeds:?}");
+    for (_, ppb) in &seeds {
+        assert_eq!(*ppb, 500_000_000);
+    }
+    assert_eq!(set.source_report_ids(), &["r1", "r2", "r3", "r4"]);
+}
+
+#[test]
+fn seed_ppb_conversion() {
+    // G10: share_ppm ×1,000 → ppb, clamp at 1e9, checked math.
+    // 1,000,000 ppm (max share) ×1000 = 1e9 ppb exactly at the clamp.
+    let report = ReportContribution::from_report_bytes(
+        report_json("r1", "computed", &[("evt-a", 1_000_000)]).as_bytes(),
+    )
+    .unwrap();
+    let (set, _) =
+        derive_seeds(&[report], &[("evt-a", "alpha")], &PriorConfigV1::default()).unwrap();
+    assert_eq!(set.seeds().len(), 1);
+    assert_eq!(set.seeds()[0].ppb(), 1_000_000_000);
+    // Clamping: two max shares on the same single-key event would sum to
+    // 2e9, clamped to 1e9.
+    let r1 = ReportContribution::from_report_bytes(
+        report_json("r1", "computed", &[("evt-a", 1_000_000)]).as_bytes(),
+    )
+    .unwrap();
+    let r2 = ReportContribution::from_report_bytes(
+        report_json("r2", "computed", &[("evt-a", 1_000_000)]).as_bytes(),
+    )
+    .unwrap();
+    let (set, _) =
+        derive_seeds(&[r1, r2], &[("evt-a", "alpha")], &PriorConfigV1::default()).unwrap();
+    assert_eq!(set.seeds()[0].ppb(), 1_000_000_000, "clamped at 1e9");
+}
+
+#[test]
+fn seeds_unavailable_marker() {
+    // G11: unavailable report → zero seeds, unavailable_reports +1.
+    let report =
+        ReportContribution::from_report_bytes(report_json("r9", "unavailable", &[]).as_bytes())
+            .unwrap();
+    let (set, _) = derive_seeds(
+        std::slice::from_ref(&report),
+        &[("e", "p")],
+        &PriorConfigV1::default(),
+    )
+    .unwrap();
+    assert!(set.seeds().is_empty());
+    assert_eq!(set.unavailable_reports(), 1);
+    // Two unavailable reports → 2 (explicit warning count, no error).
+    let (set, _) = derive_seeds(
+        &[report.clone(), report.clone()],
+        &[("e", "p")],
+        &PriorConfigV1::default(),
+    )
+    .unwrap();
+    assert_eq!(set.unavailable_reports(), 1, "duplicate id folds once");
+}
+#[test]
+fn seed_cap_ordering() {
+    // G12: 65 seeds → 64 kept by descending ppb then entity asc; drop lands
+    // in the returned dropped count (envelope `dropped_seeds`).
+    let mut contributions = Vec::new();
+    let mut payloads = Vec::new();
+    for i in 0..65u32 {
+        let event = format!("ev{i:03}");
+        let ppm = 100_000 + u128::from(64 - i); // ev000 largest … ev064 smallest
+        contributions.push(
+            ReportContribution::from_report_bytes(
+                report_json(&format!("r{i:03}"), "computed", &[(event.as_str(), ppm)]).as_bytes(),
+            )
+            .unwrap(),
+        );
+        payloads.push((
+            Box::leak(event.clone().into_boxed_str()),
+            Box::leak(format!("k{i:03}").into_boxed_str()),
+        ));
+    }
+    let payloads_ref: Vec<(&str, &str)> = payloads.iter().map(|(e, p)| (&**e, &**p)).collect();
+    let (set, dropped) =
+        derive_seeds(&contributions, &payloads_ref, &PriorConfigV1::default()).unwrap();
+    assert_eq!(dropped, 1, "65th seed dropped and counted");
+    assert_eq!(set.seeds().len(), 64);
+    assert_eq!(set.seeds()[0].entity(), "k000", "highest ppb kept");
+    assert!(
+        !set.seeds().iter().any(|s| s.entity() == "k064"),
+        "lowest ppb dropped"
+    );
+    // Rendered order is entity byte order after cap selection.
+    let entities: Vec<&str> = set.seeds().iter().map(|s| s.entity()).collect();
+    let mut sorted = entities.clone();
+    sorted.sort();
+    assert_eq!(entities, sorted, "byte order after cap");
+}
