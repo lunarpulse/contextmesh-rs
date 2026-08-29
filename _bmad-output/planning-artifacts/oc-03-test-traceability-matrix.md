@@ -63,13 +63,13 @@ Total: **52 rows** — T8 + G12 + P14 + A10 + X8.
 |---|---|---|---|---|
 | OC03-A01 | Envelope assembly from graph+seeds+vector per §7.4 | `artifact_assembly` | tests/oc03_artifact.rs | Member values equal inputs |
 | OC03-A02 | prior_id = BLAKE3(`oc-03-prior-v1\0` + placeholder-normalized bytes) | `prior_id_derivation` | tests/oc03_artifact.rs | Independent hash over placeholder bytes matches |
-| OC03-A03 | prior_id flips on any byte change | `prior_id_tamper_matrix` | tests/oc03_artifact.rs | Flip each top-level member → different prior_id |
+| OC03-A03 | prior_id flips on any byte change | `prior_id_tamper_matrix` | tests/oc03_artifact.rs | Three scalar-member mutations (config_hash prefix, terminal_status, residual key) each → verify Err |
 | OC03-A04 | verify_prior recomputes; byte-identical required | `verify_recompute` | tests/oc03_artifact.rs | Rebuild from inputs verifies Ok; mutated → Err |
-| OC03-A05 | verify_prior never trusts recorded intermediates | `verify_no_trust` | tests/oc03_artifact.rs | Falsified vector/seeds in artifact → Err despite well-formed |
-| OC03-A06 | Mixed terminal statuses rejected at assembly | `mixed_terminal_rejected` | tests/oc03_artifact.rs | terminal+unterminated reports → Err |
+| OC03-A05 | verify_prior never trusts recorded intermediates | `verify_no_trust` | tests/oc03_artifact.rs | Self-consistent forged vector (re-derived prior_id) → Err via rebuild divergence; forged id → Err |
+| OC03-A06 | Mixed terminal statuses rejected at assembly | `mixed_terminal_rejected` | tests/oc03_artifact.rs | terminal+unterminated reports → derive_seeds Err; unknown spelling → assemble Err |
 | OC03-A07 | Golden fixture byte equality | `golden_prior_fixture_immutable` | tests/oc03_artifact.rs | Suite compares committed bytes; generator `#[ignore]` |
 | OC03-A08 | Golden fixture SHA-256 sidecar matches | `golden_fixture_sha256` | tests/oc03_artifact.rs | sha256sum of file equals sidecar |
-| OC03-A09 | Unverified report input → whole build Err | `unverified_report_rejected` | tests/oc03_artifact.rs | Report failing verify_report → Err, no partial |
+| OC03-A09 | Unverified report input → whole build Err | `unverified_report_rejected` | tests/oc03_artifact.rs | Malformed report bytes → parser Err; artifact verified against falsified reports → Err |
 | OC03-A10 | Non-canonical JSON spellings rejected | `noncanonical_spelling_rejected` | tests/oc03_artifact.rs | Reordered/whitespace/padded JSON → parse Err |
 
 ## Gate ADVERSARIAL (X01–X08) — tests/oc03_adversarial.rs

@@ -574,10 +574,58 @@ impl SaliencePriorV1 {
         &self.config_hash
     }
 
-    /// Read-only accessor for the convergence flag.
+    /// Read-only: the source report ids (folded once each, §7.3).
+    #[must_use]
+    pub fn source_report_ids(&self) -> &[String] {
+        &self.source_report_ids
+    }
+
+    /// Read-only: the bounded entity graph.
+    #[must_use]
+    pub const fn graph(&self) -> &EntityGraphV1 {
+        &self.graph
+    }
+
+    /// Read-only: the folded seed set.
+    #[must_use]
+    pub const fn seeds(&self) -> &PriorSeedSetV1 {
+        &self.seeds
+    }
+
+    /// Read-only: the positive-mass propagation vector (byte order).
+    #[must_use]
+    pub fn vector(&self) -> &[PriorSeedV1] {
+        &self.vector
+    }
+
+    /// Read-only: iterations executed.
+    #[must_use]
+    pub const fn iterations(&self) -> u32 {
+        self.iterations
+    }
+
+    /// Read-only: whether the L∞ threshold was reached.
     #[must_use]
     pub const fn converged(&self) -> bool {
         self.converged
+    }
+
+    /// Read-only: final-iteration flooring loss.
+    #[must_use]
+    pub const fn residual_ppb(&self) -> u128 {
+        self.residual_ppb
+    }
+
+    /// Read-only: seed-cap drop count (§7.3).
+    #[must_use]
+    pub const fn dropped_seeds(&self) -> u128 {
+        self.dropped_seeds
+    }
+
+    /// Read-only: `terminal` or `unterminated`.
+    #[must_use]
+    pub const fn terminal_status(&self) -> &'static str {
+        self.terminal_status
     }
 
     /// Canonical JCS bytes with the exact 13 §7.4 members in lexicographic
@@ -1212,4 +1260,309 @@ pub fn run_ppr(
         converged,
         residual_ppb,
     })
+}
+
+// ── Stage 3F: canonical prior assembly and verification (spec §7.4/§9) ────
+
+/// Assemble the canonical 13-member `SaliencePriorV1` envelope from the
+/// bounded graph, the folded seed set, and the PPR outcome (spec §7.4).
+///
+/// `prior_id` is derived over placeholder-normalized canonical bytes —
+/// BLAKE3(`oc-03-prior-v1` + NUL + canonical bytes with `prior_id` set to
+/// the literal `"prior_id"` placeholder; the derived value is substituted
+/// back afterwards (§9, inheriting the OC-02 §9.2 precedent). `dropped_seeds`
+/// is the seed-cap remainder from `derive_seeds`. Mixed terminal statuses
+/// were already rejected upstream (§7.3).
+///
+/// # Errors
+/// Returns [`OutcomeError::Malformed`] when config validation or the
+/// graph/seed consistency gates fail.
+pub fn assemble_prior(
+    graph: EntityGraphV1,
+    seeds: PriorSeedSetV1,
+    ppr: &PprOutcome,
+    dropped_seeds: u128,
+    terminal_status: &str,
+    config: &PriorConfigV1,
+) -> Result<SaliencePriorV1, OutcomeError> {
+    config.validate_frozen()?;
+    if terminal_status != "terminal" && terminal_status != "unterminated" {
+        return Err(OutcomeError::Malformed);
+    }
+    // Consistency: the vector must live on the graph's entities and every
+    // value must be in range (run_ppr already enforces; re-assert here so
+    // verification is not the only gate).
+    let mut vector = Vec::with_capacity(ppr.vector().len());
+    for (entity, ppb) in ppr.vector() {
+        if *ppb == 0 || *ppb > caps::PRIOR_MAX_PPB {
+            return Err(OutcomeError::Malformed);
+        }
+        if !graph.entities().contains(entity) {
+            return Err(OutcomeError::Malformed);
+        }
+        vector.push(PriorSeedV1::new_for_test(entity, *ppb));
+    }
+    vector.sort_by(|a, b| a.entity().cmp(b.entity()));
+
+    let placeholder = SaliencePriorV1::new_for_test(
+        "prior_id".to_owned(),
+        config.config_hash()?.clone(),
+        seeds.source_report_ids().to_vec(),
+        graph,
+        seeds,
+        vector,
+        ppr.iterations(),
+        ppr.converged(),
+        ppr.residual_ppb(),
+        dropped_seeds,
+        leak_terminal(terminal_status),
+    );
+    let canonical = placeholder.canonical_bytes()?;
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(PRIOR_ID_DOMAIN);
+    hasher.update(&canonical);
+    let prior_id = format!("{}{}", PRIOR_ID_PREFIX, hasher.finalize().to_hex());
+    Ok(SaliencePriorV1 {
+        version: 1,
+        prior_id,
+        ..placeholder
+    })
+}
+
+/// Leak a runtime terminal-status string into the `'static` field.
+///
+/// The wire type freezes `terminal_status` as `&'static str` for
+/// compile-time spelling discipline; assembly only ever receives the two
+/// frozen spellings, validated above.
+fn leak_terminal(status: &str) -> &'static str {
+    if status == "terminal" {
+        "terminal"
+    } else {
+        "unterminated"
+    }
+}
+
+/// Verify a prior artifact by REBUILDING every intermediate from the
+/// caller-supplied inputs (spec §8/§9.4): the graph is rebuilt from the
+/// session payloads, the seeds from the verified report contributions, the
+/// vector from a fresh `run_ppr`, and the whole envelope is reassembled —
+/// byte-equality against the artifact's canonical bytes is then required.
+/// Recorded intermediates are never trusted: a self-consistent forgery
+/// (re-derived prior_id over falsified members) is rejected because the
+/// rebuilt envelope diverges from the recorded one.
+///
+/// # Errors
+/// Returns [`OutcomeError::Malformed`] on any structural failure, member
+/// mismatch, non-canonical bytes, or rebuild divergence.
+pub fn verify_prior(
+    bytes: &[u8],
+    sessions: &[SessionPayloads<'_>],
+    reports: &[ReportContribution],
+    event_payloads: &[(&str, &str)],
+    config: &PriorConfigV1,
+) -> Result<(), OutcomeError> {
+    let prior = parse_prior_bytes(bytes)?;
+    // Canonical-bytes gate: raw bytes must equal the JCS re-render.
+    if bytes != prior.canonical_bytes()? {
+        return Err(OutcomeError::Malformed);
+    }
+    // Terminal status consistency: derive_seeds rejects mixed statuses, so
+    // the artifact's spelling must match the uniform status of the inputs.
+    let uniform_status = reports
+        .first()
+        .map_or(TERMINAL_STATUS, |r| r.terminal_status());
+    if prior.terminal_status() != uniform_status {
+        return Err(OutcomeError::Malformed);
+    }
+    // Rebuild the graph from the session payloads (never trust the
+    // recorded graph).
+    let rebuilt_graph = build_entity_graph(sessions, config)?;
+    // Rebuild the seeds from the verified report contributions.
+    let (rebuilt_seeds, dropped_seeds) = derive_seeds(reports, event_payloads, config)?;
+    // Rebuild the vector from a fresh PPR run over the rebuilt inputs.
+    let rebuilt_ppr = run_ppr(&rebuilt_graph, &rebuilt_seeds, config)?;
+    // Reassemble the full envelope from rebuilt inputs only.
+    let rebuilt = assemble_prior(
+        rebuilt_graph,
+        rebuilt_seeds,
+        &rebuilt_ppr,
+        dropped_seeds,
+        uniform_status,
+        config,
+    )?;
+    // Byte-equality gate: the artifact must equal the rebuilt envelope.
+    if prior.canonical_bytes()? != rebuilt.canonical_bytes()? {
+        return Err(OutcomeError::Malformed);
+    }
+    Ok(())
+}
+
+/// [`verify_prior`]; this only extracts members).
+///
+/// # Errors
+/// Returns [`OutcomeError::Malformed`] on non-object input or missing
+/// members.
+pub fn parse_prior_bytes(bytes: &[u8]) -> Result<SaliencePriorV1, OutcomeError> {
+    let text = std::str::from_utf8(bytes).map_err(|_| OutcomeError::Malformed)?;
+    let value: serde_json::Value =
+        serde_json::from_str(text).map_err(|_| OutcomeError::Malformed)?;
+    let object = value.as_object().ok_or(OutcomeError::Malformed)?;
+    let get_str = |k: &str| -> Result<String, OutcomeError> {
+        object
+            .get(k)
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_owned)
+            .ok_or(OutcomeError::Malformed)
+    };
+    let get_u64 = |k: &str| -> Result<u128, OutcomeError> {
+        object
+            .get(k)
+            .and_then(serde_json::Value::as_u64)
+            .map(u128::from)
+            .ok_or(OutcomeError::Malformed)
+    };
+    let prior_id = get_str("prior_id")?;
+    let config_hash = get_str("config_hash")?;
+    let thorn_status = get_str("thorn_status")?;
+    if thorn_status != versions::THORN_STATUS {
+        return Err(OutcomeError::Malformed);
+    }
+    let terminal_status = get_str("terminal_status")?;
+    if terminal_status != "terminal" && terminal_status != "unterminated" {
+        return Err(OutcomeError::Malformed);
+    }
+    let source_report_ids: Vec<String> = object
+        .get("source_report_ids")
+        .and_then(serde_json::Value::as_array)
+        .ok_or(OutcomeError::Malformed)?
+        .iter()
+        .map(|v| v.as_str().map(str::to_owned).ok_or(OutcomeError::Malformed))
+        .collect::<Result<_, _>>()?;
+    let iterations = u32::try_from(get_u64("iterations")?).map_err(|_| OutcomeError::Malformed)?;
+    let converged = object
+        .get("converged")
+        .and_then(serde_json::Value::as_bool)
+        .ok_or(OutcomeError::Malformed)?;
+    let residual_ppb = get_u64("residual_ppb")?;
+    let dropped_seeds = get_u64("dropped_seeds")?;
+    let version = get_u64("version")?;
+    if version != 1 {
+        return Err(OutcomeError::Malformed);
+    }
+
+    // Nested graph, seeds, vector via lenient serde_json extraction.
+    let parse_seed = |v: &serde_json::Value| -> Result<PriorSeedV1, OutcomeError> {
+        let o = v.as_object().ok_or(OutcomeError::Malformed)?;
+        let entity = o
+            .get("entity")
+            .and_then(serde_json::Value::as_str)
+            .ok_or(OutcomeError::Malformed)?;
+        let ppb = o
+            .get("ppb")
+            .and_then(serde_json::Value::as_u64)
+            .ok_or(OutcomeError::Malformed)?;
+        Ok(PriorSeedV1::new_for_test(entity, u128::from(ppb)))
+    };
+    let graph_object = object
+        .get("graph")
+        .and_then(serde_json::Value::as_object)
+        .ok_or(OutcomeError::Malformed)?;
+    let entities: Vec<String> = graph_object
+        .get("entities")
+        .and_then(serde_json::Value::as_array)
+        .ok_or(OutcomeError::Malformed)?
+        .iter()
+        .map(|v| v.as_str().map(str::to_owned).ok_or(OutcomeError::Malformed))
+        .collect::<Result<_, _>>()?;
+    let edges: Vec<EntityEdgeV1> = graph_object
+        .get("edges")
+        .and_then(serde_json::Value::as_array)
+        .ok_or(OutcomeError::Malformed)?
+        .iter()
+        .map(|v| {
+            let o = v.as_object().ok_or(OutcomeError::Malformed)?;
+            Ok(EntityEdgeV1::new_for_test(
+                o.get("a")
+                    .and_then(serde_json::Value::as_str)
+                    .ok_or(OutcomeError::Malformed)?,
+                o.get("b")
+                    .and_then(serde_json::Value::as_str)
+                    .ok_or(OutcomeError::Malformed)?,
+            ))
+        })
+        .collect::<Result<_, _>>()?;
+    let graph = EntityGraphV1::new_for_test(
+        entities,
+        edges,
+        graph_object
+            .get("truncated_entities")
+            .and_then(serde_json::Value::as_u64)
+            .map(u128::from)
+            .ok_or(OutcomeError::Malformed)?,
+        graph_object
+            .get("truncated_edges")
+            .and_then(serde_json::Value::as_u64)
+            .map(u128::from)
+            .ok_or(OutcomeError::Malformed)?,
+        graph_object
+            .get("config_hash")
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_owned)
+            .ok_or(OutcomeError::Malformed)?,
+    );
+
+    let seeds_object = object
+        .get("seeds")
+        .and_then(serde_json::Value::as_object)
+        .ok_or(OutcomeError::Malformed)?;
+    let seeds_list: Vec<PriorSeedV1> = seeds_object
+        .get("seeds")
+        .and_then(serde_json::Value::as_array)
+        .ok_or(OutcomeError::Malformed)?
+        .iter()
+        .map(&parse_seed)
+        .collect::<Result<_, _>>()?;
+    let seed_source_ids: Vec<String> = seeds_object
+        .get("source_report_ids")
+        .and_then(serde_json::Value::as_array)
+        .ok_or(OutcomeError::Malformed)?
+        .iter()
+        .map(|v| v.as_str().map(str::to_owned).ok_or(OutcomeError::Malformed))
+        .collect::<Result<_, _>>()?;
+    let seeds = PriorSeedSetV1::new_for_test(
+        seeds_list,
+        seed_source_ids,
+        seeds_object
+            .get("unavailable_reports")
+            .and_then(serde_json::Value::as_u64)
+            .map(u128::from)
+            .ok_or(OutcomeError::Malformed)?,
+        seeds_object
+            .get("config_hash")
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_owned)
+            .ok_or(OutcomeError::Malformed)?,
+    );
+
+    let vector: Vec<PriorSeedV1> = object
+        .get("vector")
+        .and_then(serde_json::Value::as_array)
+        .ok_or(OutcomeError::Malformed)?
+        .iter()
+        .map(&parse_seed)
+        .collect::<Result<_, _>>()?;
+
+    Ok(SaliencePriorV1::new_for_test(
+        prior_id,
+        config_hash,
+        source_report_ids,
+        graph,
+        seeds,
+        vector,
+        iterations,
+        converged,
+        residual_ppb,
+        dropped_seeds,
+        leak_terminal(&terminal_status),
+    ))
 }

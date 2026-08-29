@@ -239,9 +239,10 @@ range is a hard rejection, never a silent clamp).
 - `compute_prior(ledgers, reports, config) -> Result<SaliencePriorV1>` —
   verifies every report structurally first; then graph → seeds → propagation →
   §7.4 assembly; `prior_id` derived per §9.2.
-- `verify_prior(prior_bytes, ledgers, reports, config) -> Result<()>` —
-  recomputes from inputs and requires byte-identical canonical bytes and
-  equal `prior_id`. No judge, no network, no re-derivation shortcut.
+- `verify_prior(prior_bytes, sessions, reports, event_payloads, config) -> Result<()>` —
+  rebuilds graph/seeds/vector from the caller-supplied inputs and requires
+  byte-identical canonical bytes (equal `prior_id` follows). No judge, no
+  network, no trust in recorded intermediates.
 - All §7 types: privately-constructed fields, read-only accessors (OC-02 2F
   precedent); no public field mutation anywhere.
 
@@ -392,3 +393,14 @@ silently normalized in code.
   P01/P05/P08/P11 evidence cells aligned; P08 strengthened to exercise the
   reachable Err path with the star-graph fixture. A10 test added for
   adversarial coverage of the same path.
+- 2026-08-29 (Stage 3F review): **Compliance B1 — verify_prior trusted
+  recorded intermediates** (reviewer-verified exploit: self-consistent
+  forgery with re-derived prior_id and ghost-entity graph both passed).
+  Rewritten to the §8 signature: rebuild graph/seeds/vector from
+  caller-supplied sessions/reports/event_payloads and require byte-equality
+  with the rebuilt envelope. §8 wording aligned to the implemented
+  parameter names; matrix A03/A05/A06/A09 evidence cells corrected to
+  match actual assertions; golden fixture regenerated through the real
+  pipeline (generator remains #[ignore], change-control gated). Normative
+  verification semantics unchanged (byte-identical requirement) — the gap
+  was implementation, now closed.
