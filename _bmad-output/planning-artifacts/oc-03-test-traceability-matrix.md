@@ -76,9 +76,9 @@ Total: **52 rows** — T8 + G12 + P14 + A10 + X8.
 
 | Row | Requirement | Test name | File | Evidence |
 |---|---|---|---|---|
-| OC03-X01 | Forged ocattr1_-shaped report rejected | `forged_report_rejected` | tests/oc03_adversarial.rs | verify_report failure → whole build Err |
+| OC03-X01 | Forged ocattr1_-shaped report rejected | `forged_report_rejected` | tests/oc03_adversarial.rs | Negative share → parser Err; parses-OK forged report → rebuild divergence Err |
 | OC03-X02 | Tampered vector byte → verify failure | `tampered_vector_detected` | tests/oc03_adversarial.rs | Single byte flip → Err |
-| OC03-X03 | Cross-config rebuild → different prior_id | `cross_config_divergence` | tests/oc03_adversarial.rs | Mutated config → different ID, verify fails |
+| OC03-X03 | Cross-config rebuild → different prior_id | `cross_config_divergence` | tests/oc03_adversarial.rs | Frozen config: mutation → validate_frozen Err (different-ID branch structurally unreachable) + cross-config verify Err |
 | OC03-X04 | Graph overflow beyond caps → counters, never errors | `graph_overflow_counters` | tests/oc03_adversarial.rs | Massive corpus → Ok with counters>0 |
 | OC03-X05 | Seed overflow → counted drop, valid artifact | `seed_overflow_counted` | tests/oc03_adversarial.rs | >64 seeds → drop counted, artifact valid |
 | OC03-X06 | Negative/Thorn inputs structurally absent | `thorn_unreachable` | tests/oc03_adversarial.rs | No API accepts negative ppb or Thorn payloads |
