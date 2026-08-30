@@ -21,7 +21,7 @@ name verbatim; evidence cells describe ONE executable assertion each.
 | OC04-S10 | Signature fails on wrong domain | `signature_domain_isolated` | tests/oc04_schema.rs | Same body signed over other domain → Err |
 | OC04-U01 | Union dedups by EventId; `both` entry reason recorded | `union_dedup_both_reason` | tests/oc04_union.rs | Overlap → single entry, reason `both` |
 | OC04-U02 | TF=0 event enters via prior arm only, reason `prior` | `tf_zero_enters_via_prior` | tests/oc04_union.rs | No lexical match + positive prior → included, reason `prior` |
-| OC04-U03 | Zero-prior entity contributes nothing | `zero_prior_no_entry` | tests/oc04_union.rs | vector entry 0 → absent |
+| OC04-U03 | Prior vector is positive-only by OC-03 construction; no-positive-match entity contributes nothing | `zero_prior_no_entry` | tests/oc04_union.rs | Source whose derived entity key has no positive verified-vector match → absent from prior arm |
 | OC04-U04 | Orphan prior entity skipped, counted (bound owned by X10) | `orphan_entity_counted` | tests/oc04_union.rs | Counter>0, Ok |
 | OC04-U05 | Empty prior → union ≡ capped lexical arm | `empty_prior_identity` | tests/oc04_union.rs | Byte-equal to lexical-only |
 | OC04-U06 | Prior-only candidates when lexical arm empty | `prior_only_union` | tests/oc04_union.rs | All prior-arm, reasons recorded |

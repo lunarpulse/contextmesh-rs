@@ -21,6 +21,7 @@ pub mod io;
 pub mod json;
 pub mod judge;
 pub mod oc04_selection;
+pub mod oc04_union;
 pub mod outcome;
 pub mod prior;
 pub mod types;

@@ -85,6 +85,8 @@ pub mod handoff;
 pub mod http;
 /// Strict versioned event and wire-format types.
 pub mod model;
+/// OC-04 scored baseline carrier (additive — `select` untouched).
+pub mod oc04_scored;
 /// Provider recording boundary and invocation contract.
 pub mod provider;
 /// Option B agent-experience receipts and derived selection layer.

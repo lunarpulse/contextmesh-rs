@@ -353,7 +353,7 @@ impl Selector for BaselineSelector {
 }
 
 /// Splits ASCII text into lowercase alphanumeric terms.
-fn tokenize(text: &str) -> Vec<String> {
+pub(crate) fn tokenize(text: &str) -> Vec<String> {
     let mut tokens = Vec::new();
     let mut current = String::new();
     for ch in text.chars() {
@@ -369,8 +369,24 @@ fn tokenize(text: &str) -> Vec<String> {
     tokens
 }
 
+/// Scores one source for OC-04 as checked u128 term frequencies. This is
+/// additive: the baseline's historical usize scorer remains untouched.
+pub(crate) fn score_source_u128(
+    task_terms: &[String],
+    source: &SourceEvent,
+) -> Result<u128, SelectionError> {
+    let tokens = tokenize(&format!("{} {}", source.kind(), source.text()));
+    task_terms.iter().try_fold(0_u128, |total, term| {
+        let frequency = u128::try_from(tokens.iter().filter(|token| *token == term).count())
+            .map_err(|_| SelectionError::SelectorError)?;
+        total
+            .checked_add(frequency)
+            .ok_or(SelectionError::SelectorError)
+    })
+}
+
 /// Scores one source as the sum of task-term frequencies in its text.
-fn score_source(task_terms: &[String], source: &SourceEvent) -> usize {
+pub(crate) fn score_source(task_terms: &[String], source: &SourceEvent) -> usize {
     let tokens = tokenize(&format!("{} {}", source.kind(), source.text()));
     task_terms
         .iter()
