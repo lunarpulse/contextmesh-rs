@@ -123,17 +123,29 @@ fn influence_jcs_render() {
     assert_eq!(std::str::from_utf8(&bytes).unwrap(), expected);
     // Entries must be in rerank order in the record itself.
     assert_eq!(influence.entries()[0].event_id_text(), "ev-b");
-    // §6 reason↔ppm coherence (part of the S01 render contract: the wire
-    // enum and its ppm semantics render together) + duplicate EventIds
-    // rejected at assemble (schema-level union dedup). These assertions
-    // guard the same entry-wire rule S01 renders; the matrix's
+    // §6 entry-wire rules within the S01 render contract: the wire enum
+    // and its ppm semantics render together, and duplicate EventIds are
+    // rejected at assemble (schema-level union dedup). Membership-truth
+    // separation (founder-approved, 4D gate change control): the enum is
+    // validated here, but zero ppm does NOT imply non-membership —
+    // min-max normalization (§7.2) legitimately collapses an arm's
+    // minimum member to 0, so reason↔magnitude consistency belongs to
+    // `rerank` (which knows the union), not the constructor. These
+    // assertions guard the same entry-wire rule S01 renders; the matrix's
     // one-row/one-assertion discipline treats them as enumerated cases of
     // the entry-rule, not separate rows (v12 row-atomicity convention).
-    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_BOTH, 5, 0).is_err());
-    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_BOTH, 0, 5).is_err());
-    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_LEXICAL, 0, 5).is_err());
-    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_PRIOR, 5, 0).is_err());
+    // Only an unknown reason string is rejected at construction:
     assert!(SelectionInfluenceEntryV1::new("ev", "unknown", 5, 5).is_err());
+    // Non-member-zero rule (§6 one-way): lexical means prior arm absent →
+    // prior_ppm must be 0; prior means lexical_ppm must be 0.
+    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_LEXICAL, 5, 5).is_err());
+    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_PRIOR, 5, 5).is_err());
+    // Zero ppm collapses are valid member states (min-max minimum):
+    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_BOTH, 5, 0).is_ok());
+    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_BOTH, 0, 5).is_ok());
+    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_LEXICAL, 0, 0).is_ok());
+    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_PRIOR, 0, 0).is_ok());
+    assert!(SelectionInfluenceEntryV1::new("ev", ENTRY_REASON_BOTH, 0, 0).is_ok());
     let dup = SelectionInfluenceEntryV1::new("ev-x", ENTRY_REASON_LEXICAL, 7, 0).unwrap();
     let dup_assemble =
         SelectionInfluenceV1::assemble(&config, "ocprior1_x", "task-fp", vec![dup.clone(), dup]);

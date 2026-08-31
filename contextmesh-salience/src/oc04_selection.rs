@@ -165,28 +165,42 @@ pub struct SelectionInfluenceEntryV1 {
 
 impl SelectionInfluenceEntryV1 {
     /// Constructs one entry, validating the exact string enum, the
-    /// reason↔ppm coherence rule (§6: a prior-arm-only entry has
-    /// `lexical_ppm = 0` and vice versa; `both` requires BOTH arms > 0),
-    /// and the arithmetic identity `score_ppm = lexical_ppm + prior_ppm`
-    /// (checked; fail-closed on overflow).
+    /// NON-MEMBER-ZERO rule, and the arithmetic identity
+    /// `score_ppm = lexical_ppm + prior_ppm` (checked; fail-closed on
+    /// overflow).
+    ///
+    /// Change control (membership-truth separation, founder-approved at the
+    /// 4D gate): per-arm min-max normalization (§7.2) legitimately collapses
+    /// an arm's minimum member to `0` ppm, and a zero ppm does NOT imply
+    /// absence from that arm — `entry_reason` records UNION MEMBERSHIP
+    /// (§7.1), while the ppm values record NORMALIZED RELATIVE MAGNITUDE.
+    /// The one-way implication REMAINS normative (§6): a NON-MEMBER arm
+    /// renders `ppm = 0` — reason `lexical` requires `prior_ppm = 0`,
+    /// reason `prior` requires `lexical_ppm = 0` — while `both` admits any
+    /// magnitude combination including the double-collapse `(0, 0)`.
+    /// Membership-vs-reason consistency is asserted by `rerank` against the
+    /// union outcome and re-verified in the §7.5 chain — not here.
     ///
     /// # Errors
     /// Returns [`OutcomeError::Malformed`] on a reason outside
-    /// `lexical|prior|both`, on reason/ppm incoherence, or on score
-    /// overflow.
+    /// `lexical|prior|both`, on a non-member arm with a nonzero magnitude,
+    /// or on score overflow.
     pub fn new(
         event_id_text: impl Into<String>,
         entry_reason: &'static str,
         lexical_ppm: u64,
         prior_ppm: u64,
     ) -> Result<Self, OutcomeError> {
-        let coherent = match entry_reason {
-            ENTRY_REASON_LEXICAL => lexical_ppm > 0 && prior_ppm == 0,
-            ENTRY_REASON_PRIOR => lexical_ppm == 0 && prior_ppm > 0,
-            ENTRY_REASON_BOTH => lexical_ppm > 0 && prior_ppm > 0,
+        let nonmember_zero = match entry_reason {
+            // §6: a non-member arm renders ppm = 0 (one-way rule — the
+            // converse does NOT hold: a member may legitimately collapse
+            // to 0 by min-max normalization).
+            ENTRY_REASON_LEXICAL => prior_ppm == 0,
+            ENTRY_REASON_PRIOR => lexical_ppm == 0,
+            ENTRY_REASON_BOTH => true,
             _ => false,
         };
-        if !coherent {
+        if !nonmember_zero {
             return Err(OutcomeError::Malformed);
         }
         // Prereg overflow policy: checked arithmetic, fail closed.

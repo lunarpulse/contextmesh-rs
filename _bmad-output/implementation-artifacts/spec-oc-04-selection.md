@@ -103,8 +103,14 @@ definition); `version` is decimal JSON integer `1`. Each entry:
 `entry_reason` is an exact string enum, one of `"lexical"`, `"prior"`,
 `"both"`; the entries array is ordered by rerank order (score_ppm
 descending, then EventId canonical-text ascending — same key as §7.2).
-(normalized ppm values; a prior-arm-only entry has `lexical_ppm = 0` and
-vice versa).
+(normalized ppm values; a non-member arm renders `ppm = 0` — CHANGE
+CONTROL, founder-approved at the 4D gate: `entry_reason` records UNION
+MEMBERSHIP (§7.1), while ppm records NORMALIZED RELATIVE MAGNITUDE; the
+former §6 claim that a zero ppm implies non-membership ("and vice versa")
+contradicted §7.2 min-max normalization, which legitimately collapses an
+arm's minimum member to 0. Zero ppm does NOT imply non-membership;
+reason↔membership consistency is asserted by `rerank` and re-verified in
+the §7.5 chain — not by the entry constructor).
 
 **`SelectionExecutionV1` body** (19 members, JCS lexicographic):
 `b3_candidate_fingerprint, b3_policy_fingerprint, b6_warnings_hash,
@@ -264,7 +270,8 @@ impl VerifiedPrior {
 }
 pub fn union_candidates(lexical: &[ScoredSelection], prior: &VerifiedPrior,
     sources: &[SourceEvent], config: &Oc04ConfigV1) -> Result<UnionOutcomeV1, OutcomeError>;
-pub fn rerank(union: &UnionOutcomeV1, config: &Oc04ConfigV1)
+pub fn rerank(union: &UnionOutcomeV1, prior: &VerifiedPrior,
+    task_fingerprint: &str, config: &Oc04ConfigV1)
     -> Result<SelectionInfluenceV1, OutcomeError>;
 pub async fn bind_execution<'a, F, D, Fut>(
     influence: &SelectionInfluenceV1,
@@ -541,3 +548,30 @@ gate; any dependency-DIRECTION change requires explicit founder approval.
   list is pinned at 4B per plan (schema spec-before-code at that stage).
   Matrix 51→57 rows (S12+U8+R9+E14+X14). Implementation had NOT started —
   zero code changes, wording-only eligibility satisfied.
+- 2026-08-31: **v13 4D-gate change control (FOUNDER-APPROVED — both
+  controls; Discord approval IDs 1543728366379606149 for the §8 surface
+  AND the §6 membership-truth semantics (option 1, follow-up directive
+  "correct behaviour throughout"), reaffirmed by proceed directive
+  1543785462018088980):** (1) §8
+  `rerank` signature corrected — the frozen `rerank(union, config)` could
+  not populate the frozen §6 members (`prior_id`, `task_fingerprint`);
+  now `rerank(union, prior: &VerifiedPrior, task_fingerprint: &str,
+  config)` — `prior_id` is structurally copied from the verified token,
+  `task_fingerprint` verbatim from the OC-02 report; (2) §6 zero-ppm
+  converse removed — membership-truth separation: `entry_reason` records
+  union membership, ppm records normalized relative magnitude; §7.2
+  min-max legitimately collapses an arm's minimum member to 0, which the
+  former "and vice versa" clause rejected (hard contradiction with the
+  prereg-verbatim §7.2). The ONE-WAY non-member-zero rule remains
+  normative: a non-member arm renders `ppm = 0` (`lexical` ⇒
+  `prior_ppm = 0`, `prior` ⇒ `lexical_ppm = 0`); only the false converse
+  (zero ppm ⇒ non-membership) is removed. Code impact:
+  `SelectionInfluenceEntryV1::new` validates the enum + non-member-zero
+  rule + checked sum; `rerank` asserts arm↔union set/value consistency
+  (fail-closed). OC-02/OC-03 frozen artifacts untouched. 4D dual review
+  round 1 (deleg_99f1c699): NO-GO 1B/1W (compliance) + REQUEST_CHANGES
+  5B/4W (quality) — all fixed same-day. Round-2 re-check (deleg_c0255d22):
+  CB1 CLOSED (this §17 rewrite), QB2 CLOSED, QB1 CLOSED, R-rows/diff PASS;
+  quality found 2 residual blockers (duplicate-masking gap in the prior
+  arm set check; R07 tie branch not actually reached) — fixed in the same
+  session (see the round-3 entry appended below).

@@ -93,7 +93,8 @@ impl UnionOutcomeV1 {
         &self.lexical
     }
 
-    /// Prior-arm candidates in canonical EventId-text order.
+    /// Prior-arm candidates in 4C normative order: raw ppb descending,
+    /// with canonical EventId-text ascending as the tie-break.
     #[must_use]
     pub fn prior(&self) -> &[PriorCandidate] {
         &self.prior
