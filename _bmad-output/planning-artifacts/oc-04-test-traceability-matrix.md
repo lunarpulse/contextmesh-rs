@@ -15,7 +15,7 @@ name verbatim; evidence cells describe ONE executable assertion each.
 | OC04-S05 | ID derivation placeholder discipline | `id_placeholder_derivation` | tests/oc04_schema.rs | BLAKE3 over placeholder bytes; `oc04inf1_`/`oc04exec1_` prefixes |
 | OC04-S06 | Forged ID prefix rejected | `id_prefix_rejected` | tests/oc04_schema.rs | Wrong prefix → Err |
 | OC04-S07 | Parser lenient: extra member still parses | `parser_lenient` | tests/oc04_schema.rs | Extra member parses Ok (no rejection claim) |
-| OC04-S07b | Extra member rejected by canonical gate on verify | `canonical_extra_member_rejected` | tests/oc04_adversarial.rs | Parsed extra-member bytes → verify_execution Err |
+| OC04-S07b | Extra member rejected by canonical gate on verify | `canonical_extra_member_rejected` | tests/oc04_exec.rs | Parsed extra-member bytes → canonical gate Err; parsed value-tampered (forged) bytes → verify_execution Err |
 | OC04-S08 | No f32/f64 tokens in new code | `no_float_tokens` | tests/oc04_schema.rs | include_str! scan of oc04_selection.rs |
 | OC04-S09 | Signature issuance + verification round-trip | `signature_roundtrip` | tests/oc04_schema.rs | Sign body → verify Ok |
 | OC04-S10 | Signature fails on wrong domain | `signature_domain_isolated` | tests/oc04_schema.rs | Same body signed over other domain → Err |
@@ -42,14 +42,14 @@ name verbatim; evidence cells describe ONE executable assertion each.
 | OC04-E04 | Recipient head bound as explicit body member | `execution_binds_recipient_head` | tests/oc04_exec.rs | Body member equals B5-verified head |
 | OC04-E04b | b6_warnings_hash bound per derivation table | `execution_binds_b6_warnings` | tests/oc04_exec.rs | Recompute oc-04-b6warn-v1 hash over `Handoff::uncertainty()` exposure → equal |
 | OC04-E04c | Normative exact-two-marker rule holds (used/empty alternative) | `b6_marker_rule_exact` | tests/oc04_exec.rs | prior-arm fixture → markers exactly {prior_arm_used, orphan_prior_entities=n}; empty-arm fixture → {prior_arm_empty, ...} |
-| OC04-E05 | Influence/execution mismatch → Err, no artifact | `influence_mismatch_rejected` | tests/oc04_exec.rs | Tampered influence → Err |
+| OC04-E05 | Influence/execution mismatch → Err, no artifact | `influence_mismatch_rejected` | tests/oc04_exec.rs | Bind-side: pre-closure is influence-derived (§7.3 structural identity — a mismatched influence cannot bind). Verify-side: envelope bound over chain A refused on chain B (recorded pre_closure/hash members ≠ replayed chain); plus forged envelope (canonical bytes, fresh signature) refused by replay |
 | OC04-E06 | Budget: over-budget events → refusal | `budget_events_refusal` | tests/oc04_exec.rs | max_events exceeded alone → Err + reason |
 | OC04-E06b | Budget: over-budget bytes → refusal | `budget_bytes_refusal` | tests/oc04_exec.rs | max_bytes exceeded alone → Err + reason |
 | OC04-E07 | VerifiedPrior token privacy (compile gate) | `verified_prior_compile_gate` | tests/oc04_adversarial.rs (harness; snippet source: tests/compile/oc04_token_privacy.rs) | rustc-compile-fail: privacy-violating snippet exit-fail + expected E0xxx; runtime forgery → Err in X01 |
 | OC04-E08 | Full-pipeline golden fixture (committed bytes + sha256) | `execution_golden` | tests/oc04_exec.rs | #[ignore] generator + committed fixture compared (generator run IS the pipeline) |
 | OC04-E09 | B7 non-convergence → no artifact, Err | `b7_nonconvergence_no_artifact` | tests/oc04_exec.rs | Non-converging driver → bind_execution Err, no SignedExecutionV1 emitted |
 | OC04-E10 | B8 simulate failure → no artifact, Err | `b8_failure_no_artifact` | tests/oc04_exec.rs | simulate fail fixture → bind_execution Err, no SignedExecutionV1 emitted |
-| OC04-E11 | Checked-u128 overflow/out-of-range → Err (fail-closed) | `checked_overflow_rejected` | tests/oc04_exec.rs | score_ppm overflow via u128 checked add fixture → Err, not clamp |
+| OC04-E11 | Checked-u128 overflow/out-of-range → Err (fail-closed) | `checked_overflow_rejected` | tests/oc04_exec.rs | u128 checked add of a u64 pair cannot overflow (max sum fits exactly) — the extreme exact-sum fixture proves determinism/no-clamp; overflow is structurally unreachable (documented vacuity, §17 U03-class) |
 | OC04-X01 | Unverifiable prior bytes → VerifiedPrior::verify Err | `unverified_prior_rejected` | tests/oc04_adversarial.rs | Tampered prior bytes → verify Err (runtime; privacy itself is E07 compile gate) |
 | OC04-X02 | Forged influence with re-derived id → Err | `forged_influence_rejected` | tests/oc04_adversarial.rs | Self-consistent forgery caught by rebuild divergence |
 | OC04-X03 | Tampered execution signature → Err | `forged_execution_rejected` | tests/oc04_adversarial.rs | Body tamper with original sig → Err (wrong-key case covered by S10 domain isolation) |

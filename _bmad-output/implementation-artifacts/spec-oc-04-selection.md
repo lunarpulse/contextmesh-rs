@@ -575,3 +575,24 @@ gate; any dependency-DIRECTION change requires explicit founder approval.
   quality found 2 residual blockers (duplicate-masking gap in the prior
   arm set check; R07 tie branch not actually reached) — fixed in the same
   session (see the round-3 entry appended below).
+- 2026-09-01: **v14 4E-gate change control (FOUNDER-APPROVED, Discord
+  1544166546883223622):** (1) `HandoffError4E` 신설 — §8의
+  `HandoffError` 반환형 명칭을 충족하는 4E 전용 오류형
+  (Malformed/Stale/Budget + From<OutcomeError>); suffix "4E"는 승인
+  문언 그대로 사용. (2) B6 membership reason 권위(§17 v13 연장) +
+  orphan marker 유도: influence entries positive-prior_ppm 카운트 —
+  §7.3 "U04 counter"와의 의미론 갭은 인지된 한계로 기록(union 재실행
+  없이는 influence에서 U04 근원 접근 불가). (3)
+  `parse_execution_body_lenient`/`_canonical` 신설 — S07 파싱/S07b
+  canonical gate 분리. 4E dual review: R1 (deleg_9424fff1 +
+  deleg_1b5d2fa9) NO-GO 5B+3W/REJECT 3B+3W → 정정. R2
+  (deleg_0d565ecc) NO-GO 6B → 정정 (HandoffError4E, influence 주도
+  바인딩, 파서 S07/S07b, E01/E03 음성 단언, E05 재설계, E11 정정).
+  R3 (deleg_085b1272): C4/S07b RESOLVED, C5/E01 강화 — C2/C5 union
+  재검증·C6 §17 vacuity는 X-rows(4F 게이트, 스펙 line 51-52) 이관
+  판정 (FOUNDER 승인: 4E 게이트는 E-rows GREEN except E07 + S07b +
+  dual review). 경고 2건 수정: W1 E05에 forged-envelope 거부 단언
+  복제, W2 S07b 주석 실제 검증 경로로 갱신. 최종 게이트:
+  oc04_exec 15/15, schema 13/13, union 11/11, rerank 8/8, workspace
+  regression 472/0 EXIT 0, clippy/fmt/diff EXIT 0. golden
+  c07f23b0...c6bf8e.

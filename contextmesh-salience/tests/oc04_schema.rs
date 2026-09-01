@@ -443,3 +443,29 @@ fn placeholder_body(config: &Oc04ConfigV1) -> SelectionExecutionBodyV1 {
         version: 1,
     }
 }
+
+// ---------------------------------------------------------------------------
+// S07: parser_lenient — extra member still parses (parser never rejects
+// membership; the canonical gate at verify does)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn parser_lenient() {
+    let config = Oc04ConfigV1::default();
+    let body = placeholder_body(&config);
+    let canonical = render_execution_body(&body);
+    // Inject an EXTRA member into the wire bytes; the parser must not
+    // reject on membership (S07's sole claim — no acceptance of the
+    // tampered bytes is asserted here, that is S07b's canonical gate).
+    let text = std::str::from_utf8(&canonical).unwrap();
+    let injected = text.replacen('{', "{\"aardvark_extra_member\":\"sneaky\",", 1);
+    assert_ne!(
+        injected, text,
+        "fixture must actually inject an extra member"
+    );
+    let parsed = contextmesh_salience::oc04_exec::parse_execution_body_lenient(injected.as_bytes())
+        .expect("S07: extra member must still parse");
+    // The parsed typed body round-trips the frozen members.
+    assert_eq!(parsed.execution_id, body.execution_id);
+    assert_eq!(parsed.version, 1);
+}
