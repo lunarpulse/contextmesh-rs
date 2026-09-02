@@ -177,7 +177,12 @@ An event's raw prior value = **max** ppb over its matching entities
 match are not prior-arm candidates. Orphan prior entities (positive vector
 entry with no matching candidate event) increment
 `UnionOutcomeV1::orphan_prior_entities` (u32; **fail-closed Err on exceeding
-`ORPHAN_PRIOR_ENTITIES_MAX = 1024`** — §5 new freeze). Reconstruction
+`ORPHAN_PRIOR_ENTITIES_MAX = 1024`** — §5 new freeze). Because the only public
+input is `VerifiedPrior` rebuilt from an OC-03 graph capped at
+`MAX_ENTITIES = 1024`, the `> 1024` branch is a defensive internal-invariant
+guard and is structurally unreachable through the verified public surface;
+X10 pins the two boundary values and the reachable maximum instead of
+fabricating a 1,025-entity token. Reconstruction
 iterates the candidate pool in its canonical order; HashMap iteration is
 prohibited.
 
@@ -596,3 +601,13 @@ gate; any dependency-DIRECTION change requires explicit founder approval.
   oc04_exec 15/15, schema 13/13, union 11/11, rerank 8/8, workspace
   regression 472/0 EXIT 0, clippy/fmt/diff EXIT 0. golden
   c07f23b0...c6bf8e.
+- 2026-09-02: **v15 X10 wording-only change control (FOUNDER-APPROVED,
+  Discord 1544663739582652426):** the former X10 evidence demand
+  "1,025 orphan entities → union Err" was structurally unconstructible:
+  OC-03 `VerifiedPrior` is rebuilt from a graph capped at
+  `MAX_ENTITIES = 1024`, exactly equal to OC-04
+  `ORPHAN_PRIOR_ENTITIES_MAX = 1024`. Normative production behavior is
+  unchanged: the OC-04 `> 1024` check remains fail-closed as a defensive
+  internal-invariant guard. X10 now pins boundary equality and proves the
+  reachable verified-prior count is `<= 1024`; no code, constant, wire,
+  ID, signature domain, or dependency changes arise from this clarification.

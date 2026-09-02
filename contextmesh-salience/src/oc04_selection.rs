@@ -828,3 +828,47 @@ fn base64_url_no_pad(bytes: &[u8]) -> String {
     use base64::Engine as _;
     base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn valid_execution_body() -> SelectionExecutionBodyV1 {
+        let mut body = SelectionExecutionBodyV1 {
+            b3_candidate_fingerprint: String::new(),
+            b3_policy_fingerprint: String::new(),
+            b6_warnings_hash: String::new(),
+            budget_max_bytes: 1,
+            budget_max_events: 1,
+            closed_count: 0,
+            closed_hash: String::new(),
+            config_hash: "0".repeat(64),
+            critical_projection: String::new(),
+            delta_count: 0,
+            delta_hash: String::new(),
+            execution_id: "execution_id".to_owned(),
+            handoff_hash: String::new(),
+            influence_id: format!("{OC04_INFLUENCE_ID_PREFIX}fixture"),
+            pre_closure_count: 0,
+            pre_closure_ids_hash: String::new(),
+            prior_id: format!("{}fixture", crate::prior::PRIOR_ID_PREFIX),
+            recipient_head: None,
+            version: 1,
+        };
+        body.execution_id = derive_execution_id(&body);
+        body
+    }
+
+    #[test]
+    fn tampered_execution_signature_rejected_by_envelope_verifier() {
+        let signer = SigningIdentity::from_fixture_seed([91; 32]);
+        let mut envelope = SignedExecutionV1::issue(valid_execution_body(), &signer)
+            .expect("valid fixture envelope");
+        envelope.verify().expect("precondition: original verifies");
+        envelope.signature[0] ^= 0x01;
+        assert!(
+            envelope.verify().is_err(),
+            "the envelope verifier itself must reject a one-bit signature mutation"
+        );
+    }
+}

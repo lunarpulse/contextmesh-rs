@@ -59,7 +59,7 @@ name verbatim; evidence cells describe ONE executable assertion each.
 | OC04-X07 | Duplicate event in both arms folded once, reason `both` | `duplicate_folded_once` | tests/oc04_adversarial.rs | Single entry |
 | OC04-X08 | Stale-state handoff mismatch → no artifact, no handoff | `stale_state_no_artifact` | tests/oc04_adversarial.rs | Recipient head drift → Err |
 | OC04-X09 | Non-canonical prior payload → VerifiedPrior::verify Err | `noncanonical_prior_payload_rejected` | tests/oc04_adversarial.rs | Equivalent JSON with non-canonical formatting → verify Err |
-| OC04-X10 | Orphan count > 1024 → Err | `orphan_bound_fail_closed` | tests/oc04_adversarial.rs | 1,025 orphan entities fixture → union Err |
+| OC04-X10 | OC-03 verified-entity cap and OC-04 orphan bound remain aligned at 1024; `> 1024` is unreachable through `VerifiedPrior` | `orphan_bound_fail_closed` | tests/oc04_adversarial.rs | Assert literal `MAX_ENTITIES == 1024`, `MAX_ENTITIES == ORPHAN_PRIOR_ENTITIES_MAX` (joint-drift guard), and verified positive-entity count `<= 1024` on a real pipeline fixture; the retained production `> 1024` guard is defensive fail-closed (§17 v15) |
 | OC04-X11 | Verifier replay: bind→verify Ok on same chain, production history unchanged | `verifier_replay_positive` | tests/oc04_adversarial.rs | bind→verify Ok; production RepairHistory bytes identical before/after |
 | OC04-X11b | Verifier replay: tampered recorded handoff_hash → Err | `verifier_replay_wrong_hash` | tests/oc04_adversarial.rs | Envelope with falsified handoff_hash → verify Err |
 | OC04-X12 | ScratchHistoryGuard rejects same-path as production history | `scratch_guard_same_path_rejected` | tests/oc04_adversarial.rs | scratch path == repair_history.path() → Err |

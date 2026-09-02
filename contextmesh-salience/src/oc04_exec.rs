@@ -312,9 +312,10 @@ where
     // §7.3: B3 binds over THE INFLUENCE'S OWN reranked pre-closure set —
     // the entry EventId texts parsed back into EventIds (Malformed on any
     // non-canonical id text), canonically sorted; close_selection re-
-    // deduplicates. There is NO caller-supplied pre_closure input: §7.5's
-    // "entries ≠ actual union/rerank → Err" is structural here, because
-    // the bound set IS the influence's set by construction.
+    // deduplicates. There is NO caller-supplied pre_closure field. Instead,
+    // §7.5/X02 independently compares this set with the caller's actual
+    // union/rerank candidate surface (`chain.b3_candidates`) before B3, so
+    // a self-consistent forged influence cannot redefine the bound set.
     let mut pre_closure: Vec<EventId> = influence
         .entries()
         .iter()
@@ -323,6 +324,18 @@ where
         .map_err(|_| HandoffError4E::Malformed)?;
     pre_closure.sort();
     pre_closure.dedup();
+
+    // §7.5/X02: the influence set must equal the caller's ACTUAL
+    // union/rerank candidate set. Assembly makes an influence internally
+    // self-consistent, but does not prove provenance; this independent
+    // comparison closes the self-consistent-forgery gap. Compare as sets
+    // because B3's candidate surface is order-insensitive.
+    let mut actual_candidates = chain.b3_candidates.to_vec();
+    actual_candidates.sort();
+    actual_candidates.dedup();
+    if pre_closure != actual_candidates {
+        return Err(HandoffError4E::Malformed);
+    }
 
     // B6 membership inputs (§7.3 normative warning rule, §6/v13 reason
     // authority): prior-arm USED iff ≥1 entry's reason is `prior`/`both`;
@@ -426,7 +439,8 @@ where
 async fn drive_chain_replay<'a, F, D, Fut>(
     body: &SelectionExecutionBodyV1,
     pre_closure: &[EventId],
-    chain: &mut ExecutionChainInputs<'a, F, D, Fut>,
+    chain: &ExecutionChainInputs<'a, F, D, Fut>,
+    repair_history: &mut RepairHistory,
 ) -> Result<ChainPrefix, HandoffError4E>
 where
     F: Fn() -> D,
@@ -526,7 +540,7 @@ where
         chain.recipient,
         chain.repair_bounds,
         &mut driver,
-        chain.repair_history,
+        repair_history,
     )
     .await
     .map_err(|_| malformed())?;
@@ -698,7 +712,7 @@ where
     let _guard =
         ScratchHistoryGuard::reserve(chain.scratch_history_path, chain.repair_history.path())
             .map_err(|_| HandoffError4E::Malformed)?;
-    let scratch =
+    let mut scratch =
         RepairHistory::open(chain.scratch_history_path).map_err(|_| HandoffError4E::Malformed)?;
 
     // Derive the replay's pre-closure from THE RECORDED ENVELOPE'S OWN
@@ -713,14 +727,11 @@ where
     pre_closure.sort();
     pre_closure.dedup();
 
-    // Swap the scratch history into the chain inputs for the replay so
-    // drive_chain_replay writes B7 records to the guarded scratch file —
-    // the caller's production history is restored before any error
-    // return (swap-back happens even on failure).
-    let production = std::mem::replace(chain.repair_history, scratch);
-    let replay = drive_chain_replay(env.body(), &pre_closure, chain).await;
-    drop(std::mem::replace(chain.repair_history, production));
-    let prefix = replay?;
+    // Replay writes B7 records only to the guarded scratch history passed
+    // explicitly below. The caller's production history is never moved,
+    // swapped, or mutably exposed across an await, so cancellation cannot
+    // strand the chain on a scratch handle or drop the production handle.
+    let prefix = drive_chain_replay(env.body(), &pre_closure, chain, &mut scratch).await?;
 
     if !prefix.converged {
         return Err(HandoffError4E::Malformed);
