@@ -450,7 +450,7 @@ git show "$F":scripts/verify-oc05.sh > "$tmp" 2>/dev/null \
   || { echo "OC05-LAUNCH: FAIL (extraction)"; exit 1; }
 [ -s "$tmp" ] || { echo "OC05-LAUNCH: FAIL (extraction)"; exit 1; }
 want=$(git show "$PINS":_bmad-output/implementation-artifacts/spec-oc-05-release-gate.md 2>/dev/null \
-       | grep -m1 '^`OC05_SCRIPT_SHA256`' 2>/dev/null \
+       | grep -m1 '^OC05_SCRIPT_SHA256=' 2>/dev/null \
        | grep -oE '[0-9a-f]{64}' 2>/dev/null) \
   || { echo "OC05-LAUNCH: FAIL (pins read)"; exit 1; }
 have=$(sha256sum "$tmp" 2>/dev/null | cut -d' ' -f1 2>/dev/null) \
