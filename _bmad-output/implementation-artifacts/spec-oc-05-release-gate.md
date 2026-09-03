@@ -215,9 +215,7 @@ set -u -o pipefail
 # --- setup ---
 E="${1:?usage: oc05-5d.sh <founder-E commit id>}"
 git show "$E":_bmad-output/implementation-artifacts/spec-oc-05-release-gate.md \
-  | awk '/^```$/{f=!f; next} f' \
-  | sed -n '/^cd "${OC05_WORKDIR/,/^bash "\$tmp"; rc=\$?; exit \$rc$/p' \
-  > /tmp/oc05-wrapper.sh
+  | grep -A31 '^cd "${OC05_WORKDIR' > /tmp/oc05-wrapper.sh
 git clone -q /home/cosmo/contextmesh-rs /tmp/oc05-probe
 cd /tmp/oc05-probe || exit 9
 git checkout -q --detach "$E"
