@@ -214,8 +214,9 @@ requires the evidence in tracked paths):**
 set -u -o pipefail
 # --- setup ---
 E="${1:?usage: oc05-5d.sh <founder-E commit id>}"
-sed -n '/^cd \/home\/cosmo\/contextmesh-rs/,/^bash "\$tmp"; rc=\$?; exit \$rc$/p' \
-  _bmad-output/implementation-artifacts/spec-oc-05-release-gate.md > /tmp/oc05-wrapper.sh
+git show "$E":_bmad-output/implementation-artifacts/spec-oc-05-release-gate.md \
+  | sed -n '/^```$/,/^```$/p' | sed -n '/^cd "\${OC05_WORKDIR/,/^bash "\$tmp"; rc=\$?; exit \$rc$/p' \
+  > /tmp/oc05-wrapper.sh
 git clone -q /home/cosmo/contextmesh-rs /tmp/oc05-probe
 cd /tmp/oc05-probe || exit 9
 git checkout -q --detach "$E"
