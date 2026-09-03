@@ -30,7 +30,7 @@ v1; spec-oa-07; OC-01..04 evidence/docs.
 `OC05_SCRIPT_SHA256` + §5 freezes). E's object id lives in the founder
 approval record outside the repo.
 
-OC05_SCRIPT_SHA256=6952b516f1c71122b36251aa28d2324a569cc52d62a1deba4936c2ac9f81bb85
+OC05_SCRIPT_SHA256=50b04e4c955cca5949febf45ff0a38c6e19d0362d12043be8b7cbe16fb20669e
 
 **3.2 Wrapper invariants (worded to match the implementation exactly):**
 i. **Unset-safe expansion**: no `set -u`; pins/expected read via `${VAR-}`.
@@ -359,7 +359,7 @@ that checkpoint's marker).
 Prereg: `P1-PREREG-SALIENCE-EVAL-V1` v1 `non_claims` (4).
 
 New freezes (written at E): `OC05_SCRIPT_ID="oc-05-release-gate-v1"`;
-`OC05_SCRIPT_SHA256`=`6952b516f1c71122b36251aa28d2324a569cc52d62a1deba4936c2ac9f81bb85`;
+`OC05_SCRIPT_SHA256`=`50b04e4c955cca5949febf45ff0a38c6e19d0362d12043be8b7cbe16fb20669e`;
 `OC05_REPLAY_SHA256=176ea2801555dbef59f31013d426f183b288524c44422dcaf47a5e91363219c5`;
 `OC05_PROTO_SHA256=4c71f4a2cfb992c3c777c9e7a77e584c9090ca41fc6eeb48c91001071a479631`;
 allowed set = 2 full repo-relative dirs (component-wise); owner pins (§6);
