@@ -79,18 +79,19 @@ run OC05-04 bash -c '
 run OC05-05 bash -c '
   mf="_bmad-output/verification-artifacts/oc-05-fixture-manifest.txt"
   [ -f "$mf" ] || { echo "OC05-05 FAIL (manifest missing)"; exit 1; }
-  tmp="$(mktemp)"
-  {
-    while IFS= read -r line; do
-      f="${line#*  }"; f="${f# }"
-      f="$(echo "$line" | sed -E "s/^[0-9a-f]{64}  //")"
-      [ -f "$f" ] && sha256sum "$f"
-    done < "$mf"
-  } | sed -E "s/^[0-9a-f]{64}  //" > "$tmp"
-  if ! diff -q <(sed -E "s/^[0-9a-f]{64}  //" "$mf") "$tmp" >/dev/null; then
-    echo "OC05-05 FAIL (manifest drift)"; rm -f "$tmp"; exit 1
-  fi
-  rm -f "$tmp"
+  n=0
+  while IFS= read -r line; do
+    n=$((n+1))
+    want="$(echo "$line" | cut -d" " -f1)"
+    f="${line#"${want}"  }"
+    [ -n "$f" ] || { echo "OC05-05 FAIL (line $n unparsable)"; exit 1; }
+    [ -f "$f" ] || { echo "OC05-05 FAIL (line $n missing file: $f)"; exit 1; }
+    have="$(sha256sum "$f" | cut -d" " -f1)"
+    if [ "$have" != "$want" ]; then
+      echo "OC05-05 FAIL (line $n drift: $f have=$have want=$want)"; exit 1
+    fi
+  done < "$mf"
+  [ "$n" -gt 0 ] || { echo "OC05-05 FAIL (empty manifest)"; exit 1; }
   exit 0'
 
 # --- OC05-06 owner pins ------------------------------------------------------
