@@ -216,17 +216,17 @@ set -u -o pipefail
 E="${1:?usage: oc05-5d.sh <founder-E commit id>}"
 git show "$E":_bmad-output/implementation-artifacts/spec-oc-05-release-gate.md \
   | grep -A31 '^cd "${OC05_WORKDIR' > /tmp/oc05-wrapper.sh
-git clone -q /home/cosmo/contextmesh-rs /tmp/oc05-probe
-cd /tmp/oc05-probe || exit 9
+rm -rf /home/cosmo/oc05-probe-clone && git clone -q /home/cosmo/contextmesh-rs /home/cosmo/oc05-probe-clone && git -C /home/cosmo/oc05-probe-clone config user.email probe@oc05.local && git -C /home/cosmo/oc05-probe-clone config user.name probe
+cd /home/cosmo/oc05-probe-clone || exit 9
 git checkout -q --detach "$E"
 reset_base() { git checkout -q --detach "$E" && git clean -qfdx -e /tmp 2>/dev/null; git reset -q --hard "$E"; }
 
 run_wrap() {  # $1=pins $2=expected $3=selector("" = unset)
   if [ -n "${3:-}" ]; then
-    OC05_PINS_COMMIT="$1" OC05_EXPECTED_E="$2" OC05_ONLY="$3" \
+    OC05_WORKDIR=/home/cosmo/oc05-probe-clone OC05_PINS_COMMIT="$1" OC05_EXPECTED_E="$2" OC05_ONLY="$3" \
       bash /tmp/oc05-wrapper.sh > /tmp/probe.out 2>&1
   else
-    OC05_PINS_COMMIT="$1" OC05_EXPECTED_E="$2" \
+    OC05_WORKDIR=/home/cosmo/oc05-probe-clone OC05_PINS_COMMIT="$1" OC05_EXPECTED_E="$2" \
       bash /tmp/oc05-wrapper.sh > /tmp/probe.out 2>&1
   fi
   return $?
@@ -291,12 +291,11 @@ git merge -q --no-ff -m merge-node "$SIDE1"
 git checkout -q --detach HEAD        # detach at the merge commit
 chk assert_fail R13-v 'OC05-02b FAIL' "$E" "$E"
 
-# === R13 (vi) sibling branch from F: pins=S is NOT an ancestor of HEAD ===
-#     detach at E (so OC05-01 passes: clean+detached), pins=S where S is a
-#     sibling commit (not on E..HEAD ancestry) -> 02b(a) fails ===
+# === R13 (vi) sibling branch off E: pins=S (child of E, NOT on E..HEAD
+#     ancestry since HEAD stays at E). S carries the full spec tree (it is
+#     an E-descendant), so wrapper extraction succeeds and 02b(a) fires. ===
 reset_base
-git checkout -q --detach 0386462f8a1069820371726af19125351a5ae8b6
-git checkout -q -b sibling 0386462f8a1069820371726af19125351a5ae8b6
+git checkout -q --detach "$E"
 git commit -q --allow-empty -m sibling
 S=$(git rev-parse HEAD)
 git checkout -q --detach "$E"        # back to clean detached E
@@ -333,7 +332,7 @@ reset_base
 run_wrap "$E" "$E"; a=$?
 run_wrap "$E" "$E"; b=$?
 [ "$a" -eq 0 ] && [ "$b" -eq 0 ] || { echo 'R14: FAIL-rc'; FAILN=$((FAILN+1)); }
-norm() { sed -E -e 's#/tmp/oc05-probe#PROBE#g' -e 's#/home/[a-zA-Z0-9_.-]+#HOME#g' \
+norm() { sed -E -e 's#/home/cosmo/oc05-probe-clone#PROBE#g' -e 's#/home/[a-zA-Z0-9_.-]+#HOME#g' \
              -e 's#[0-9]+(\.[0-9]+)?(ms|s)\b#TIME#g' /tmp/probe.out | tr -s ' \t' ' '; }
 run_wrap "$E" "$E" >/dev/null; norm > /tmp/t1
 run_wrap "$E" "$E" >/dev/null; norm > /tmp/t2
@@ -408,7 +407,7 @@ OC-02 implementation; policy-only freeze with no evaluation-result claim.
 Zero `pending`/`TODO`/`TBD` occurrences must remain after resolution.
 
 **7.3 Transcript normalization (matrix R14).** For the two-run determinism
-probe: strip absolute paths (`/tmp/oc05-probe…`, `/home/…`), strip
+probe: strip absolute paths (`/home/cosmo/oc05-probe-clone…`, `/home/…`), strip
 timing/duration fields, collapse whitespace runs, then compare the two
 trimmed transcripts for byte equality.
 
