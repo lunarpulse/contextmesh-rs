@@ -47,7 +47,7 @@ ii. **Guaranteed-guard steps (inventory, with declared deviations)**:
     whitespace-adjacent divergence); prefixes are stated verbatim, the
     remainder of each line is NOT part of the anchor:
     (a) stderr-suppressed guards `2>/dev/null \|\| { marker; exit 1; }`:
-        lines with prefixes `cd /home/cosmo/contextmesh-rs`,
+        lines with prefixes `cd "${OC05_WORKDIR:-$PWD}"`,
         `source ~/.cargo/env`, `F=$(git rev-parse "$PINS^"`,
         `tmp=$(mktemp`, `git show "$F":scripts/verify-oc05.sh`,
         `want=$(git show "$PINS":` (the pins-read pipeline, via
@@ -426,7 +426,7 @@ inline wrapper verbatim; manifest cost trivial.
 ## 10. Operator procedure (FROZEN inline wrapper — fully guarded, quiet)
 
 ```
-cd /home/cosmo/contextmesh-rs 2>/dev/null \
+cd "${OC05_WORKDIR:-$PWD}" 2>/dev/null \
   || { echo "OC05-WRAP: FAIL (workdir)"; exit 1; }
 source ~/.cargo/env 2>/dev/null \
   || { echo "OC05-WRAP: FAIL (cargo env)"; exit 1; }
@@ -512,7 +512,7 @@ edit itself moved §10 by one line — LINE ANCHORS IN A PROSE SECTION ABOVE
 §10 ARE SELF-DEFEATING (any edit to the anchors shifts their target).
 v18 ABOLISHES line-number anchors: §3.2(ii) now uses CONTENT anchors —
 §10 step-comment markers (`# --- step N: …`) and verbatim command text
-(`cd /home/cosmo/contextmesh-rs`, `source ~/.cargo/env`,
+(`cd "${OC05_WORKDIR:-$PWD}"`, `source ~/.cargo/env`,
 `F=$(git rev-parse "$PINS^" …)`, `tmp=$(mktemp …)`,
 `git show "$F":scripts/verify-oc05.sh`, the `[ -s "$tmp" ]` test, the
 want/have pipelines, `[ "$have" = "$want" ]`,
