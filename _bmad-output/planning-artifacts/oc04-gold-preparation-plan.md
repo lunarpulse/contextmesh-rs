@@ -1,7 +1,7 @@
-# OC-04 4G+ — Real Human-Gold Corpus Preparation Plan (DRAFT v4)
+# OC-04 4G+ — Real Human-Gold Corpus Preparation Plan (DRAFT v5)
 
 **Status:** DRAFT — NOT FROZEN · **Date:** 2026-09-04
-**Revision:** v4 — incorporates independent review round 3 (NO-GO: 3 residuals — candidate-arm scope, recall denominator, judge-cap retry exemption). Change log at §12. Rounds 1–2 findings remain resolved (unchanged).
+**Revision:** v5 — adds gpt-5.6-sol independent cross-validation round (fresh reviewer; NO-GO, 3 HIGH + 2 MED + 1 LOW). Change log at §12. Rounds 1–4 findings remain resolved.
 **Purpose:** Define how the real human-gold corpus for the P3-GO gate is constructed, labeled, quality-controlled, and bound into `oc04_gold.rs` — before any labeling starts.
 
 ---
@@ -25,7 +25,7 @@ P3-GO (OC-04 §14) flips OPEN→judged only when a **real human-gold corpus** re
 | Sampling manifest (frozen before labeling) | committed `oc04-gold/sampling-manifest.json`: source-snapshot SHA-256, selection-script SHA-256, RNG seed, eligibility criteria, per-stratum family-assignment rule, selected session/family IDs (HMAC — §6), 2 alternates per stratum, and exclusion reasons for every skipped session. |
 | Selection script | committed `oc04-gold/sample.py` — stdlib-only, deterministic given seed + snapshot; emits the manifest. No manual picking. |
 | Stratum assignment (BLOCKER-11 fix, round-2 executable form) | `terminal_with_full_cost`, `terminal_with_partial_cost`, `unterminated` are assigned deterministically from pre-label transcript state (terminal status, cost fields). `strict_all_gold_tf0` CANNOT be known pre-label: the oversupply pool size is **pre-declared by formula in the sampling manifest** — `oversupply_N = ceil(target_stratum_N / base_rate_estimate − target_stratum_N)` where `base_rate_estimate` comes from the Stage-0 simulation's strict-stratum yield estimate (the manifest states the estimate and its source). Labeled blind, then assigned by the frozen rule (all gold candidates lexical-TF=0) AFTER labeling, NO opportunistic replacement. **Success criterion:** if assigned yield < target_stratum_N, the stratum is recorded SHORT and the gate is underpowered-for-stratum — disclosed, never swapped. |
-| Candidate universe (BLOCKER-3 fix, extended per round 2) | a candidate-union manifest is frozen BEFORE labeling: EventId-deduplicated candidates from the TWO frozen candidate arms — lexical and positive-prior (`selection_pipeline.candidate_generation`, per-arm caps 64/30 exactly as frozen). M0/M1/M2 are EXTRACTOR VERSIONS (`evaluation.extractor_versions`) feeding the lexical arm's candidate generation and judging, NOT separate candidate arms; no fourth arm is created. Rank/score/arm-membership are hidden from annotators. Annotators label the union, not a ranked top-12. **Pool-blind relevance gap is disclosed and bounded:** events missed by BOTH frozen arms remain unlabeled and unmeasurable — the corpus therefore supports nDCG@12 and recall **over the arm-union candidate set only**, and every evidence statement produced from this corpus must carry the qualifier "over the candidate union". Measuring recall over the FULL eligible pool would require labeling every pool event — out of scope for the primary gate. Instead a bounded diagnostic is defined: for each sampled session, the NEXT 12 events after the arm-union (by episode order, capped) are also labeled and reported as `bounded_next12_coverage` — explicitly NOT the frozen `shortlist_recall` (which is measured by the gate harness over the frozen shortlist set) and NOT part of the primary metric. The "@all" naming from v2 is withdrawn as unexecutable. The manifest records candidate eligibility timestamps (episode boundaries). |
+| Candidate universe (BLOCKER-3 fix, extended per round 2) | a candidate-union manifest is frozen BEFORE labeling: EventId-deduplicated candidates from the TWO frozen candidate arms — lexical and positive-prior (`selection_pipeline.candidate_generation`, per-arm caps 64/30 exactly as frozen). M0/M1/M2 are EXTRACTOR VERSIONS (`evaluation.extractor_versions`) feeding the lexical arm's candidate generation and judging, NOT separate candidate arms; no fourth arm is created. Rank/score/arm-membership are hidden from annotators. Annotators label the union, not a ranked top-12. **Pool-blind relevance gap — renamed and gated honestly (MED-5 fix):** events missed by BOTH frozen arms remain unlabeled, so this corpus measures a **pooled-candidate reranking gate**, NOT full-pool retrieval. All evidence claims carry the qualifier "over the candidate union". Because IDCG excludes union-missed relevant events, primary nDCG may be inflated relative to full-pool retrieval — this bias is DISCLOSED in every evidence record. The gate name is `P3-GO (pooled-candidate reranking)`. A separate mandatory nomination-coverage diagnostic accompanies the gate: for each sampled session, the NEXT 12 events after the arm-union (by episode order, capped) are also labeled and reported as `bounded_next12_coverage` (NOT the frozen `shortlist_recall`, NOT part of the primary metric). If coverage is judged insufficient for the founder's intended claim, a full-pool labeling campaign is a separate plan amendment. The "@all" naming from v2 is withdrawn as unexecutable. The manifest records candidate eligibility timestamps (episode boundaries). |
 | Session definition | one `.jsonl` file = one session; annotator context = the task episode plus the FULL FORWARD transcript through the terminal answer (BLOCKER NEW-3 fix — `dead_end` rejection evidence may occur after the ±1 window), and 1 preceding episode. Rank/arm blinding is preserved regardless of window size. The window rule is fixed in the sampling manifest. |
 
 ## 4. Label scheme (BLOCKER-5, -6, WARNING-1 fixes)
@@ -67,9 +67,17 @@ Committed task/session hashes are keyed-HMAC, non-reversible without the local k
 
 ## 7. Binding into the gate (BLOCKER-12, WARNING-5, review-answer-5 fixes)
 
-1. `oc04_gold.rs` gains a real-data path: reads `labels.jsonl` via `include_str!`, verifies the manifest SHA-256, maps labels per §4, runs the SAME integer nDCG@12 + strict TF=0 checks over the real pipeline.
-2. **Same-commit flip + fail-closed CI:** `GOLD_LABELS_REAL_DATA=true` lands in the SAME commit as the label file, and the harness fails closed if (a) the manifest hash does not match the frozen sampling manifest, (b) schema validation of `labels.jsonl` fails, or (c) real-data mode is on with any unresolved `uncertain` in the gold set.
-3. P3-GO judgment: primary nDCG@12 aggregate + per-stratum, frozen family-cluster bootstrap CI, judged against the P3-GO acceptance threshold — a NEW plan-level commitment established by THIS plan under founder change control (the prereg freezes metric policy only and defines no threshold, per §1); result recorded in `oc-04-evidence.md` Layer-4 update with the achieved family count and CI width (the §2 stopping-rule disclosure).
+1. **Bindable corpus artifact (HIGH-1 fix — HMAC closure):** committed `labels.jsonl` uses keyed-HMAC IDs, but CI cannot reconstruct raw IDs from them without the local key. Binding therefore uses TWO committed artifacts: (a) `labels.jsonl` (HMAC IDs, annotator-facing) and (b) `bindings.jsonl` — a sanitized, deterministic replay manifest generated by the local key holder, mapping each HMAC ID to the public deterministic candidate index (arm, session ordinal, event ordinal) that `oc04_gold.rs` and the pipeline reproduce identically from the committed snapshot. The key NEVER leaves the local machine; CI consumes only public indices and verifies HMAC↔index consistency via a locally-generated check file whose SHA-256 is committed. The corpus is validated end-to-end BEFORE key-dependent files are purged (§6 retention).
+2. **Harness real-data path is a PREREQUISITE (HIGH-2 fix — sequencing):** the current `oc04_gold.rs` is synthetic-only (no `include_str!`, no JSONL parser, no manifest verification, no bootstrap, no judge-call accounting). A separate 4G-harness-extension stage implements the real-data branch with fail-closed checks BEFORE labeling begins: labels.jsonl + bindings.jsonl parsing, manifest SHA-256 verification, label mapping, family-cluster bootstrap computation, and judge-call cap emission. The synthetic 6 tests keep passing throughout. Labeling does NOT start until this extension is committed and its own gates pass.
+3. **Same-commit flip + fail-closed CI:** `GOLD_LABELS_REAL_DATA=true` lands in the SAME commit as the label file, and the harness fails closed if (a) the manifest hash does not match the frozen sampling manifest, (b) schema validation of `labels.jsonl` fails, or (c) real-data mode is on with any unresolved `uncertain` in the gold set.
+4. P3-GO judgment: primary nDCG@12 aggregate + per-stratum, frozen family-cluster bootstrap CI, judged against the EXACT decision rule below (NEW plan-level commitment under founder change control; the prereg freezes metric policy only and defines no threshold, per §1):
+
+   **P3-GO decision rule — D-C-10 §3 adopted VERBATIM (founder-frozen thresholds, not plan-invented; all four must hold for positive-prior C4 deployment):**
+   - **D1 (primary nDCG@12):** prior-assisted selection **beats lexical** on the preregistered primary nDCG@12 point estimate, AND the 95% family-cluster bootstrap interval (frozen params: 95%, 10,000 iters, seed 20260820) for the nDCG@12 delta has **lower bound above zero**;
+   - **D2 (Any-hit@12):** prior-assisted selection **beats lexical** on the Any-hit@12 point estimate (point-estimate superiority, NOT mere non-inferiority — v5's weakened wording is withdrawn as conflicting with D-C-10 §3);
+   - **D3 (strict TF=0):** strict TF=0 Any-hit is **above lexical AND above deterministic random** (a deterministic random-ranking baseline over the same candidate union, seeded 20260820, computed by the harness and reported alongside);
+   - **D4 (no-regression):** no Option B B3–B8 regression (workspace gate EXIT 0 at the binding commit). `shortlist_recall` remains recorded separately per D-C-06 and does not gate.
+   Per D-C-10 §6: if sample size cannot support the interval, the result is **inconclusive** and the gate is NOT lowered post hoc. The rule is founder-frozen (D-C-10 approved 2026-08-21); this plan does not modify it — changing it is founder change control on the decision record itself. Result recorded in `oc-04-evidence.md` Layer-4 update with the achieved family count and CI width (the §2 stopping-rule disclosure).
 
 ## 8. Non-claims
 
@@ -77,7 +85,7 @@ No evaluation result is claimed or implied. Every label is human and blind at re
 
 ## 9. Normalization (BLOCKER-4 fix — stated verbatim)
 
-Per-arm min-max normalization is computed **separately for each arm (lexical, prior), within each session, over that arm's RAW scored candidate list, before union and rerank**, then clipped to [0, 1,000,000] ppm — exactly the frozen `score_normalization` text. The plan's earlier "session candidate set" wording is withdrawn.
+The frozen prereg value, quoted VERBATIM from `p1-prereg-config.json`: `"score_normalization": {"method": "per-arm min-max to [0, 1000000] ppm", "clip_above_ppm": 1000000, "clip_below_ppm": 0}`. The prereg record §4.6-c explicitly discloses the normalization WINDOW as a definitional gap. This plan therefore fills the gap as a NEW plan-level interpretation under founder change control (NOT claimed as frozen text): the window is per-arm, per-session, over that arm's RAW scored candidate list, applied before union and rerank. The earlier claim that the window detail was "exactly the frozen text" is withdrawn — only the method string and clip bounds are frozen.
 
 ## 10. Change log v1 → v2
 
@@ -96,6 +104,17 @@ Per-arm min-max normalization is computed **separately for each arm (lexical, pr
 3. **Full forward context adopted (§3 session row):** `dead_end` gets forward visibility through the terminal answer; blinding preserved.
 
 ## 12. Change log
+
+### v5.1 (cross-validation round 2 residual)
+- §7.4: decision rule rewritten to adopt D-C-10 §3 VERBATIM — point-estimate superiority (not non-inferiority) on nDCG@12 AND Any-hit@12; strict TF=0 above lexical AND deterministic random (seeded baseline added); D-C-10 §6 inconclusive-if-underpowered clause added. v5's weakened D2/D3 withdrawn (reviewer: conflicted with founder-frozen D-C-10).
+
+### v4.1 → v5 (gpt-5.6-sol fresh cross-validation, NO-GO → fixes)
+- §7.1 NEW: dual-artifact binding (labels.jsonl HMAC + bindings.jsonl public indices + committed check-file SHA) — HIGH-1 HMAC closure.
+- §7.2 NEW: harness real-data path is a PREREQUISITE stage committed and gated BEFORE labeling starts — HIGH-2 sequencing.
+- §7.4 NEW: exact P3-GO decision rule D1–D4 (CI lower bound > 0, Any-hit non-inferiority, strict-TF0 recovery, no-regression disclosure) — HIGH-3.
+- §9: normalization window explicitly re-labeled as plan-level interpretation filling prereg gap §4.6-c; frozen JSON quoted verbatim — MED-4.
+- §3: gate renamed `P3-GO (pooled-candidate reranking)` with IDCG-inflation disclosure; coverage diagnostic mandatory — MED-5.
+- Title/revision synced v5 — LOW-6.
 
 ### v4.1 (round 4 residuals)
 - §7: "prereg threshold" wording corrected — threshold is a plan-level founder commitment, prereg has none (residual 1).
