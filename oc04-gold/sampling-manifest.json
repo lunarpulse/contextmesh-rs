@@ -1,0 +1,1623 @@
+{
+  "alternates_per_stratum": {
+    "terminal_high_tokens": [
+      "30b0635fd0098dff1a6d9e2980aeae2b665133ae42497119a74ab98cf8253a3c",
+      "2f0f9e51d092fe7509231389bbf835c380cbd48d3344540a3e7185195997f265"
+    ],
+    "terminal_low_tokens": [
+      "6051c94c43790088f779cca7bd92d77195ab09679faf116eaf7ba357fdabc6b3",
+      "f86460c34241508d0461a6b45627ac88beadbbc7515b0264ca9fd7176559849e"
+    ],
+    "unterminated": []
+  },
+  "corpus_size": 192,
+  "cutoff_epoch": 1787280000.0,
+  "cutoff_iso": "2026-08-21T02:40:00Z",
+  "eligibility": {
+    "min_messages": 4,
+    "temporal_holdout": "post_OC00.5_snapshot"
+  },
+  "excluded_sessions": [
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "199f70bec4b1ad8ad75aa13aede42bcc34454eb6ef8f51d62d193613e0820a27"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ee736a1a2bd43971698f11b31fdb1897057fa9c0d6409a240fba195846eac274"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "aa90de0be937750fdeadc155662aee72e981cce811223dd17256967ff9f93e9e"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "eea6ae73be07bd87f3d45231972932345e3971d5d2496e52a0adbf5db7d1fcb0"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "d6f8330f7dca6d5b73db251d2786e1ee9336afe84248abad8ff8f65f25de2759"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "368def91681b89c62265c1c46799091fb037f53d05eff8d3c4b76bcdab2383a2"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ffa850be65020dc2f95dabd336aacabef4c9481e6612fcebfe9fdd484b19f3bf"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ff21c7b92289cc4371c460317c0ea42f5fb2fcc834360146caf6a20689ba0f6e"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "da36286dd87f9ad19d2c2033cc1812ed89092c9a1a7cf16e1b4aaabc1341dfaf"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "075ba24805a754d8e421375982bed58d9debbdfe577ec00e2cb1516fe62091f9"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "91b17cb066a3694e61841830c9f0070c6836bec458111571864bb8f7a69e0b02"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "e3cb9f21de1d92d8c7db39001b230a7e5a19608c41a7e77e0e5e1bf386d89eb1"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "1618a6f9d9c3afb9faab19e4e33c671b52f8da66109ddcf09b61035fa3b9508c"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "79f490ff065c166359bd3347973c3473e0c11f8df3d6726882b77871115a2a8b"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "8eb8040a85f39c5a94cc0fa0059b5af497ef3180b5b6ff3128ab3198c07a08e5"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "03c29f0bb5d2a2d184427310882d1ee357988686c20be72012066f46c285b4b2"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "bf1857ed68d3d4e9c8e367ab42509ff28b1e0074415164d79c0e972c9b853b2e"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "eb75b088ebbfa1c4c25a1ceaa7752325833829697ad822b6deba32804b6397e5"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "0aabde1cf28afa945ef179fe9c88105fcf848cd989b91c627a3728f113c532b9"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "585e0222d973f40207197ebb7a2e68c4e0bc5330d467305a8216a22c2f1c5388"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "550d96d1307669c8a75c4c5ca1d0d397f1c2b6ff6aab8c3868ede1ed3de8f139"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "1c5e018c070b2c66c141a7eb0354ddf9a484ad76ca54940a891372fad7cd17d6"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "3db3fbc4fdc0987698ab9e53912253a0e57d48771cc735a31c26a696d9cfd213"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "78888336b24c0e3108b51868b1bfe8cd5d9eb1db4e03646dc1840de2cbae5543"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ce1f39c57055109871b94115fba0c103dedae0d573203d8bb42558d0a3611f46"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "00f608397ff375efc65a9670a479ea0d7bad35a93c3161562e8c6fe134c713e0"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "d51d6aa5115fc159ff5d975fe66d3d0ae5b0715b8875a0c3816f8c2dad413387"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "6968b76a052fb8ce79853b7cdcc2be4c6c28a36665b1c83368bafb0d926ce5b4"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2b122c77365e591dde7e2b5ca31251d7d109c349ebf974158c23590c350eabba"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "83ef1994b2c236ffbc808667c3f29fbb8f7e9e06cb4f30029aa9f8894b9cff0d"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "041054eb40fbf92c281f7f55354685b05548690b034e3c2b46373c2e528b5dbb"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "e80209622310b3c3f5385fdbf8e6c00b3e129200ec6a5df1f11d5d045cf58eae"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "65f13fd3083e9f833bbbc55ca97faf741ac803dc7d812f8e99235dec62a7ad59"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ee1c1ad43d3d031cbc737dd3361518b4bb072200f1f72eec865e6b7a734a35ba"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "b36f396eca866600e509634d921a267e477db9f2ae0df93dec9a892d4a98b178"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "3b78df0249df59bc7c66f8e54603a9f8a2263bfbc9096d4490fac7b7d3ed79a0"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "6c767f1e67acc21b70ba4591569b69b30ea27a3424ca69eb784523eae6c56f7a"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ba9904bc4120ecf60b39f96fd8224a637f39cb6cd141d3459f076b97dab9f669"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "fa7e3f5f71aba837cde1fe1075463fe0b486a725cf9e53cf2dc335ff6b7ea3d3"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "0d0de6c87f2294de96f5418266b47a3b2a5b74dde56590492d06a384d40b910d"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2a50b859feca991e442072ccb07b9aca228c23ba375acc518d4844555996d564"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "6164fd15ad456c35b9af24404d6b4c79e85ccabe2fb143a878b396423ad15c9e"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "3237136a38138becdfa8bf0179a4801380f312e59bbb12ac9ba7848d137a12a6"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "77fac0826427ad837efcb2edcfc657dfb4094755b3eb31f7fffc2a02aca3c479"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2e0794709b87801f9385dd283331bf53aadbc50c1df63ac1c1af3dcd1ad4282d"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "cb7649f83212a0cd73e65eec553187066a61ded0c3b4d0d6d6a4ace05e5167c1"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "175c192eccabef17061dd46584c14b5eff18ecbd997f961a7f5ce6c02279c634"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "c010d095576c426b9641a2db74a38de858fd921bc7e63aaa36c99010f7d5e3e4"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "5f8a13f8e71bd7a02a2cc2538a5a584e6340f31793562eee97388ef5fe30777a"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "82b82cd9aa2355f3ccb8bcb8f54ae9753da87c861a722bbf40b80d8fd3a70d9c"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "348f2b2232efacac1c763a2483e95dd076a8928e39408cf3bf837bc9a1cbd078"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "28eba4e9a16988a3f38b53dbd0a6e2fb6b692e03aefeab7d7d1465c5fef7a1e1"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "e8d2215794b33ff5d4bd09d0e85e41b70b193ce48c9fcac856c134c1f34d4a71"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "b53d6abb44c94a45f357321e49fdd6a986e25598f37d6b3f87d8ce57be9ede0c"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "8085018f6bb00a664a856f12ac3b808a92d5d7ede7268527b5c9319c1af51b5b"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "4022c8938dec43c678a2b987b84803da0c6669c6f45621e8f1584700d60c83cb"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "f65840217de7d9b3987ac3a681ce754fda9717d58de95eb6f8fb2b713f5a0253"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "4a00fb6ae7b6fc4085363ab2096b381d071f1a67f097adad94131fad6f6f396c"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "62dd0f55d8d82835455aad2857c35fc4e46a40649573eaab900ded3acb139a69"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "4f477ce44185d06bac5ff891a4e11529e570eb681a84818af90461fa512f4371"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "747c32038df98a3eb9911ca35c9fb62efe94bd05de364c1f3042bd5b52b87ca6"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "bdf415ecd5b8b68c2a831d0a26253a33ae94bb197c3f0f8d03a51954024b9c01"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "014ab4cbccebc1e01430483d441066315f27f8b8ebfcad9f44a1efcd7942c0aa"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "360ce10d054a299bed1a9ba256b88d2d296db19eb0469a09184297ff421433c9"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "a0e38bd1c7ad1719cb85baa4d1332e00f85eb76801d6b71077a423096f9e01d2"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "be431b36871d3f57c421006ca6abc98f39e6d8f2b3f09f7f8721dce56625d685"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "770f83f8109be3c37378fdb02188256acc44ef25569a13d68736bb82a98a877e"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "849169c290a7fa27133f5352fe8f33490895568a51c8e32859a117a49362eba1"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "86f97dbb17f531541a23c179df7f48ed64962fe124d4c513b38fc918588c1e50"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "249bc74c46090dd27c3925cc2b6bf6a8f7140fb65057d5c17631dbca476bebfc"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "a389c1aeef1f1257ce81d1369cd2333a84547f4cf9bed5436afaff4ddb2b4b59"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "23af6dedccbd975e2928947c5ea919d7457f0c78ac140457e91557ce2a492c81"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "539603d7a53911adac460d47c9c764af0c62ad42a249af2e2e968685419ab347"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "c56e0f50cdb94e891af3312306c119d9ac09b858e3ab8ed43db34ba224eeeb78"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ff4541327f328a6a6acf25f7567a908bdcf6603c1e6ab34f47bdf7f50a4aa5c3"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "66c242274b63abf5820dfe3a9efaa8fe41c4374f8dc9d0adfdf1acecdb2061f3"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "7abf0f588ec8ec964e7b49c23ac46f5c4bc06c6d6f5578608965350f279ecfd6"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "4f6a5af7a52cc4e46b780fcf7aa45ee38183ccc448f4c1a935bad802ac8692f8"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "3eaf0a5cd900ea02879b213504df70e7c18d13f6c55b56ab9b7a4503dc1d52b5"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "29bbe404585f28e13eaf3785e84e86695b4a921d53310bc59946d0c117509769"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "e13dce181bedbd657259f5a094b80a2431c2cffb74b8b0940ae1acfc57b3d819"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "22f25289899e1de98549ab6737b8ee3ee3765587b43a2bd1e00a688b244f04b7"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "8cf38732bff4a608cb9277bb58e87bc7184c61c874fae2892a075e727333102d"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "9f155d40ba8be6d353e98375edd9ba15fd84ca9e1cd848e2fbf20fdeb2aacc86"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "b59e167a0e564890beb452ea52d287fb708169420d58f71e8ccef5ea16dae476"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "7275e1e1185200c216c8cde4cda4e5ff267965080d42340498678d2b64fac528"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "8348b8045096f979cf187305f4314ed16bf193fdf5d12952f164c50f2bd5d68e"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "0d7d3576519bad6b77d52be6530e5402f85200f4c9abbde134bb0546b8aa8061"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "8edeee0c9e24c3d0a0b84472535e5f33200dc7bfbb4e75bec82d2a08e15ce973"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2245303a009eb31cca513b5ff4bf8555325b955a16a07966125cb897d2317fc5"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "aa1c8d11089196f4ee0a522d47de51a8cbe6910cbf7beae9469742389b9008a4"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "23e86ff20a9217ea4d782922f84d972e991e0aa930c7ae698af37a5d5e03af48"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "e704e99d1c0423c87fd35cf2138bccc6312f2c6ee4e0af024edfe31c7d84343c"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "f95f7a4b45b4c2eeb7d19dd977e0b9958ad4576ffb65e35f9dc257b9fd3cb1e8"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "894cdf82f94849110a1eeb1a9a22dc7edcb9b1b72e8631c0c2ab5886ff35961a"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2c69e7838ba10a7469b2ca40713e321a363ca15d1ef63ce2e5a78a6ba0dedd4d"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "abd25cd264aba1feaa3e4d8926de03b12f154b7b17956cb862d6ee31b6ef2e20"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "6d8e5db8d7958ce60869941f769ba0b649cb4123d16690dce722a86f26d91d26"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "081c121be1749ecc49fedd9be87f30f24c38d83f6683b8eb35d84d8eeaab5b8d"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2a1ad1ed3bc38007be0fef43f11b6adea882399b334d7cbb0247a05c5fdb2faf"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "96eb67a37e028b0ae0f555da92813ece5c9c574cc360c9116115b0d9e39e02f0"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2bf974a59ef21ef1cc20d87fd75e92b889fd62b83bf9739645c23d00c302b879"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "a6d1f564dfea81024e7e711f758541a0acaf16a6fc98d7f1d211b80cd156af10"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "79a95443aef0834ba8bd5f86ff66394526dfead4ca51ec1923370a4872fb24d6"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "7915ac788d321546c358fcc89dd8815265377a24af106db41385a0807b76e404"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "13b34c524b7dfa10b4e2b56366966c922258d40d1e8613c7ee3687804c5ede62"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "9f20e7f348f4bcc59ad607a0f25f1b510235a427c281d131e10f54f82b76c779"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ee00ddf65bdc07cea487bea49a8fc81518984c459874abc4700234bb98ff62c2"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "dc3cb3fa4fad4c22ad76ce21596aef6560f14e905d224a36c7686720b05f431c"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "d293d87dc42d44e1976af4752dca70a78225086ad957939362e83d8da3ebc5a6"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "47f9f7225d17edb40471c57bce59acbda07b3542648d2e7a00781ee41cdedbcd"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "fb545e256bcc9557d21dca07ad3951bfbfaacb95d28a6a0cc0a29a940d739b69"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "02f857689cb8a6a2409ec9371755de39cfc64a3d6ff3a81762453fa02aaa1f43"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2f25bcb191fec4bb5b34bd7560c2d8e6071875936f629b9515f3764576469762"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "a4e6c6475eb960251d0a403d41ef287af1909106368175a75f953ab87815e73d"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "2023f7f5d249115620d372b61ebed7147d3985009f03e994265d493b0e4cd0ea"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "eea3e37f8e6bf16668a1f66045929ddff9750ee8c04ba8437999f84b88f28f12"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "a14d9c621395c2e1dec8ba9258b7a6efcce974079d5a7280f779c7dc94683e99"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "b193c63f705bda7a1d6b56a75e56a4c9c8fd205856e2c5791463ec115640020f"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "1e87a0f52b69073ed6abf8bce1b509060ad233e4896c2c001a0b399d48d5e19f"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "3564d0091c24dc0aaee51bdcbed713369a1a4a560c8e2461c24f6b7560761483"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "b74ad859937cc86172996adfe92eacce552b2220ceccf496fe8a47c6914de278"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "fa521d60dd25b89747d3c7a724b58781cb6e40f487abcb21da2a2f78e4552e38"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "77296d9200cdf12f76e6faaab09fc8e49e76802c67f2ae556cc10a37cfcca0c3"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "072f21925689c4b377afc9d5120b431cbfa0045dd4b6d9a36469087459bd42a2"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "b9a24ddd18e2108f02a83c260077cabd743bf86007c695331656ab9f241783ae"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "75da0b5b06ec2058a2ffbf6b35b553fa0990fe87f1ce1e4957f263a5becadae3"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "55ff3c8dc87cf57aa4c986c96fb515a1ce925902ed04411b43dcd888836c7dee"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "efc02227c1d19b2a86cdeb6bcb56bc70b7ef35280012e9f6a2ab765f613e7a18"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "f1a086c06adebc49b140b2f61dee3c584162c02196ee617d1ef81c43e78bd294"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "20d25f8d6038d7345eb7329b23cff68aba19f8367b08d194d8d42f48811125b4"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ce0105ec14d38e770c798f52d362026b2a1f7377f4eda06d4f2d3250f509b8b4"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "ac9e72a90a48072ba958d7c63e47792d05d208f0eda390c274ba18ed5067490c"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "21974f932c5b439886e09f949279a56e67c29caf8b7e4de56848562499d7df74"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "3db6ccd35a3aa4340507495559d0de5da3e82325e23c16eaa6d1fce24366c94d"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "7139cca3642b69457ebb6a26b9175d053864651a9a581f8467c981b732070f0a"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "3e3eb7993f3317167e4b7bb890d5984fa754bb38e107c13e11d30b2ae856ba5a"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "271df840ff6eaa1a2dfdbb6cd9098f8b5989f7f3cbc4bc7c19adfb2889e0dca3"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "9acf8a6ad8114047c2eb77ea66fd2dd2029768178000eac83efd715c5078f1f2"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "d5842d78a812a81b28a1b6b8622521287e97f0f46ff3d035a858f29fe4afd368"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "5f2c66ff02a0b920d81b7278c2e70874f1159934d5c682e81ca008f2563d863e"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "173f73a0f405f86a540b5499b5c836d6288ab8ba63c1438c9b048f25c81d4f64"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "7982c24efa01ef4d91507618e9dec398a3f48f8b31aae19fb92c1087cb30a7a8"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "8d6a5a10c7cde77e78fbb5e2767bdf6c9d01f35fa91aa6b615cf5e2e42c8eb45"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "b7a304100bb1348a7ac0c6bac12c42ce1f75f769f34514d0f8dfa742d6247742"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "5665631823bd59f832de1801a9f7397f31b89c457ce85ec19d38f0e78950aa70"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "e45c16338d5f763ee396f54c17be682b687fab6982ebcd4c55ad049d2f470b4b"
+    },
+    {
+      "reason": "pre_cutoff",
+      "session_hmac": "df0bda5238aa9c3b0f45811b48f558b80bfa6758c857ac0cc52de81258625684"
+    },
+    {
+      "reason": "under_min_messages",
+      "session_hmac": "30999f59893e56aa5f1e45119854b77f29ec165f6c0d70328f830ddb06b2e063"
+    },
+    {
+      "reason": "under_min_messages",
+      "session_hmac": "7f31d8982c89f4335c0c80fbc709a6553579a5e2de7575985c72e7ddafb62e91"
+    }
+  ],
+  "frame_counts": {
+    "eligible": 234,
+    "excluded": 150,
+    "total": 384
+  },
+  "frame_median_input_tokens": 43985.0,
+  "oversupply": {
+    "base_rate_estimate": 0.3,
+    "base_rate_source": "Stage-0 power-sim-v2 strict-stratum yield estimate (declared pre-label)",
+    "formula": "ceil(target_stratum_N / base_rate_estimate - target_stratum_N)",
+    "oversupply_N": 222
+  },
+  "plan_version": "v5.4",
+  "seed": 20260820,
+  "selection_script_sha256": "6fd0dd32306caede83edaa1171bbb128634eba1847c62878c4986602d742e743",
+  "sessions": [
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "eadd5d8718840daf9ccb9c7935ba808c0822d0ad84da41fe017d4f167611c672",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "f966b9c902b75df760e19ad3321aa4d2b329592dae6db9069a6386a4690603fe",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "8e399b444d13fc5d2c82f5e4017c410a4238a082c486de80f9d1c6107a1db78a",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "b4c9865b6aac8b8913aa104c6340a6e5f0425d6adec905ea6d80695f9200e41d",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "cb929ea5d2ef06e242f94736d00dfa6a310fb18c80a8bb795e3a78d839917d54",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "31112c5f5d9309ac0def571f8367faa4dddcb10283a8ffc3860c45231042fc33",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "e6300d99c5eba35b7e171a0bf8bb55a1d00b9a42432da7ca5830f281a687cfce",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "e181a151372a5f56fb65f9e5fc097052a3378b5907f03475cfbf70b333112475",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "44f984ba50745542b08ac306dd11425eaf39da655548f97e6e1fe27a37e73959",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "04d2193789aa9adfd9f812eadb67f6bc05a010e8a77cc29204add4b6cfb1d1d7",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "72c27ce1240aabf01751e7526fcff47a0fca95bb3d312dfed472daba05cabe12",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "42dfcbc82acf02953713c6bba0f7d1a3c1b7d73358e10b23e52a2e0bdf69ab4b",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "afc9b71713f46c9e2ce8a342a83814be6568df7798de640f60d7e5c56f7e5810",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "02033d6c7b6bf4467c60ec8855ba7963c2f27a684f88d2fcec18bdf69323175a",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "a4bc2cceae6b12d3bad60d919672b1dc8feafd0d77bb32fd3c50f69cfcc3ef48",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "b32dcd156169dc4a0420bfa7ef816298ec010f9f0e71aa5f9d76a4f59bfc78c5",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "c6bc898102589eff68fd1b4af4367bc60a2efc68060d183774b801092341575e",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "f89cbb8e93161e91364b8e6c856f77b969e93e0244d8565defff84c4968d0ccf",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "7a08669ec3e98773d63dc20ede7d5697cd1adbd66a5eeb2f9ac954d599fb184f",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "9c371eb909b610eb92c18eae1eacd66694c39076280ff3adfb09d62894e6b283",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "e345fa55761ab3ee2ff2ab1331051a5ed8b5e2b7ce049331fdb44e1d39ab32a4",
+      "session_hmac": "abd78beea7b0dcfbfab03a07da76ea7be6158da8e2d1bffa36d410004c8a85ac",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "36cff0c02580c0f676006cea5c6538637738807b7f0bbe91adaf6e3c718f0fea",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "efe4b0716c0a6151d58daa8112232a47340d0435541a71b38f99d4407f421a04",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "6cafb9523fb9b37e138f2e69363b4837067cb3d03a58d320ccedf09a8e494ffa",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "e85a28a7db6acdbc0dee10f344949c7711a1cad92f01d95591360762757cc222",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "ba86015ea18db8b8c187ffdf7518b86af302222a26203fbd110061de523a5500",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "f8117d12fd944bc37ba6b0eb3cfcf6a4451de014967db34362f456660d462ac8",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "9f44ae0dcc9eec1ae166e98f16eb59c55c362783e8a750f668429dd1dae85d85",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "ef0dfe52f92e8d81758eedfb1563c211dfeb89cb59915606fc6f07bc0e350f4c",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "8935d81cf0066f992eb8144667519f4bf0d30bef5cffee0a649b98bf291b674b",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "e98a46c056f1dc6b68b0c222f2e8c7b9c7ab29c295f90749671e226460ef1d72",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "53afb52965ef8842af30232ab24ce3c40cfc7d9d1a49320a1ea379927699194a",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "910ff102065ac55360954c8501a698c7db3e38079fc33de3264b703e53d8d4ed",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "8849a3d2ecbbd87b5bbbbf441f74f4d68a70db7346d5583e88a18468181d8764",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "bb30d821af8a3014fe33c746f2b151664582724203d0cbc9881b3dd35186de1f",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "6c1493f7794635b4d8b4dc8f4dd3d301db42b1032027699f4a042c977801c057",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "44b2e033a6f6ecb0d6898c332f5b6e0c16df960520daaecc58f85c81a8d6cdc0",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "983da8f8fbaedd92f0ae13633f237d2eb171bec9b5b269e656bf76c58cc34a4d",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "4cde4ace6cfc0c27bfe04e1b40347c5320f925f0e5889b33c2ade7d90beb328c",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "f5fe5b011cad428bcb0d4df6e0d363d1db2c858c0b7a0f668881ac7c06d40d83",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "8895ef76c1f700e3893d5f0de979d7e3a476898d94128e4b3af4050cd2a0086a",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "feeef04de433ee9665056f93639c08feed6fd859bf3d1169ae5db356778de87b",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "0ff59de1635f0cfdb8f8a6fe9d9abc10ca6044d0f1f51e5a08c2f96b5638caa3",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "eaa911b64e77f7e16d0eab2e51818e8c9399290b813187bcbf30e52e80efcb45",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "91818bdc6e9708ccd43d9c19d433817b12ddff5ef38ae32f4d9c989d9720d9c3",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "08e049e652478569dd8511eb1ad70984364337c24cc438970b267897c8973d76",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "23c404957cd3f7ecb180095fff878f128545e5da89b13fa6ea807d3927c5e674",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "41efa3880e786aa5c6a7cf136a509dab4a977bb33b2b4cd7c79c23e2611b21ec",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "0420d8f24d6c1d4a69ca976c96fada40c879cd95dec4de2ee806b71314272851",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "4c11b92f1848f073d34f0b8fe4a798c0e557fb4fdfa1b052a9fbd3688c58648e",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "f6c36c3b100ff36b482ff3c1a0754e6dd573ff0f9c149fc0b1067686e2f827aa",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "d98832d91ea5f31c26e7a06847dbfde71412ffab4acec75470035a0bdb640c2e",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "40a489aef9af50cecdd938654199a85b7d2e9e01f6af2f68a042dd477cdd5db7",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "6c1e5597521ecb5cad3b62523c6e4e0f51f4b56252c8968111de4acedfc68aac",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "85a4157b69c21430dd2595ddf04f5fae899670b752b80c22a590ae16a8596516",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "661b01477eee8cfcf7158d13a2169c4c77adee8b8d25753e0389b587d40cdc46",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "e55d4dc219e139ea4dd9288bc94bf9b93a7dcf176989d6ff3785462efd4d3ecb",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "9aa3d3221c9bb77d18101b567416fb8af14c93e3160185ab8eda1371988c0b23",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "cf61ac99ddfc0d3e4e19d7bd7ea454282a4dd75e0c9e4f8b0f7e20bdc4b9de7c",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "625ec6b7d60120a4a2f09bc061dc50d3f9b9733f399e1d48673b816ccc92e954",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "611cd5acc31acf8ec0de53c63759534d7fd15555e35bb3fc63deb4a440c1f683",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "17a12f1c68ea89d7998eb4de28163b23fb98c0f4dd18be016ae1a7c622406f52",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "298da43fcbfa3454f034ab0c2b60a34584cca51ea3d6959d4a1b4e7879081000",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "909cf1c1d362ae423b011316e421c48bfa95584ffcafb2e752f8ae5316652627",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "bc291922eebb6fd0b203a2f366f964cc8978fb81c2914603effeafc15d0e43b6",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "e71c6cb0f3b4900a2578512e79f47238acf67bdbf1826fe7428eff2b8868b57c",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "1ee9902284f0b71cb189fe49384397e461baf3cca6664838aefdb52e021d9aa3",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "25190e0b4ee9eb5fc7880d77f924df0d2fe6ad79d3f946704be00669bafdeb06",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "bb7a0f338e986607a0ffb0f3a6c515d5eee98210848963f7a1671fde026a4986",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "7374450fa1a89d7fc68019be287587fc4467a0049d9cce1b81e7b6047a185ed0",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "e0dec03141ea76d2adb6ec16be8abb872ed89005306f0771549b7b94549a38cc",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "85b0347b879507ad98b02687562a64244f0596255cc332fe68da64292d4da2b0",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "3e8ffe775559ec0e1ccf0ccdba353c8ab346aa400b9f3a3f32d03396c8416502",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "e30f83a58bf5af3afa86ea95cffadd1672fdc87cb3d7981accd062f623f81fa1",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "b0e27240c2c02acb579766278307093f24f2177df61c1242b4126aa7576e15a1",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "4817809e936d79a1d3f2b4ff034f3aa535d4ba8dbc28661003dd9ed254c76a78",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "92f3384cc2ffff3df46f4f2764cf602d0e9805675f9575eb4d81c48e6e9be350",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "7223d1a97746e17764561071b6bdd12132ecae9f52673932d9c0d15968fb02bd",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "020329a054ede7570c1c22ca019b6e53e94dc521468c734b283faa25c7089b9f",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "0f192e54dcc6a774aa987d6f8d848fc0b98844ad65f236536a97d5e989b21bfc",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "4810ef72c8be4056cebb434b5773a96e9d96246130a3dcdfb75e5b6fc34cdd1c",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "ea654cf4fe452e262586344144f951c481835baba59e0d28d1aef52cb1432884",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "bc8d1bc55a721c771b5de012d69a271e78dd0cea2b9eb963cffa1a9168016e78",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "53e2cf6d23f532d61d846e7eca1a1a394c634dc6ceef435e9e6981153369ea1c",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "85b5b549ef884b3a09c3ffb769a3561b7090a5d0c1aa4f1925d812930e0f3262",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "7ea90104b59c3ed4fc21c047a16dc6388d2347402d7173b094b36b904c4d370f",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "0cfd8ff76156a850b34d8c8241536beb5a2cd50bb86fad44e28c8c5fb309e432",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "6e1733abd14ebd7ac595b3dc60215308b975a084ff678e353a6f81b7cbe49372",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "76e303b8e14fb8bb65682501fb512b39346eabcccd1c2e7e4a2318d2f6088627",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "8b93a4dfd4c8f13f4345caf3235ce3f0ed2ff62f395ebb6454476d8097f5952e",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "616752b564023bfabdcc6fb50ea7fde54a182d3dfd249c089d86038ee02eaa50",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "3e9e3669431fe30063da4a19ba3b018104f027c060796f58dd29cbaa6b7fe243",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "6d037ff9a55ecbbdc1bd4b279ac9d154f63c6c96396e34e20f9912451ca9e18c",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "e32dfac32a5d2c5d67d16cd7217622282c75687bed67939502ffccc6b6220d89",
+      "session_hmac": "ec909a1453ac0d51be11b162a1dbb8c414169e087e0fda0ace8db2f0d4fce788",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "8a58bfad8cfa370410e76e615ea73c01aab636608f589d754d984acab4af8d93",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "14456f753da2e5bfe770b12b8e0c3788d6d5f859022ce37a51972d65ad4a4a5c",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "a1c29cf96860efced400a719d4238413f50c78509cd6f35279e6aa65486f3acd",
+      "session_hmac": "d95855e2ba67b4f4fc1fed6a401958e2df3877c1b1e02e273c0955dc93d6c2cc",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "580ba5fc7c6db98ff8a2529cfec76e65ade21d5d6544a43d0dc19d1a3eb974c7",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "88789c9ede1f76acf590ca543e126a6d47495d924d492c5a32934f780af52f59",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "a29de4928c2981b0e594f88df30876d91ffc048e1876734493e8ab4dda3daeab",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "a95fbf66b3feca7f190ba32a365de90c903513d2e56b4cbff6ab4b1cb30eea92",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "ae9b6041250fb768e23ccb6df7296b0e1dd605a18caa14288708b8dc1fa92636",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "a4f4faf2fc521428784bb0f11a9aa6adc16b2093609a4c2da10091cc776800c2",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "5a866b30bef5870f84b3c83906b67bf12e8d51c984c3e88b98dce2c516c7ade0",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "6c93c25f9651f6f15b8dc0d46163def3035c89a249a9140ea9502e34d6e5c0f9",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "ace6cd53251e89ae383a8655ec0ae07b9981352dd054eb49de98205bea61137a",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "b0760839c313b7a486a52fc95f2b1121e3a1faad3210b2cdea846d6d4bb5a602",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "7fb08004611c2a7720b57e044f713374bcf60c303e55955b56e58b40e8ad8a3c",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "734b654a554e4c90bb036bcc81f092f4623aae04a90ff168bad2e882e369a232",
+      "stratum": "unterminated"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "2e1ea483222d3fb4cbfca1b310e4df21cf1c07a39884b395b9afe0eff8aa02e7",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "35c92b7398f6314638801f35041d5cbf4bf6972cdf5b74876535eeef16ccd29f",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "1bc8ca59f0c43f89d021694ec92cffb4fa10e1158f285d6a72e12fdb544ab5a2",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "2976411848877a301f9869acafe3f425b012fb9299bfa7414fb86b55535c3cc7",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "0311ea621100a443dc1a1eb4cf595f0130eb6ba38d6aba8a02d5f93db0905673",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "d1dd8660423b63f3afbd98c5bc674c57c628b19b014dead4bcf66a93d04114f8",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "4eeb96ed75ec0724cddc4fdd83201dc42014f632267c687652d1b9e8dfe65de6",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "8eb4cf7ccb32b411e4c82f622bc606e492a675c0fc83061c736320f7e5690b67",
+      "session_hmac": "1bd44b88aa2fabc3b7a6f037b6e243468bb731595653b81bbeee3b8f2e786c5b",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "9a03bb5f2b60756da69f81748f0afed5931800063f5bbd31a56fa1865f4a7693",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "2667ed0062c24988301672cb132ddc58cfbcdac0463019c8fa0b81988ee10165",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "1301592a9bddf4823723f8654025580ac0368bdfcb9a4e2358a7974416f572a1",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "360456dd7a843035b688678a6047d80f45ba4f05c3f0294c41559db6a389bb26",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "99f52ade0e24d6c67217559bcfe5cc7ed2121447ae91e61ba60ff2327c948a28",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "ee0789972e2e48581cd952e69380e46e7e5cef69618bc83ef0c03d163bcdfd50",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "9d51faa45a734104dc6c83934dac41ec09019bb6d0eb0ee06ed3bca0042c5a98",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "baf620dd345dd9496f7671c9cb7990ac5c3a2526324a4e1a223b90c6707ecd12",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "f1a47ae777feb98a9601041e2148d7bfa56b147b81e62295dab46de7c4c7489d",
+      "session_hmac": "85d2dd5f696f9fb74e5a87263416b217a23322f1284dfda0ac30485f7e4d3792",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "24b1af2dbdb69b654354a02cdb6e0ea2498a9757f74d7a29054add4b6c2fb695",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "30de492d565d2c07fc9911befc6629c12c58006dc5ec296d4116a779f20a2396",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "6dfc224fa4d6b4f20e1e35d0ca3e38c949c775d3dbd4c178c77867016922b133",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "69e52b7ab9733872eeb48d8e34b4bea4a1178be2f290c838fc41d4ae373c453b",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "6ccf088ada7eaf8fb39f030954dcc9287f7d81f7ef55427b85ae3b30b7ee598a",
+      "session_hmac": "cf6e08e5e6323582193fc82cb2162be4f3e7e235d07a96cc06379507c3b7c859",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "6ccf088ada7eaf8fb39f030954dcc9287f7d81f7ef55427b85ae3b30b7ee598a",
+      "session_hmac": "c7e744014409fa9b6f7a6add7b81f68ab12c5a2db0d11fefc16d2c5863671d83",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "6ccf088ada7eaf8fb39f030954dcc9287f7d81f7ef55427b85ae3b30b7ee598a",
+      "session_hmac": "decf3ce51e45c9587b51430607203b9ccdd3d5ffa373b1c6d7653793c0183dc4",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "6ccf088ada7eaf8fb39f030954dcc9287f7d81f7ef55427b85ae3b30b7ee598a",
+      "session_hmac": "907ffba1b32dcc592a383b35a8d713f0b8d02487fe355928cb2ad0eeea63178c",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "6ccf088ada7eaf8fb39f030954dcc9287f7d81f7ef55427b85ae3b30b7ee598a",
+      "session_hmac": "22099dcc148e121b12daf828f689119a8aa83b05629ed5a28728bb25da7e7e2e",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "6ccf088ada7eaf8fb39f030954dcc9287f7d81f7ef55427b85ae3b30b7ee598a",
+      "session_hmac": "040425104b564162d54744f8f66f86a33e25f8c1f191bc4f860d5938e6015621",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "6ccf088ada7eaf8fb39f030954dcc9287f7d81f7ef55427b85ae3b30b7ee598a",
+      "session_hmac": "8cfd928e3256df77bb49ce607d5c9e7f4ea3ba03c740348f6afb6615062e947b",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "c43df9b02d8dbde6a99c7f4d5a3bee482ca3fe19b573c39cd6807e299023d2b6",
+      "session_hmac": "22c1e86ca28fe4df8f2e91ee319d7706365329ac70acfcaf12bd4ec3798916af",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "c43df9b02d8dbde6a99c7f4d5a3bee482ca3fe19b573c39cd6807e299023d2b6",
+      "session_hmac": "a0d86da6d66b458a12c850e5e095d69300ead15d0030011d5806eaae0b1a8818",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "c43df9b02d8dbde6a99c7f4d5a3bee482ca3fe19b573c39cd6807e299023d2b6",
+      "session_hmac": "50f34019e527b4de7c6f1c8682937b30b7de33f53238eb11fe9400d54b7bd1a9",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "c43df9b02d8dbde6a99c7f4d5a3bee482ca3fe19b573c39cd6807e299023d2b6",
+      "session_hmac": "2feee6dce08d32ef3778a86cab48e5186473aa704b3fde508a7e145ddf91e2af",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "c43df9b02d8dbde6a99c7f4d5a3bee482ca3fe19b573c39cd6807e299023d2b6",
+      "session_hmac": "cd07c508fe14269bb4326d729820efb4a13745729e939da2fd48053ccbb0047f",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "c43df9b02d8dbde6a99c7f4d5a3bee482ca3fe19b573c39cd6807e299023d2b6",
+      "session_hmac": "c8c4d3ded4b3aedcd9c4c6cd0666c153f584237ed46ac1fbfffcfacbd8600f1d",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "8f35c597b12f436eeaf31396644de4e228ea2f70225185545e3586e5c9045301",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "3f501404c131149609e415f6d2b61114040506a175ea171b35277186d5e7f1cb",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "93778486d71a1a79319c3aeb8f4a5f21609e8d1a1f3fdca940372563690d6cdb",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "83581ff6888e66ed4bbaf57c25751853b9660a1ce88ac52ccf2a4c8815e6c94b",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "a7d25f12c9d023192348cfbc3aeea7469c6938bb522f9b8d948736c1b5f326ea",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "b63c7737d0f82e5170f8258a127eefec7817fc1f58a2a0b3e34eace1749a006d",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "6f0acfad9fbc86484ba6c506116e7971e12790fa617d69414ed646af996efb33",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "a8a6e980ccc4cf1a4729fd8c99af1ced4c220ea4260971eef8564d437c5ce08e",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "8595f8271bfa3f06cec1cc686a59370fef8459b84c8cbdf27402bb39cc057acc",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "87055c7255b6f2941b66c9f46f3ec0c579c2c5552d4396a75a087f44be316341",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "79378e6f974ff040ab404fc396806d0a68ada772fe76d6ea6bf87ef793b7d012",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "198afde6d8dd921071329b15a7141312a3b90af5696f43cf317adcfef75ac886",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "f93d9e4bbbead54e31111594d2e9c2ea090042aaf8fc68e533da0480125a5a96",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "76045cf845535baaf65a232e4d4e336aac1816798b806755e479610485b71746",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "74848693bde8673e4fbae8755db53765321e0cec3a28fe76291e40422f5c800e",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "04aef22b6771e321316abc8f0d739c1c62ecb3599a916d3d5ea0f5b16693fa87",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "3f690f48b5ae8ec1be52b21a610dd333858420ee9c0b09b6d6a9becbc23a04a0",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "536dea21757be10266fdddb7ff6a48704d50407b3a3637fdb10cf1763d2eedfc",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "d107f322e2ea7326af8b51f0210672546129224eea78739d56aa304f171099ae",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "4bf19372340f10ec6f25cda63eb2d0f8826805cd5b28ce7b177436693247368c",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "5781c372090873ce289d65077ca5a2a914a390aac452d764768fb5a688bde9de",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "8b6dd0577aa7a1456a2d7c9e9eee2d30bd20e72772216a505d375cadecc2b5d7",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "12fdd7415c799473988fadaa8d50b084c47f3bc30cd4fdc0b129666b4ffa4ecb",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "04bcf0842021cbfe6f34134c9562ab9401e086c51250b4b045be83dd42ba4dc1",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "7b6e866dd2047fbefa8f80291d67871cb0f30624b9a5bb6787cb4867c32f5874",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "638dabd72372960ffef61001fc6c8050442b601c35df27b46aef5de95964b647",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "647a4622a08261d3d68c15cfce2c903b7bf2616ac3ccf7ebbcd0897a7f38d51d",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "18438250ab4d116b8474900b7dc9d0c33a716a38a683ce179311df4dc44c87ce",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "e7c0f712dbb4d453fd09e332f3fe96ae519adce69d64885117b14eea42aa08a0",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "09aa3e20ea5aaf95d0edaae38939513fd0254f9e278430bc1637da0fa8f833be",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "0814a217ef53519d3b4d965c8a2d2e4377a23a962fefcecfc278fc07219483e2",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "e636a317858b3bce52c5585f8b00c4de8c912ac4be748b20632ec90c0329988e",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "0c1b514af82d48cbde89cb2779ea7d212dd768e5fd59684812b18b88cc5f0628",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "8eb025ad479e74af4caac4575bcb48bb026bb68744298303c31478e734719b5a",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "090f0da9aa317ab119a636b35a1c82e1c49a2bb801b9231056761f8a17d3038f",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "7c2dbb63b001ac5f46dad65ef7d78a820f1345373a22b2ac056f9ddd1987651f",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "95167e7858aff02643748e0429f04e7e82398997b4a9d784f0f8433c88f522b6",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "d95d9305c2247719d11258d123aba1afb5eeacb26310b5d2d94ded48cb6723eb",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "44bd78abded1ed9bd6e8b82d44ed3ff2291b476312efbd255cc975801632c3a0",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "a1ec4add0b3f3211b53e03f833fb4ff0507114e362c051e2322bb1e944bdf7d5",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "3b74b12632fe19d723bc08764db76dbc9454845328767d6426e4f61ec08eecd3",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "4742a26dca0cbcdca6198779d31d487d31d2a513807d0a9255a04211f73ef230",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "a7c99dfa0cf1b052aeaec15720b070d706b41b38900e6f5193733a52a76d3f33",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "d5cf2c988b68f47fbdb1baac67e7cae908c2f59b73dd2098bb15b085f134cd32",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "ce17b4a2841f78aca971df2407cf9907c4e8762eacff0be9a5f74b4a97b7fc67",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "e6a1bbedf10b15ea8657f7bdd1cb40845ca230356835b00fa88007bc4bfcd16e",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "cd3cf5f8b8528822f30f6ad8b5923a30a84552c433756d402e5d229fb7c4558b",
+      "session_hmac": "cd5740a5610a38159b18abfbe3ad489430a160eba65563ebf2e24ae62c2c9bfa",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "80834360bc9fa8cc3c05cab386d48f5c11350f9f29aa8b99a89c295e2bab8ecf",
+      "session_hmac": "f0eeced6e3a79a4414ecdf646733b426bcb60d0f3247c3820275a26be6806778",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "463e566cceaaea8e901c6a309e7a3feac65672d9308141ef1a15297476d90d36",
+      "session_hmac": "6ab12ad27731f0768bde8db6be3c0844307ad95142d16647d0d81e2897aaeb82",
+      "stratum": "unterminated"
+    }
+  ],
+  "snapshot_digest": "fb279786cd7f60c6065614ec5bc250e3879fa9374e9a3068688155e1b2976906",
+  "strata": {
+    "terminal_high_tokens": 95,
+    "terminal_low_tokens": 95,
+    "unterminated": 2
+  },
+  "strata_families": {
+    "terminal_high_tokens": {
+      "families": 13,
+      "family_min_required": 12,
+      "status": "OK"
+    },
+    "terminal_low_tokens": {
+      "families": 5,
+      "family_min_required": 12,
+      "status": "SHORT(7)"
+    },
+    "unterminated": {
+      "families": 1,
+      "family_min_required": 12,
+      "status": "SHORT(11)"
+    }
+  },
+  "version": 2
+}

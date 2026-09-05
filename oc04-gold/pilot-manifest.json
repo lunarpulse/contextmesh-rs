@@ -1,0 +1,95 @@
+{
+  "corpus_size": 16,
+  "kind": "pilot",
+  "parent_manifest_snapshot_digest": "fb279786cd7f60c6065614ec5bc250e3879fa9374e9a3068688155e1b2976906",
+  "plan_version": "v5.4",
+  "seed": 20260821,
+  "sessions": [
+    {
+      "family_hmac": "42d367e2a7bde38becf4ea14f637aa545630d9a0d6d8fa147417ae2e234c269d",
+      "session_hmac": "b4c9865b6aac8b8913aa104c6340a6e5f0425d6adec905ea6d80695f9200e41d",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "4dc9a276c967ca19a55c6eb973d9884c04bfdd615ba4e4889e9ef78afb3516d2",
+      "session_hmac": "ba86015ea18db8b8c187ffdf7518b86af302222a26203fbd110061de523a5500",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "91818bdc6e9708ccd43d9c19d433817b12ddff5ef38ae32f4d9c989d9720d9c3",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "ac3697ddf1b95eeabbf6ced399c73a2d5196e35488ceca1560ad5db781b49503",
+      "session_hmac": "d98832d91ea5f31c26e7a06847dbfde71412ffab4acec75470035a0bdb640c2e",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2c0921f2d1acc3eeeaea082df1df3c5d7e32d4c8b450faa9ed6b3a7cb7ac4ffa",
+      "session_hmac": "1ee9902284f0b71cb189fe49384397e461baf3cca6664838aefdb52e021d9aa3",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "bece7588881b492a07fb5fd377486d570b7c0319f4a45e65709c0c3b6c675768",
+      "session_hmac": "7ea90104b59c3ed4fc21c047a16dc6388d2347402d7173b094b36b904c4d370f",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "e32dfac32a5d2c5d67d16cd7217622282c75687bed67939502ffccc6b6220d89",
+      "session_hmac": "ec909a1453ac0d51be11b162a1dbb8c414169e087e0fda0ace8db2f0d4fce788",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "14456f753da2e5bfe770b12b8e0c3788d6d5f859022ce37a51972d65ad4a4a5c",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "6c93c25f9651f6f15b8dc0d46163def3035c89a249a9140ea9502e34d6e5c0f9",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "ace6cd53251e89ae383a8655ec0ae07b9981352dd054eb49de98205bea61137a",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "b0760839c313b7a486a52fc95f2b1121e3a1faad3210b2cdea846d6d4bb5a602",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "9dd261b675e29880954b85a5ca10b147d50df2a067888f1c401a543388a44ad4",
+      "session_hmac": "2e1ea483222d3fb4cbfca1b310e4df21cf1c07a39884b395b9afe0eff8aa02e7",
+      "stratum": "terminal_low_tokens"
+    },
+    {
+      "family_hmac": "2add22340cd4789da8e3fb1d769c7b28b93f252ad6ba44f46548763f7e72ed65",
+      "session_hmac": "6dfc224fa4d6b4f20e1e35d0ca3e38c949c775d3dbd4c178c77867016922b133",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "6ccf088ada7eaf8fb39f030954dcc9287f7d81f7ef55427b85ae3b30b7ee598a",
+      "session_hmac": "907ffba1b32dcc592a383b35a8d713f0b8d02487fe355928cb2ad0eeea63178c",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "d791092498c0fb09e4a0a93025ec68b127e167f74dbc01c5930dfc465cb8b55f",
+      "session_hmac": "a8a6e980ccc4cf1a4729fd8c99af1ced4c220ea4260971eef8564d437c5ce08e",
+      "stratum": "terminal_high_tokens"
+    },
+    {
+      "family_hmac": "891e46087bc06dcebf4b76f3c53ce8870fc23279c0885058fdb05895ae5ee964",
+      "session_hmac": "e636a317858b3bce52c5585f8b00c4de8c912ac4be748b20632ec90c0329988e",
+      "stratum": "terminal_high_tokens"
+    }
+  ],
+  "strata": {
+    "terminal_high_tokens": 8,
+    "terminal_low_tokens": 8,
+    "unterminated": 0
+  },
+  "version": 2
+}
