@@ -1,0 +1,200 @@
+{
+  "assumptions_sha256": "d19653cd785118e4c28f7727ad57b5098835f77f382302f51a9c2a3d4f9f75e1",
+  "chosen_corpus_size": null,
+  "decision": "UNDERPOWERED",
+  "plan_version": "v5.2 FROZEN",
+  "results": [
+    {
+      "ci_width_75pct": 0.192158,
+      "delta": 0.05,
+      "icc": 0.0,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.179888,
+      "delta": 0.1,
+      "icc": 0.0,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.179037,
+      "delta": 0.15,
+      "icc": 0.0,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.193248,
+      "delta": 0.05,
+      "icc": 0.1,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.19116,
+      "delta": 0.1,
+      "icc": 0.1,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.184326,
+      "delta": 0.15,
+      "icc": 0.1,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.199979,
+      "delta": 0.05,
+      "icc": 0.3,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.196188,
+      "delta": 0.1,
+      "icc": 0.3,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.192982,
+      "delta": 0.15,
+      "icc": 0.3,
+      "n_sessions": 48,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.153626,
+      "delta": 0.05,
+      "icc": 0.0,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.150441,
+      "delta": 0.1,
+      "icc": 0.0,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.143324,
+      "delta": 0.15,
+      "icc": 0.0,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.152253,
+      "delta": 0.05,
+      "icc": 0.1,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.155262,
+      "delta": 0.1,
+      "icc": 0.1,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.153944,
+      "delta": 0.15,
+      "icc": 0.1,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.162154,
+      "delta": 0.05,
+      "icc": 0.3,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.157175,
+      "delta": 0.1,
+      "icc": 0.3,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.158195,
+      "delta": 0.15,
+      "icc": 0.3,
+      "n_sessions": 72,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.130582,
+      "delta": 0.05,
+      "icc": 0.0,
+      "n_sessions": 96,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.132491,
+      "delta": 0.1,
+      "icc": 0.0,
+      "n_sessions": 96,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.126937,
+      "delta": 0.15,
+      "icc": 0.0,
+      "n_sessions": 96,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.135591,
+      "delta": 0.05,
+      "icc": 0.1,
+      "n_sessions": 96,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.134126,
+      "delta": 0.1,
+      "icc": 0.1,
+      "n_sessions": 96,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.127783,
+      "delta": 0.15,
+      "icc": 0.1,
+      "n_sessions": 96,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.140479,
+      "delta": 0.05,
+      "icc": 0.3,
+      "n_sessions": 96,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.136695,
+      "delta": 0.1,
+      "icc": 0.3,
+      "n_sessions": 96,
+      "passes_rule": false
+    },
+    {
+      "ci_width_75pct": 0.135844,
+      "delta": 0.15,
+      "icc": 0.3,
+      "n_sessions": 96,
+      "passes_rule": false
+    }
+  ],
+  "seed": 20260820,
+  "stage": "OC-04 4G+ Stage-0 power/sensitivity simulation",
+  "stopping_rule": "75th-pct CI width <= 0.025 at delta=0.05"
+}
