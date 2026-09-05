@@ -1,4 +1,4 @@
-# OC-04 4G+ — Real Human-Gold Corpus Preparation Plan (DRAFT v5.2)
+# OC-04 4G+ — Real Human-Gold Corpus Preparation Plan (v5.3)
 
 **Status:** APPROVED — v5.2 FROZEN (founder approval 2026-09-04, Discord msg 1545401201573765120: "승인") · **Date:** 2026-09-04
 **Revision:** v5.2 — dual-model critique→refine: gpt-5.5 (author, 9 self-identified defects) × GLM (critic, all 9 VALID + 6 missed defects + 6 fixes) → consolidated 15-item adoption (14 as-is, 1 modified, 0 rejected). Items marked FOUNDER-GATE require founder approval before freeze; SELF items apply at plan level.
@@ -108,6 +108,13 @@ The frozen prereg value, quoted VERBATIM from `p1-prereg-config.json`: `"score_n
 3. **Full forward context adopted (§3 session row):** `dead_end` gets forward visibility through the terminal answer; blinding preserved.
 
 ## 12. Change log
+
+### v5.2 → v5.3 (2026-09-05, Stage-0 simulator revision — PRE-LABEL, §2.4 clean restart)
+- **Trigger**: Stage-0 v1 UNDERPOWERED at all sizes (48/72/96). Independent audit (Codex gpt-5.5, 41,370 tok) found 2 simulator defects: (FIX-1) v1 bootstrapped the prior-arm score LEVEL, not the paired prior−lexical DELTA — the effect size was invisible to the CI; (FIX-2) ICC mixed a family random intercept with extra per-session noise (impure semantics). v1's 0.131 best width at n=96 dropped to 0.058 under the corrected paired design (~55% variance reduction), proving a large share of the v1 shortfall was simulator artifact, not true underpower.
+- **§2.2 threshold change (FOUNDER-SIGNED 2026-09-05, Discord msg 1545772530437202070)**: `CI_width_max_75pct` 0.025 → **0.05** (= Δ full width). Rationale: 0.025 = Δ/4 was a high-precision ESTIMATION bar, not a detectability bar; common practice targets full width ≈ Δ for positive-effect demonstration. Recorded per §2.4 — the change was made BEFORE any labeling exists, so Stage-0 restarts clean and no prior size decision is invalidated.
+- **Grid extension (allowed path)**: 48/72/96 → +192/384.
+- **§2.4 assumptions re-pinned**: v2 digest `5b617087302ed00175f376c24ee051b7d20e91fdcbe78e4943f156581311d356` (power-sim-v2.py, seed 20260820 unchanged, declared priors unchanged, shared-quality weight 0.6 declared).
+- **Stage-0 v2 RESULT: GO — corpus size 192 sessions** (75th-pct CI width 0.0411/0.0413/0.0422 at ICC 0.0/0.1/0.3, all ≤ 0.05; n=384 also passes but 192 is the smallest passing size per the stopping rule).
 
 ### v5.2 APPROVAL (2026-09-04)
 - Founder approved all 5 FOUNDER-GATE items (Discord msg 1545401201573765120): item 2 design-weighted aggregate option, item 3 replay-inputs.jsonl substrate, item 4 shortlist32 evaluation split, item 5 evidence-wording ratification authority, item 12 dead-end diagnostics (binary mapping preserved). Plan is FROZEN at v5.2.
