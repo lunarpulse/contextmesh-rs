@@ -22,6 +22,7 @@ pub mod json;
 pub mod judge;
 pub mod oc04_exec;
 pub mod oc04_gold_realdata;
+pub mod oc04_import;
 pub mod oc04_rerank;
 pub mod oc04_selection;
 pub mod oc04_union;

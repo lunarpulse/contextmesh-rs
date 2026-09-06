@@ -87,6 +87,8 @@ Committed task/session hashes are keyed-HMAC, non-reversible without the local k
 
 No evaluation result is claimed or implied. Every label is human and blind at reliability measurement. No frozen prereg field is altered (labels/strata/metrics/budgets/normalization stay as hashed — where this plan interprets, it cites the frozen text verbatim).
 
+**Importer boundary (founder-approved Option A, 2026-09-06, msg 1545940775236280361):** the local-only transcript importer (`oc04_import.rs`) reconstructs sessions as LINEAR signed event chains for pipeline admission; the original Hermes session graph structure is NOT reconstructed, and imported events are NOT ContextMesh ledger storage events. The importer does not alter the frozen pipeline (arms/union/rerank untouched); signatures exist solely to pass the verified-source gate. Signatures verify only under the local identity; cross-machine reproduction relies on committed digests, not signatures.
+
 ## 9. Normalization (BLOCKER-4 fix — stated verbatim)
 
 The frozen prereg value, quoted VERBATIM from `p1-prereg-config.json`: `"score_normalization": {"method": "per-arm min-max to [0, 1000000] ppm", "clip_above_ppm": 1000000, "clip_below_ppm": 0}`. The prereg record §4.6-c explicitly discloses the normalization WINDOW as a definitional gap. This plan therefore fills the gap as a NEW plan-level interpretation under founder change control (NOT claimed as frozen text): the window is per-arm, per-session, over that arm's RAW scored candidate list, applied before union and rerank. The earlier claim that the window detail was "exactly the frozen text" is withdrawn — only the method string and clip bounds are frozen.
