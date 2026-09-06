@@ -1,0 +1,2562 @@
+{
+  "arms": {
+    "lexical_cap": 64,
+    "prior_cap": 30
+  },
+  "disclosure": "prior arm has empty m4 seeds in this first cut (plan §8); union == lexical arm for these sessions",
+  "kind": "pilot-candidate-union",
+  "sessions": [
+    {
+      "event_count": 17,
+      "events": [
+        {
+          "event_id": "evt1_1RjTOFbZ_-NnvC4D8fynZ0sEDayTnmSnbwLDOeJ5KbA",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_3Ax3KVspYymeivQBawOW2DRftbBgO4SEpAVcJ_9-By8",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_5rmLEAT0lDIuP-a-fbXwcKyU3-hsbUcObioz7u3g4sE",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_6_wJ4cYSAmyUbtZQwK1hjOUqeHh5D3_oDpeIRUcMMgw",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_AUd2cyelPllm3Qit-0i8usOajgeAm756pD5jmnHvziI",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_EBkqnYzzo6S2V1jGu7oILmyvEimbuzuO4sI0NkhhsOc",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_HF4PHaxyLWVWBeujArPd-AIinMlCpYX24SdBK6lZKdk",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_J8gf1Kkvt59wmRAK4GhgrMhXxAMp-KCGPWvJGEHk8QU",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_LOEnFvXLAMWpgexf0AFQmcv0bVe7mxK6VcimPH4qMfc",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_SRdbHjV_ZRXUtotzFfqgLpKgYCMepidhsbVvWx4bRLg",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_UbvcVBJ1vb9KVNYEQiUGzVWm6zRE54-mY3xJpNyedA0",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_aMiA0mYBzB6qj2ZAFg7SOd728Jm3M--HP4DphZxp2_w",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_drcxW1hvxx2_yZ_BixbuP3g3TWa8cuvAn20N7Phgp14",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_g85nI3HI_MCX7aeiaNPxqP5lDh3TF3hrxqbZdMhrDDQ",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_rL36F3qIxvx6oAiCPlT35aqVgg5VxaTmQjT74-xQu00",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_v34UJAgrMR43G2nkYSmf3Tnx2DOZDILnp0No1CCDKM4",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        }
+      ],
+      "lexical_count": 16,
+      "prior_count": 0,
+      "session_hmac": "b4c9865b6aac8b8913aa104c6340a6e5f0425d6adec905ea6d80695f9200e41d",
+      "union_count": 16
+    },
+    {
+      "event_count": 35,
+      "events": [
+        {
+          "event_id": "evt1_2hfSb7eMKkRWViof_JkG-v-_qybTaqwBQbykjPqVMWQ",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_2uECFf5MF1_n-1RPMXf8My_WtjL0yXUtT2DdZy8qyPM",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_80ENMITV5vFjQtUMr-WpL7BoIDymD0ZZEkKuFTzthPk",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_8J9l7MS8MbgFIyeOzKiIe2uFBv_c1Lsyy59sPXDp4NA",
+          "import_index": 27,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_AhC6n0oIoTu2NzcBEsa4c1FlbKW3XwMGwjNvvMNZ2NI",
+          "import_index": 26,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_B7dyQ-Rboa91XAfIFSM4frZSD6ueSWUOUIPZr9HHCdk",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_BwnhV5Q1GzWnlwOmNv_8D11VNKMuvxxN_fCZd9InJjI",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_C83dIY8h5A32i9n2BB2y-35DfdSYToilaL_qq3t6RDQ",
+          "import_index": 28,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_CbyHGFSRaY2ATMJbPN6Tax-EezLyRumepD_xkJvd6cA",
+          "import_index": 22,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_FQAsVIbTk0XRPdh4Et_IrXdB-Pg63X8luDqCr0g2bEo",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_G2z2_HJ5WUVBzDlz7jS855Pio-fDohyqRyOukkxmxw8",
+          "import_index": 31,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_HaWWEBn-z97NFQbman15GcMi-ltlcldDtyWB2D33hiw",
+          "import_index": 30,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_HwfdE1w-LcpSKLfMfCL5RQbpodfSKAhz8cjfFauJTyc",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_Ka_K2DEJKTgfYK1UM7Lw-Y7eO_o6MAhqFIZwdOkZlrY",
+          "import_index": 24,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_NGhKtNnOdYm0EKyBm8uIaCBWgGM1ugtKMpGLb5tA6B4",
+          "import_index": 29,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_OlgB5L_87VnU628_O-LY8_wUc_byqnG4kk_bNYLuSA4",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        },
+        {
+          "event_id": "evt1_RiqxyxgGQLmlPvbTdYdAsBDWT4DAkcNZJkdPkxjOYOw",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 16
+        },
+        {
+          "event_id": "evt1_RjB5z_cPW_rje9BIbKWxM0iYeb2wwOem1nbYrsNAgyU",
+          "import_index": 18,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 17
+        },
+        {
+          "event_id": "evt1_Ros3sKaxAMjleFQIfYpGuLzW8FC5ZLibT7XeZ_urT_w",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 18
+        },
+        {
+          "event_id": "evt1_U1xKqKmtUub066bupI54Xw4536ZVouRZtHM6U6A0lPg",
+          "import_index": 20,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 19
+        },
+        {
+          "event_id": "evt1_VO43If7XgV5TRehiWRtNh6EejbnULExM4RHdGntXQLo",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 20
+        },
+        {
+          "event_id": "evt1_X-U1cIo7UXev8YNFMjw-sHdJZRSySuFYqpmiVp-fktI",
+          "import_index": 25,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 21
+        },
+        {
+          "event_id": "evt1__9XiqJvcmPuRTU85OwTNrO2O4otMC7b7gefZKItvmPo",
+          "import_index": 21,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 22
+        },
+        {
+          "event_id": "evt1_dcV0A7Z-BV9MV_-q0xNRPeM5KgQ6VZItlxfn3J671bA",
+          "import_index": 33,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 23
+        },
+        {
+          "event_id": "evt1_fxzKUIKclKwPnVoG3RnQRdmTQU4QQj1sd6Q2FngSaOo",
+          "import_index": 32,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 24
+        },
+        {
+          "event_id": "evt1_iF8j4CfmccxcHrOfmkQ1k6oF2ANkDDVvC9MOoybtUNs",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 25
+        },
+        {
+          "event_id": "evt1_m3dVRx7hu8RRjGpFabbE5DG2Raw5jFyoM25NApSMmsU",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 26
+        },
+        {
+          "event_id": "evt1_mlinhkgsmEzG7tYeewbfFYkjHgcJVjhQExP7oBt0xmo",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 27
+        },
+        {
+          "event_id": "evt1_motKLSG9ESUtVAp2Nqg8luIZ02CQvEOEHMV3EWjw2ik",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 28
+        },
+        {
+          "event_id": "evt1_ngaqHYQomrGmgZzkqpBOI3HKPPzeQVnCvkiKWPney2c",
+          "import_index": 19,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 29
+        },
+        {
+          "event_id": "evt1_rMSg2EvYyNt-FwZxxn07fqPNkg1_dpAmx6ZM2y0rCkk",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 30
+        },
+        {
+          "event_id": "evt1_s5PkorxjIzGeaav9PMVp6ke3JGr70R9Y-IWp4g09PhA",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 31
+        },
+        {
+          "event_id": "evt1_t-gHcXAReW2bK1oFLfcQvTtxrhACQkYzuBbQLo8i7u4",
+          "import_index": 34,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 32
+        },
+        {
+          "event_id": "evt1_vNyI1fam7EWNmfk9ayGAtPxz2kHEYKqFGFcrIRJU3Vw",
+          "import_index": 23,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 33
+        },
+        {
+          "event_id": "evt1_wGKxkcoe0GAyWcn0g_gCdIMiaADUf-n0OwNrqHD7TV0",
+          "import_index": 17,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 34
+        }
+      ],
+      "lexical_count": 35,
+      "prior_count": 0,
+      "session_hmac": "ba86015ea18db8b8c187ffdf7518b86af302222a26203fbd110061de523a5500",
+      "union_count": 35
+    },
+    {
+      "event_count": 9,
+      "events": [
+        {
+          "event_id": "evt1_UDfHkokpWO7b7Jx1OTDsQmSJkLLXd0565DDeImf_kgg",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_VIR0lPb8cLDltEVfBIPb-ZwSg6_uyND_Zsu4_s8iPnQ",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_X1IG7mhe_1_zUuJKCu66yTGyNcvb1Gyzl1TGyTkYATc",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_XDLDZuHDDgSKVG6a0g8omULvysMjgcVqeGbIHt-cNVU",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_csEwhAwySQS_0qCs6DD9vVNyLFPPbmYzRsNwXAltezA",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_n4JGC0cbSuQSYDecsv137jdTBtjBzAkJ-A2AYLwUlcU",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_t1fHbIn9DnefLFE5HyddDHutpdsTpv5RvIqLGGnSpdM",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_w3FM0dZ1EPZin5pwLDyxuHB1C21kZ1HBowTCEViP10E",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_xq52NTVlKFKOTJE6Znq9WJBaKslRcqdqZbz3panDfmQ",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        }
+      ],
+      "lexical_count": 9,
+      "prior_count": 0,
+      "session_hmac": "91818bdc6e9708ccd43d9c19d433817b12ddff5ef38ae32f4d9c989d9720d9c3",
+      "union_count": 9
+    },
+    {
+      "event_count": 13,
+      "events": [
+        {
+          "event_id": "evt1_16196WIK85QJMlcpuKd1SG2SLWJKos20ynMygH2rUqY",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_3tOJ1NyNmOgee5qIVJStcDVpX-sT7cOZLJNLpCbVjII",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_7vZCCvFjYLfr6AK63UUqEolRXQFnQz1_ds1_Sv5QqlM",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_ADikt7MRg9Cc9rfwJYzXapD86pS6R-SnJCBWQXzPCa0",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_ERUP6y-YLv_J4MG4uPvguT46RTy3ucPPymuw-tD8ONM",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_O3Rh4dZ7jBkyboq3ZUKYLY6KDqRqdzaKR5ETrAKN8jg",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_VtijJfnI_bXLpZyGSt8CjcH4XhVG_41_5dv2Yb0N0fo",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_YT0CA0ZsgBDTaToN5PbY-_rdWStatFNQMr_8UPY69gs",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_YeuPYXm-4qkHoMekf46h_45wCxLomc3EYEyNlqcArTk",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_fbDgdlU7LyEZgn_Kio0-ccGYud9p751nDZF7k7SFqzQ",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_hBXAexvvXIVNnhhSTLJaoCtiF4Omj3xIm1pMtEWAd5o",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_hg5IiME-nFTiBdPD6yvg49g_NojYJ9d0pCW2h_0LkmQ",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_u6ycuKEtyAbAYYF6wsoyziyBCFBh_GACzJqznqR2f0E",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        }
+      ],
+      "lexical_count": 13,
+      "prior_count": 0,
+      "session_hmac": "d98832d91ea5f31c26e7a06847dbfde71412ffab4acec75470035a0bdb640c2e",
+      "union_count": 13
+    },
+    {
+      "event_count": 25,
+      "events": [
+        {
+          "event_id": "evt1_2DW_MjI7eaIY9oRtCg3yz0lliiTA19vAriDWwzamDys",
+          "import_index": 23,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_4Bl76BG3XPs0iMjE7J0r5A22hJ_JquHomHFTb3x2QjA",
+          "import_index": 18,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_7ooOyvgotPiaB5pkunOgEVTss78rC2sV8GliLcJxK5s",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_9xkWs13-x69SVZXgBxWHpWvQoNmGDFOujOsXPFoiurs",
+          "import_index": 20,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_AhtCRM7bZPWTjTq_kZrgVg4R4p2t6KI0cCgmRAz09ds",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_BnxJlho4ICClEv2x_nffxYlKrkep9zRIF2zDcw8tHdM",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_E_6Pjo3TsKP7CwCyS9MhNuyDJOSKoL85zx0j2yLI-eI",
+          "import_index": 22,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_IKx40ry2q5s5ahM7TkcR2iht54ba0DQKJLTTN2Akn1o",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_ImvHvnFTxZgPZy9mrQ33dlFo330fKhcONQMSLdtfv0E",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_MfvbQByA0FP4wdx5huMk3po8S7UFCF6CeNbs3WR_08w",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_QsftFHNnDsqsjAOdq5Tia-qoUy9KDCk-vpb746xoEgk",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_YgTduPP3KUPl8JLS4LJtCsYxLVPnKJJwOucFHN4Kmig",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_eECR79CXQZUK98Yfy2mkAnWcTL2yomSAlrsZW5jWA_Y",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_gAsnLKQtmQa4JDR21bRb6qXS5qNQk8ndkoLZIC0iV2I",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_n0Ou1lEEBBqyuSbfgB9hXCVaSLgUh8tMzaAbTrGRC2Y",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_rMSxgDHeIzVnc4d30Up-eSWvINwQEyxSIhrm9B_W8jc",
+          "import_index": 24,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        },
+        {
+          "event_id": "evt1_wKSo7oMqNnYj5mygCZ67bY7xOL0yDFb8oQpgvyuge8Q",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 16
+        },
+        {
+          "event_id": "evt1_x9VvDbaA9SndhI_723XHCByBaG1moaQ8alOFo9dyjXk",
+          "import_index": 21,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 17
+        }
+      ],
+      "lexical_count": 18,
+      "prior_count": 0,
+      "session_hmac": "1ee9902284f0b71cb189fe49384397e461baf3cca6664838aefdb52e021d9aa3",
+      "union_count": 18
+    },
+    {
+      "event_count": 9,
+      "events": [
+        {
+          "event_id": "evt1_ZYDrFV1lGEQ28g8q6xhh-FftXzZHRZpwAuUPxLK0tLE",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1__i4ydCTnM8tihhWVCAS3FcIyayNV3_rqvwXnFGZyAbk",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_fhOkqMZk4ej9mVKQvP-tQ41R56bq2bo1MUjl06kjLsg",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_h6jZ1cm4uk9SNSRXJr-lfyb4_kmmB5_h5uDlbrnz9JM",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_k0Z6neFxgCFyNi5mX9oBFNO_XRctOrQ2shViaABVWqQ",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        }
+      ],
+      "lexical_count": 5,
+      "prior_count": 0,
+      "session_hmac": "7ea90104b59c3ed4fc21c047a16dc6388d2347402d7173b094b36b904c4d370f",
+      "union_count": 5
+    },
+    {
+      "event_count": 18,
+      "events": [
+        {
+          "event_id": "evt1_56V_vU-FGjR13bL32URBmuiaxw-sVmheQSpuUDX1fH8",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_DBSUQ_8h243bIvuvtJaeCHyvWCCTi0bzIbDNBUzHA80",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_DJ3mjOdGWuSbNcet4BX0T9Mgs6VMb00JHrcDNccpxL8",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_HbmEQHxJF-BX5xXb_NqbgJAyBT0jXLZphpzdb83buVw",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_LCeuy4QppizKyf6z8R__1hHxIXGkwr-HulEQVlWyD8A",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_Xl49qrm0_eAhXjNlYZhywXNYGp6UoC1XeuxIM9eTgR0",
+          "import_index": 17,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_ZhfVB9IuiBZrAcTif943WInhxUZMPXAmNuoubjkdO_A",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_dtgenAfP698hIW4-Gegyi08jf-KGNaN9lbSnGaf8vuM",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_lUvmhSy6svLnx-8-lLIp1EicW26vZkdjE0OF9vvfAIo",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_mi6QzW3fhl7f52FcRQEPKOwrhWsNRne1zcNOZL4yR_M",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_wyaunyQNbmfAVmUL0S0DmUrk5hR5U-zmKKG6X3CXM6E",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_yBSR5bu89jTPPHkLvwPnz4E45OFHLsSvF8xjVqBDKVY",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        }
+      ],
+      "lexical_count": 12,
+      "prior_count": 0,
+      "session_hmac": "ec909a1453ac0d51be11b162a1dbb8c414169e087e0fda0ace8db2f0d4fce788",
+      "union_count": 12
+    },
+    {
+      "event_count": 15,
+      "events": [
+        {
+          "event_id": "evt1_-3Affw2CohcitIch5i7EFF0B7w5WX-3QzuHipV9gOEM",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_8PjhQ7Kn5JL2WnaRjlLjQsH2gpFiZWl_zX1awyjkwMA",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_9OtxRGtGljXrNTOviurmoghG6hjiKHBITTrXXYU3tVs",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_Cm2_e0FpKkB_FGfI40h7UHdThlWIZqg6H_uRliZpl7g",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_DE8PpulYgXhw-MdcnrQBUAEMN2GROdr_hzAFqmDsqP0",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_Lo4i-1Z9iWft8F3xJYUN0bDO8zz4CWAEuB5VpccNkWI",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_SmmjmKXTHEuPkJp4OXTHXO8RYCBYbOxAf1giNW92mbI",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_U3vr9rWC0PbL46ZNlQ4XnR5QhU2InPfqelmWtr1DoL4",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1__OLwEWPz-jXiQLftk4fTNHcot_tkpHn6IBBRnGIBELY",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_bdPh1jrycnKG731khocF35mGmtBLglaKU7RuQPQtMzk",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_hfcGgWxV7dhWi99_UNUOjWdsAJ9qKj4fieQlkrCmFxs",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_iQmvx-VaY2SFzhqlOlzzqm9AUPkyQ4UU4PVMh2tpCKY",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_kGfzDcdDh1eR3xTCKwWSvLuYwjEePjKuP0wmA63R2o0",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_l5vYV4IkYoYTkraikUWxn4I_r7rB6QmMNZG73RTpyy4",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_pnv8NxmSVqMtQQCQk8XohDrxYOSerWH9ESdCqUVnLYE",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        }
+      ],
+      "lexical_count": 15,
+      "prior_count": 0,
+      "session_hmac": "14456f753da2e5bfe770b12b8e0c3788d6d5f859022ce37a51972d65ad4a4a5c",
+      "union_count": 15
+    },
+    {
+      "event_count": 36,
+      "events": [
+        {
+          "event_id": "evt1_0flpDnRNGPdQw-vxdHPlo1IcwbSbiEZg6zkQa77abQY",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_105IgUFg8_6Aaeja7T-584g-1enEiBo6ceqOqI1WUvs",
+          "import_index": 27,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_1Kk730tCpwtYUA6r7OnYh8q8oB46ZQTjJbdo1HLN5iw",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_28FQe4sxVimQHvQrmqHDbml35CzLzg66YirmTHK8bgg",
+          "import_index": 32,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_2ONrQta_8VNqu7iLmmOCSZvWRXUqEubhlXISqK9k0uY",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_5d0zob_mLoIALPJAEn2XhhUe5msnBbTlni_TPjUH68g",
+          "import_index": 19,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_7EGw09YO7XlgrkrznyZHVvzmXqcre9tOow3HXCxqBSk",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_7mBWeYTNHI11VMQodNc86k07QMSDciur_SpaJ6YJf58",
+          "import_index": 31,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_E1ggkm3E_zloVInoZAJWwHMGQyOutSadUxYyxkmSCe8",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_GdmGfMzbzFweO_UQwRO3zPiiagLZfnRHWHj9uMa1KeU",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_GwNFxx-9nL6ny508BEREXslvEhNpSsJB_XevHRLxbmg",
+          "import_index": 17,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_Js7BMBpfBOqK3Ao6MZgEahlsIYXP_a3PEVZFwrN7o3M",
+          "import_index": 21,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_PvITTRXCE5OV0bUuv7tOGFi5YhE6gWGh5KJs9BYuIr8",
+          "import_index": 33,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_RJdcydu9CEBXrgzaGPkukQe-2eCtQ-PcOH3qVxeCbDk",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_SlHn9BkDeCjONv4MgkZv_2MaOHcWODCe1md-v9bqybo",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_U5j3vQT2i3m248ek83awmlqShCRkGaXUu9hnrk5VOeM",
+          "import_index": 24,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        },
+        {
+          "event_id": "evt1_VKAygAaXrwcN_mi0TtqhcM1wBAMnVHqCcVkH6cIg8HI",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 16
+        },
+        {
+          "event_id": "evt1_VoymosEaJGCwtTToInX8f6kA2bI_9J_V2wT5oIn8vVA",
+          "import_index": 30,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 17
+        },
+        {
+          "event_id": "evt1_WgaXoCLKf4dDSgz5XZGXFu0XAOrR_kD7n5Bznh6QAyE",
+          "import_index": 28,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 18
+        },
+        {
+          "event_id": "evt1_XYl5y5_4W_-PNXYja6biPlpZpiaYQpW2euWYg_eLWyM",
+          "import_index": 23,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 19
+        },
+        {
+          "event_id": "evt1_YujyWRvs_-lu4s0uoG2KdKBQvvmM3sWU4wLm_BSiPpQ",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 20
+        },
+        {
+          "event_id": "evt1__0Wk8UYOFGfXjod1sCjrDnv4xHhosvr8HC8hc15cRF0",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 21
+        },
+        {
+          "event_id": "evt1_a_FdZnobtzpbJ-BKzOMxuZ_UhC34IdefvOKTgET9D9M",
+          "import_index": 25,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 22
+        },
+        {
+          "event_id": "evt1_aduIX1z_pAo9bdr3LCdzH1rcgTfxQBjdR2huQuvG5UM",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 23
+        },
+        {
+          "event_id": "evt1_caxTd9FBYngGKrg0ej8LaKyq7PRvZ4MwfFfZky15_zQ",
+          "import_index": 26,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 24
+        },
+        {
+          "event_id": "evt1_fQKhqO1tYBsISOrHQjiLkNk_iWaztvG_fzClzTBnqu0",
+          "import_index": 18,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 25
+        },
+        {
+          "event_id": "evt1_hyipfan6xyWhlVw9fJ0b7WjPKrIIDwVQA9sT37Kg2W0",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 26
+        },
+        {
+          "event_id": "evt1_jQjNLW716J67hKMGdSRzb7eu65hwGex8-A6TnojnV_M",
+          "import_index": 34,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 27
+        },
+        {
+          "event_id": "evt1_k5KZumwYc07taSjsh17ZSgEoDwqFBL_zs_uPEVt2hww",
+          "import_index": 20,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 28
+        },
+        {
+          "event_id": "evt1_kuNEFeEol-0OFvs44HmDksBIE86IuSsktUVMVWIz3Vg",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 29
+        },
+        {
+          "event_id": "evt1_lC8DdiVQRujTVI1DbaWknCVShHnRTV1-c4AWHOO3lAA",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 30
+        },
+        {
+          "event_id": "evt1_qYoLes2Vsv2tdYQifB-6SAVxqSvE6_F9RWO-Bxx4HGo",
+          "import_index": 35,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 31
+        },
+        {
+          "event_id": "evt1_qyf2gJ_Az41Pl8e9UUVg8zjhG6drpBS4t-pFlpTxRD0",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 32
+        },
+        {
+          "event_id": "evt1_rX13umLu-NcPHiEsQqRn0iMHbsGn-hPDgK6BFXZjMX8",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 33
+        },
+        {
+          "event_id": "evt1_t4kbHNy73b5lXfzu33KFmKV6gm1sEuHbzRM5a0qbmbU",
+          "import_index": 29,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 34
+        },
+        {
+          "event_id": "evt1_yAmeI0i88juvi1xJee6_e1ZVRpoqZc3KXiTWACWyr44",
+          "import_index": 22,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 35
+        }
+      ],
+      "lexical_count": 36,
+      "prior_count": 0,
+      "session_hmac": "6c93c25f9651f6f15b8dc0d46163def3035c89a249a9140ea9502e34d6e5c0f9",
+      "union_count": 36
+    },
+    {
+      "event_count": 50,
+      "events": [
+        {
+          "event_id": "evt1_2x7By1jAFMJfEFMqSYoervOptAn2EoZLfY8V3uV38Dk",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_3a2RNqHBgLDN_gpkMMRs_WQJF5jIJjkmKow6z8-LY0Q",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_5Mrm4YIWZgjC3VuDKhBKCrRQ9GI4NfX3UOIj_dai7T8",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_7W_ZkFikLXxGeEAhyj81nQ9g0XWyNoybIy8B-ZRdulY",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_8h5YLbMEc0pn-p0uojzN-0Bke1okuh9QxaqS-yiuI40",
+          "import_index": 36,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_DRCaQpJY0mG85LYVYmi8fZqBLnogwuDs20pNkEbGrYo",
+          "import_index": 41,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_DX6B-_oYgmSDDx_pCQA8qqn3a7gw5Tdr-Iw9CV0fRGg",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_E5hrnZG2JpVRvtI7uBzzBTSihb6KXcG-NOJpN7gd_RA",
+          "import_index": 42,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_EgMhaIw9DZJ3vIn72hx5MogQjxDEqE7DcVz57EV-DKU",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_Fb8V2klfDVYkeZb-vajjEfarADg8dPGq6TkEFkk3fSg",
+          "import_index": 35,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_JP5e3id-OUWTwNmgpDhLUorZVHMTPHk_8OrBVa9Y9eU",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_JVzKItjTf6BdcWQFvwjNV-g9FmtenYTKWX1TTTrzIR0",
+          "import_index": 37,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_L463uvjcIABODMCxsS36FdvlIG4C-Z1TnGvw00MsXCk",
+          "import_index": 47,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_LGbHo0ljPNxusW9pd0cgwgj9XUMDNViK3V27y53jubU",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_NOdB6HdRC4wA6fajNAi3A7eYGpXV9mXdeVxlFZr7rEQ",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_P9sztuXKR6w7MX_B624S-eyb2yyYv_EcpPmz-qSEz08",
+          "import_index": 40,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        },
+        {
+          "event_id": "evt1_QlnmvC-FBOPJ5vZamSTCcXVF3YYe0__sbLYji7Y1ghY",
+          "import_index": 43,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 16
+        },
+        {
+          "event_id": "evt1_SUoI_29qxpMAXTxYMl2enE-jd6fOFPbAWoUWxR5_vW8",
+          "import_index": 33,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 17
+        },
+        {
+          "event_id": "evt1_SmsqbfB6eCTnHeHrACGRXeX_IBXlvzeiQIBydv2otps",
+          "import_index": 48,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 18
+        },
+        {
+          "event_id": "evt1_TiVmG0nZo_2w2tLQEkgCGUpN1gIKJqVdfKPUeBI8K6U",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 19
+        },
+        {
+          "event_id": "evt1_Uihi9294_9VGT2J4R6D78gh0XXCLuSKcNjIiVoNOzRQ",
+          "import_index": 21,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 20
+        },
+        {
+          "event_id": "evt1_WcpjS4lGim9pqB68R_CmUTJ4tdBmOgbAtZUbC3p2YUE",
+          "import_index": 49,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 21
+        },
+        {
+          "event_id": "evt1__Hy51eDdRTBVcD7cm_Ba002Tb3ybk37zjf9rqmdbVvQ",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 22
+        },
+        {
+          "event_id": "evt1_cQiss3fSKDPzb-WXgr33dGnKNQL-2BYhKyM4NE8rpZY",
+          "import_index": 45,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 23
+        },
+        {
+          "event_id": "evt1_cfWA2Yj1AzaW5X-ElW3cMQzw6uszMtAeHakzHyvc7wk",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 24
+        },
+        {
+          "event_id": "evt1_d2xzdEJ16wh4iaKV2ifToiHS5eLkrArojsJyxfBIyvk",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 25
+        },
+        {
+          "event_id": "evt1_eGlp9dDB9VDD94UlfujMZy04nWRKUwL80yukl-Da8Jw",
+          "import_index": 24,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 26
+        },
+        {
+          "event_id": "evt1_fC7WA1aV8YVj7wXBJVNuzX1wui7J8NDOEx4fGJX4k50",
+          "import_index": 29,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 27
+        },
+        {
+          "event_id": "evt1_fgRZPEfdEtIen56zeBij0y3M4VdZKQ2rOSqnUNhZaeg",
+          "import_index": 38,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 28
+        },
+        {
+          "event_id": "evt1_fnIjgOE91eb4ef3Qc9V7g5IacRCOAB3J_MAYgZKnRtM",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 29
+        },
+        {
+          "event_id": "evt1_hxqd8so2XWPNrhVUBnlGT3HAM8VqVsVY0_D1pVBRLh4",
+          "import_index": 44,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 30
+        },
+        {
+          "event_id": "evt1_jv9Q4NEkU9upqcQlLXWV5m3G42nUzsxBxWXAljQIFtA",
+          "import_index": 19,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 31
+        },
+        {
+          "event_id": "evt1_kXRrRSaqgv7OZxiHXfspZfqiltbO94GyXy5hIixl8f8",
+          "import_index": 17,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 32
+        },
+        {
+          "event_id": "evt1_lFNmZDgn4tSJaVUUgHzxCRNPicsvn5vxmpydaIdJhME",
+          "import_index": 46,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 33
+        },
+        {
+          "event_id": "evt1_mD3fGq9XW_eSPIRMI-E2E3NOLFXHYWpOGCDxTEEbgkc",
+          "import_index": 27,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 34
+        },
+        {
+          "event_id": "evt1_mHRpYnHk1wmA9aX9iPHMQEqhUsPd_agzqD-f3RgpR_k",
+          "import_index": 34,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 35
+        },
+        {
+          "event_id": "evt1_qRz64JjKOoLF4oVdoKH8N8MjczTzCVz_IUOq8Zy8jXU",
+          "import_index": 30,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 36
+        },
+        {
+          "event_id": "evt1_s34INqeYivVS7k5sbDHFGKPqU9TdJ53GRMMgggxe82k",
+          "import_index": 20,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 37
+        },
+        {
+          "event_id": "evt1_suqfOKsO2a8Hk70NnOVKWoIYj8vyazMEjwMq5zJPHtA",
+          "import_index": 18,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 38
+        },
+        {
+          "event_id": "evt1_um8Bdz2aVKb2UIPIdgCPw7WpxiClxVGFNvKAG-ZMYzY",
+          "import_index": 22,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 39
+        },
+        {
+          "event_id": "evt1_v3-WE9W7Fql6rKY4Z-L5US8VIBz3PWQXAT3jx5xz0go",
+          "import_index": 25,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 40
+        },
+        {
+          "event_id": "evt1_v75KtkMFMK7KZPEghy2g0yYpWEDkMKkGzxiDb5gHtwA",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 41
+        },
+        {
+          "event_id": "evt1_w2YIW9EqPSM1m05MbjAq1RDl4jcdj2ioSrP3rXjI738",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 42
+        },
+        {
+          "event_id": "evt1_wXSkp06igXTyJAMVVSyCts4AkIJpOiWO4WAIGEMeLeE",
+          "import_index": 39,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 43
+        },
+        {
+          "event_id": "evt1_wZKse3914ZeHB3ggwPUqhQMKcHviASBmZoFlmOjwO0Q",
+          "import_index": 32,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 44
+        },
+        {
+          "event_id": "evt1_wm5BZjVLgn9rX9Fw9OH1pLZjmS-2CfUKq5q3_aYBGsc",
+          "import_index": 26,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 45
+        },
+        {
+          "event_id": "evt1_xE70mnp_hUYmVjdITkWrTldLctfodon75YVhwGDkLhY",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 46
+        },
+        {
+          "event_id": "evt1_xGFIY1erPj-6T2o0SK3EDd4QYzrbUYcFa5e4NNktM2U",
+          "import_index": 23,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 47
+        },
+        {
+          "event_id": "evt1_xwz2ARwIs-esv1J3Fpd50VmPhY9YaiZ2QFtF_IpDgTM",
+          "import_index": 28,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 48
+        },
+        {
+          "event_id": "evt1_zGEx5sAG_U1wGefTYwfyNeOwGRkmOiolSWrcE0NZh_k",
+          "import_index": 31,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 49
+        }
+      ],
+      "lexical_count": 50,
+      "prior_count": 0,
+      "session_hmac": "ace6cd53251e89ae383a8655ec0ae07b9981352dd054eb49de98205bea61137a",
+      "union_count": 50
+    },
+    {
+      "event_count": 30,
+      "events": [
+        {
+          "event_id": "evt1_19Vm70KUQITYolfGlrSI5rdtp1sW6UBD3yvIAouOuWM",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_BgX3_aJ_n4DNM2scIBLlFVoBuZEN87Mp9M-loDcFCW0",
+          "import_index": 24,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_DSuxxuPN5Jho58OVG1bpuTpU52Po_t9pAUKI7XkTuI4",
+          "import_index": 23,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_FHe828ZCI-tNf6REEUSQvk0pkNZXqgMji0mmZLZmEkY",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_HDjAahnvLVq4d29mJ8n3tZie8YhZSPE8F9DMws5SuxQ",
+          "import_index": 19,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_IM8YlYgU0uF-GdLMBXBjuN4avwfYuuwc6HGI-QqvaqQ",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_InS0nthH8fKdWhqPZ8Cu6mX9eewqY5rl2wdFh7-o1B8",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_Lj1PCCp0XLTUH-mdd3DAcpbZsL10B-up8z50GSQ0vf0",
+          "import_index": 26,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_PrRsfKIVWrGTdwnxmrYXNlRIfJEnHV3ZdBAn6oQm8Gk",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_Rq8HXyR9tsd3k7d0yQO_gnH4WK_gPjQg0TNvW0LN4ek",
+          "import_index": 22,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_UmC8vJYgLajHoxwUnW_j4uY2s_01O0fHywnjhRxyTGQ",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_YIdQ9ryrbekaeN3bYB6Qi-aqxC1Jxs1q9DVkqNtybLQ",
+          "import_index": 17,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1__wVN67u6ZUsnxLMJ9PA9NsotCrVT0cXA7H-eGX92LHg",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_a6tXylFcug41VLZpaDHv01uxycnawCAC27xqt5rZV_8",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_aYl9SK9PGpcXRtEbJYB5WNL7DZFrD_DeapC8qcJo1Mg",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_bv_USJiWZQb1N6wzViQMDUZEp7gykoUU_s_92P21VEU",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        },
+        {
+          "event_id": "evt1_eeY9PlXO_MbCDWJrJWqRxVDYxqGaLxFNY_qQv2VgjfQ",
+          "import_index": 27,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 16
+        },
+        {
+          "event_id": "evt1_fCxwzyHhD3XGvnI8AYJEygVIl41UnyDRPE66lO5GxEE",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 17
+        },
+        {
+          "event_id": "evt1_gNxqDuvCYVKFT8SPhZv7TDYC9YpG7hMiAKYzXyeGMpY",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 18
+        },
+        {
+          "event_id": "evt1_l8gxyHF_h6QjK2L2M3WxrD7qc-suLwGnQBzE5MJB7Z4",
+          "import_index": 28,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 19
+        },
+        {
+          "event_id": "evt1_n1Sn4w7WzG1EBpmCask_ss2AQjMHlLXJ-TUfPd70HPI",
+          "import_index": 29,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 20
+        },
+        {
+          "event_id": "evt1_nhE8If_dII0z2j-I2JKY5yQrk2EwbClBI-Q-eKQIulg",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 21
+        },
+        {
+          "event_id": "evt1_oVxnhxad8V4Pm38w6pcfMH4xehu3FWdcPPjTXpXQ6k4",
+          "import_index": 25,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 22
+        },
+        {
+          "event_id": "evt1_qfdtfkq-XPt2hrpH0LRrf5G7WcgtLugs0OBfZpizk30",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 23
+        },
+        {
+          "event_id": "evt1_qrPTejdJHiQ6zSj6b6uqjCCGX4vXS5aQD1fPPU5L2OU",
+          "import_index": 20,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 24
+        },
+        {
+          "event_id": "evt1_tBd6P76un25pPotb-rR1DaWgaNoACgOjWkWk3IyEi5o",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 25
+        },
+        {
+          "event_id": "evt1_vTmUrE-DY0BYVEBjs_6mwvifBwVSm9FzKJBLkb_dQnE",
+          "import_index": 21,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 26
+        },
+        {
+          "event_id": "evt1_xx9JpXiH9pX7LeHUT4mUZfrnGWJpi9_NxB0S7lgSsU4",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 27
+        },
+        {
+          "event_id": "evt1_y-t9XlE4yoa5pJwwBa7PphmQoHwFHJBMdssL_Eysv2w",
+          "import_index": 18,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 28
+        },
+        {
+          "event_id": "evt1_zxf9SmH71VQGxtFRj0sohIemut3J1XP_8JckLyOT99Q",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 29
+        }
+      ],
+      "lexical_count": 30,
+      "prior_count": 0,
+      "session_hmac": "b0760839c313b7a486a52fc95f2b1121e3a1faad3210b2cdea846d6d4bb5a602",
+      "union_count": 30
+    },
+    {
+      "event_count": 21,
+      "events": [
+        {
+          "event_id": "evt1_3UYUu0a8PF2TtpdGSrjKQmATbX1nD84s3-vCpTO1k7M",
+          "import_index": 19,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_3f7RKC9Kcwc3Eo5-420Im9ZPmjH9UGbMf--1BVi6e5s",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_5mlJAF-4jtdjBBHbFvEq8pg-bDBUrSxUz8M56kxFMx0",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_6St_G3rHrXpVVsUQCtk9eAiQ7idOVraUDQlF9Lzal3c",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_DYVSveQflWSvxTi8wMoO2ef2D4JZFdvqCdUDO5Awd0Y",
+          "import_index": 20,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_FRa4CAvUbNqEKyUlhf6KUd-WXtG8OsdScAI8xtU9Hmk",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_Hxn92_5rYTOkvtQfNoJT2QccvVffN3KK1C5rplvqSY0",
+          "import_index": 18,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_TOFIAyVUJcbJlFqlnipfkJ2WkFmcxPGbVzbOwNlRiAI",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_TaK8lfog-tKHy1tkyoDJg4RIoQebANmv5R0E3ToYKKs",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_U3TFXSyivSQ-V3NQhZLVWgyPkVl0En888vSwYmjUz60",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_Z5wWQrdT5AWeYmx3xA14f9KnHVsdEAX_ghBfT5qZLEc",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_joPfPhk7dGJS7KaJAdmCc084FUHf-pBvQ_txaVXMey4",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_mWC6zriy3ioUu7UCVXq-RrkOxli5G640yAwfIlKbwjQ",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_nD0XYOnDq3QFIaE0_OCB6CiPAvfexjkW2oKL20P7qiE",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_rKc0hbAkcRm18qzdPlCK_L2OMJbE4KAqJEJN9AyT-Zo",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_tGyjoQNCd8TJ4Ky6VNbqbKQ7ydVeOpH5H1ewZhsaER8",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        },
+        {
+          "event_id": "evt1_uGo6mSxXkiPjvEjAu7eLoOpe97dPAt5FXwcNgo0FyeA",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 16
+        },
+        {
+          "event_id": "evt1_utQsyOqbpHWf4A1UkuYjGk8SfLLxHKdObDvSr4KtZTE",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 17
+        },
+        {
+          "event_id": "evt1_vVvLjD35WtI_SHcWxX5uxAvgHsT_ZENlSyDprdRfkds",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 18
+        },
+        {
+          "event_id": "evt1_yn8m221LngwI36p6c5xiG29UnF4Hx312V5vNGmugA-A",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 19
+        },
+        {
+          "event_id": "evt1_zn_MpIsama6xXO1TDSx-9tdxHHbxfsWYXZLHZ6mkBok",
+          "import_index": 17,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 20
+        }
+      ],
+      "lexical_count": 21,
+      "prior_count": 0,
+      "session_hmac": "2e1ea483222d3fb4cbfca1b310e4df21cf1c07a39884b395b9afe0eff8aa02e7",
+      "union_count": 21
+    },
+    {
+      "event_count": 17,
+      "events": [
+        {
+          "event_id": "evt1_1pQhZkKIo51R-lpCu0Zr8Z2929MYk5tORCRwttnkqXY",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_5FfsZRA5T6x-GBc54uvlUgy8EypezyG_pGZmZlj3pkE",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_5ZFu8Wa7t6evrEb1doxIQwmhlK_BpvBykc8lzioURjw",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_BH5GgBXrPSOASEcHfvW07A09YLfeUDeLrBQ1z5axFJA",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_Fdq4P5VXsqcPaqKfM8GJ656bqVUttzk1mA01_gS_YVM",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_Fk2RWZlmMPEJ7K204rbxXQF-JwcMJSzkx8YqBXdI4hQ",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_FyH9JrUcS_VHtUsGKNV2q84f-I2Bs4T79AdxeNaspjM",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_KWp8sBlQer1iL0YmQF6xFPh81wxh-xvm2j_PcTnigrY",
+          "import_index": 14,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_Nx666fnabi0e04WC9KSLOl-_gT6VkGtqD-ci5bdXPL8",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_O58CeBhV5qW5X25Aj4qNHnzy3XaMdjvPUU7UnFPAA-Y",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_UkJEv_C6tSmzrcSVFcJHO-_l8W-AF98-kjRXmjyKG7Y",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_msTzXNrVfngUfeU1onPd2sP-B2p9WvDU66htLziCMl8",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_p7h1utp7UV42AENJkYJ944iVs5IwIJHFVBHIa2ZRUbg",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_qFfbT_As3XtPsw-o2Huw9P80dplrrkJZs0KQHpaXgco",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_wIbav3y00Y0JNrA-YpCCxJLb0SXU23s0BnSwkyC35BE",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_xf8GuwEci8eS_LO87bTYV5kSeah1umtw6phlIJyi0EY",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        }
+      ],
+      "lexical_count": 16,
+      "prior_count": 0,
+      "session_hmac": "6dfc224fa4d6b4f20e1e35d0ca3e38c949c775d3dbd4c178c77867016922b133",
+      "union_count": 16
+    },
+    {
+      "event_count": 52,
+      "events": [
+        {
+          "event_id": "evt1_-8_rYmdWSvfv5hSAgbFYU55j1sSST0x63H2p01NZOns",
+          "import_index": 38,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_-EdQTQ-Hy3jMbgBk1F11MKgifUARe5BaqqQ3qq7Qeg4",
+          "import_index": 34,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_2VVPusRPv5I_ukHZZLz9Kd-o8YrSRUv8HL-dSGX_m1k",
+          "import_index": 51,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_4T3f-9LT3Zq1iTHYegBBco4LhF9H6FvE6yFppSPfxAY",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_4YPII3qlgtsjRHMaRkdgri1JnvR_eHSHeWwxbPQqr2E",
+          "import_index": 42,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_5NQOuZEXsPjkNEqK8X0RdkJXVB2iuNRcuLaWo0T9Ka8",
+          "import_index": 17,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_5lPu8UZZdXroEOFM9ztMrKR--DX0X-zt_1Nryk5KVlo",
+          "import_index": 30,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_71n5ymFa-4NjGvho-k8L8NBpVvDWCwTTYCntvGThJAw",
+          "import_index": 24,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_7EyhXtaREP4_uGxJcHk3ASHpTgZNyRklSufqp7m9jmc",
+          "import_index": 18,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_9wX80lOat6sN5UAFKvKZMdTHoUYS1z9osRmVOuQSwn0",
+          "import_index": 47,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_FTraRGvMqRXi3j6sfkNAZqVu-nEQmxIVxdJbw234gpU",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        },
+        {
+          "event_id": "evt1_GDGfxbGogh281dTzKT9Nv2UuhEzSH4Bzs-BiX39G5Rg",
+          "import_index": 45,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 11
+        },
+        {
+          "event_id": "evt1_GSj3gZpoeTr4yb_NqZ3BOoeXJkK-jQtWoF4tYJpfNoY",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 12
+        },
+        {
+          "event_id": "evt1_JIhSJN_2qzRMn9v7uKc7B8y2nOaKS5nO7LDRVxh5boI",
+          "import_index": 33,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 13
+        },
+        {
+          "event_id": "evt1_K-H6o27_ixd-0H9g5sZQgcbFlbpcq_ZD9Xl_qN_3i8c",
+          "import_index": 46,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 14
+        },
+        {
+          "event_id": "evt1_KaWRPZhGPL6HwRJsHshQwHmItcIWH7ZWCloWoGZA9Ug",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 15
+        },
+        {
+          "event_id": "evt1_KsjpRCUxUFCGFbiqj7e5-jg6geATo6whjhNX98afUtc",
+          "import_index": 10,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 16
+        },
+        {
+          "event_id": "evt1_NZplzMvHmEGcRcpj67OK5YftfFBZB1L6Mlp5OjI6OOY",
+          "import_index": 27,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 17
+        },
+        {
+          "event_id": "evt1_NxpwBBo81rPvwhpDvevgmwIXoze-4jp1MEkmuRWw2J0",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 18
+        },
+        {
+          "event_id": "evt1_OC8pZbdYJ_sjjQ275l_iMZWW3-y-y_4M1aA06Zzyvrw",
+          "import_index": 32,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 19
+        },
+        {
+          "event_id": "evt1_Q0Rej3WrnPFyV--SzXF3riHrPOx6n2SBUpT6tD55dX4",
+          "import_index": 26,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 20
+        },
+        {
+          "event_id": "evt1_QL9AB1mpnc-KV6jh-KSA7XZKLwm2t5-IsbCTRpUXywQ",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 21
+        },
+        {
+          "event_id": "evt1_UKS8H6C7geGEce6T0_E6VKVZNNzuMMVoZJ_FBfji86I",
+          "import_index": 37,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 22
+        },
+        {
+          "event_id": "evt1_VXhQX4PSm90wSaVzhYGvyi6bjf5RvO4v7x8zDlvhCCI",
+          "import_index": 22,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 23
+        },
+        {
+          "event_id": "evt1_WDm0IOqnD_ZEOb7Qx2LkK9mVUkiBOw78o7mHLBmrJ-0",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 24
+        },
+        {
+          "event_id": "evt1_YoImxO5HeWExznh7fvo0m5Qc5wC_RbM2F8uoIhn8gN8",
+          "import_index": 49,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 25
+        },
+        {
+          "event_id": "evt1_a0hxrBeUAWtpErKzVLuK9LJ5smbc6RGyiynh2NtxJCs",
+          "import_index": 29,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 26
+        },
+        {
+          "event_id": "evt1_aWKi155Q-ILSfIlG1cvdetq9ktE-4j8RCNpoYFtjpkI",
+          "import_index": 23,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 27
+        },
+        {
+          "event_id": "evt1_bSI2iEDpnC-Z5VJt01hwMmSmNu9Wxzw97KneiHI9ewk",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 28
+        },
+        {
+          "event_id": "evt1_bjBIsP6EaEfqxLoNHGd6AcIslUw530UGqnAgsOkyyg4",
+          "import_index": 36,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 29
+        },
+        {
+          "event_id": "evt1_br3ruE6yAjseegof0DZOxx0jvLNA0W-dieK2yPeAkqc",
+          "import_index": 31,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 30
+        },
+        {
+          "event_id": "evt1_dXFlk0LGpTNj_j9USix0PbW_AMII7Is8gTAclCgV28w",
+          "import_index": 13,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 31
+        },
+        {
+          "event_id": "evt1_dgvuAaPKCs6s-QfuMElfDAb7kQfcb4K-TYUlBpt_byI",
+          "import_index": 41,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 32
+        },
+        {
+          "event_id": "evt1_e9dNaM0hvGpvpAFWYfuhhTK_O5wm2gCo-aQwaGjIb_0",
+          "import_index": 40,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 33
+        },
+        {
+          "event_id": "evt1_gKbCF4wcEZyIWy31IhsCPaN4fwQP-a0dISmUU2OWuuI",
+          "import_index": 19,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 34
+        },
+        {
+          "event_id": "evt1_loSHIPFuvbgIvCnk6v5NU5VAyIana8_4F19f463H_qk",
+          "import_index": 25,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 35
+        },
+        {
+          "event_id": "evt1_pAN3gB-BVcZEJdtPOaRl2EyQs6lTlaZXZOmeNQuUNK8",
+          "import_index": 50,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 36
+        },
+        {
+          "event_id": "evt1_pN9PZn0q0V170xzep3ypNgdBKTmO0PQTXNqBBijhxaA",
+          "import_index": 44,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 37
+        },
+        {
+          "event_id": "evt1_qMm0lgkadqBFghkJLK6Q6rie-kkrItth0mJiNEgUmSk",
+          "import_index": 43,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 38
+        },
+        {
+          "event_id": "evt1_rCSxyhwy5NZN1MIGVhZiJbM69iU_6q3ppbzKDy8x7vw",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 39
+        },
+        {
+          "event_id": "evt1_teQ-F4aiqubobx-FMt_tHEy4qDZSYI0pn0cPtwhWK0Q",
+          "import_index": 16,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 40
+        },
+        {
+          "event_id": "evt1_u2PKncIqQrXbbmRx4koSVwB2lcCo5-Woi4CKZgCt4AE",
+          "import_index": 15,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 41
+        },
+        {
+          "event_id": "evt1_uWuCZQ7ZHfRe1yKEyBYWHj_79H4JzBdPPMelkzjqcWY",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 42
+        },
+        {
+          "event_id": "evt1_uvv5oU55RFhm1iWYtjWhldlSoYPlGhf7j3z0NoYl7Qo",
+          "import_index": 35,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 43
+        },
+        {
+          "event_id": "evt1_vafTO-p1ntO5lz2wvalXrQfsJbYNEWWYsKF01aiOWYM",
+          "import_index": 20,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 44
+        },
+        {
+          "event_id": "evt1_w5saWUzM477gn84V4b1yFYAyqhR2RJMRD1IG8h5O6yI",
+          "import_index": 28,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 45
+        },
+        {
+          "event_id": "evt1_y3uFoWkerRD2LjothFBdGz8XxcHbD6k-z7Jlyzp35sU",
+          "import_index": 39,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 46
+        }
+      ],
+      "lexical_count": 47,
+      "prior_count": 0,
+      "session_hmac": "907ffba1b32dcc592a383b35a8d713f0b8d02487fe355928cb2ad0eeea63178c",
+      "union_count": 47
+    },
+    {
+      "event_count": 13,
+      "events": [
+        {
+          "event_id": "evt1_RullpXXlS68ZcbuinwP_RumGQ_7J9wzLqeI5Yko5PgA",
+          "import_index": 11,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_WXCpXdVFuugGZ93bGnfIml887sW8jptCNCwk1xL6LDA",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_ZI3Fx3bQ4t0WUknrGwLcYSjYgyAYPtwj6rDDu5gZXYk",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1__1VRtnNCvrHDs_bR5S0G1Bag5SH0XJDV6sn6UsyJeT8",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_csH8nEEVqKB9vNDToexB3MngJ6aVpQiQUX790r8YhP8",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_d0uIICMeW_Ph0FqRkIY29yLChxMt-uC1BPApcywCXdI",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_fN20QkPXTN-QoEme0AilOQnZETJeP01hRF8oww_XOFA",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_i7Rib9MdKF76JP8ZxgtJWeAgW2ZdhORXIIB7gui7m8I",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_ipirJ9bWQ0_1aUewSiHuKq0NmDZb3NpHooJa3IbgByc",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_swN9l5e1D3OOvlbTiDhKURi8j2JN1UH4CqHVBJBJmzU",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        },
+        {
+          "event_id": "evt1_w-wxlTTPDzlD5SCnku2pvU0DgUgSHzvWpiR4s0niu84",
+          "import_index": 12,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 10
+        }
+      ],
+      "lexical_count": 11,
+      "prior_count": 0,
+      "session_hmac": "a8a6e980ccc4cf1a4729fd8c99af1ced4c220ea4260971eef8564d437c5ce08e",
+      "union_count": 11
+    },
+    {
+      "event_count": 10,
+      "events": [
+        {
+          "event_id": "evt1_1IsEycm40Er_oQq3rskX4Cliid6oqUzRuo8-eWyXG_w",
+          "import_index": 9,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 0
+        },
+        {
+          "event_id": "evt1_3lfJbbOMqSsPpYu6MRDTLvS-9DnjXurs37aS0vSBnNc",
+          "import_index": 6,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 1
+        },
+        {
+          "event_id": "evt1_6bt0t76MBUB1GnSQAKmiarBXWFeohcMO1VHQo24TwTA",
+          "import_index": 3,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 2
+        },
+        {
+          "event_id": "evt1_AZVkfbXE0MWdAwwy6HcMddzhoJCpCWz9MZONZK0jOyE",
+          "import_index": 7,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 3
+        },
+        {
+          "event_id": "evt1_H2DHkwLbwGF12X65z1XlWOZePu4oHmRTU8guJCD8rig",
+          "import_index": 2,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 4
+        },
+        {
+          "event_id": "evt1_bN7Ys8At5J1nDWzcK-4GDjO08zPq9_MnmYQyHm6Ni7o",
+          "import_index": 5,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 5
+        },
+        {
+          "event_id": "evt1_yDGL9uLmj8c-jD6gIQgI2rf5gxuLBXisqent6v0TSDo",
+          "import_index": 4,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 6
+        },
+        {
+          "event_id": "evt1_ymJBjUpyF0uxUc2lWvBASPlmvhmvLWyv1qlbJ4MQ_wQ",
+          "import_index": 1,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 7
+        },
+        {
+          "event_id": "evt1_ymg7Bt8TcuDnRp3K405yW_M8XAQ-Mop_M1L33ohfINI",
+          "import_index": 0,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 8
+        },
+        {
+          "event_id": "evt1_zEtOdvlkaMhGQtFuLqfhp6yFQdW_JkVWvS7ELqWTM6Y",
+          "import_index": 8,
+          "in_lexical": true,
+          "in_prior": false,
+          "union_rank": 9
+        }
+      ],
+      "lexical_count": 10,
+      "prior_count": 0,
+      "session_hmac": "e636a317858b3bce52c5585f8b00c4de8c912ac4be748b20632ec90c0329988e",
+      "union_count": 10
+    }
+  ]
+}
