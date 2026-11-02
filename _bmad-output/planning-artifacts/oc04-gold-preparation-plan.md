@@ -111,6 +111,33 @@ The frozen prereg value, quoted VERBATIM from `p1-prereg-config.json`: `"score_n
 
 ## 12. Change log
 
+### v5.5 (2026-11-02, §5 amendment — annotator composition & consensus protocol)
+Founder approval: Discord msgs `1560643912371146913`,
+`1566764000182673452`. Amends §5-2 under its own escape clause
+(founder-approved amendment + fresh reliability measurement on the
+affected subset):
+
+- Four blind LLM annotations of all 344 pilot events: A′ (GLM),
+  A″ (gpt-6.1-sol, frozen dispatcher prompt), B (gpt-5.6-sol),
+  C (deepseek-chat). Founder audited only the top-4
+  highest-disagreement sessions as readable dossiers (44
+  overrides) and waived all further human adjudication (review
+  budget).
+- Gold label per event = founder override > 3-of-4 cross-family
+  majority. 2-2/no-majority events in unaudited sessions are
+  EXCLUDED fail-closed (37/344).
+- Pilot κ (frozen §5.3 tool): A↔B PASS (binary 0.7502, 5-label
+  0.6881, PA required 0.925, PA supporting 0.665); A↔C FAIL on
+  PA(supporting)=0.4704. Disposition: C demoted to reference-only
+  (degenerate tail distribution: dead_end=0 across 344); the §5.3
+  full-relabel consequence is waived by founder and recorded as a
+  deviation. Evidence:
+  `../verification-artifacts/oc04-pilot-kappa-2026-11-02.md`;
+  corpus `oc04-gold/labels.jsonl` (307 events).
+- Claim discipline: the corpus is **human-audited cross-family
+  consensus gold**, not human gold; P3-GO evidence must use that
+  wording.
+
 ### v5.3 → v5.4 (2026-09-06, §3 stratum redefinition — PRE-LABEL, §2.4 clean)
 - **FOUNDER APPROVAL (2026-09-06, Discord msg 1545922919769702450 "승인")**: v5.4 frozen — stratum redefinition, 2 disclosed SHORT strata (low 5, unterminated 1 families), family round-robin draw, family-majority stratum rule, corpus 192 + pilot 16 manifests, determinism/privacy verification PASS. Commit/push authorized.
 - **Trigger**: founder instruction "A 진행해" (Discord trigger 1545907950256660561) to execute Option A (stratum redefinition) from the 2026-09-05 pilot-start report (@session:default/20260905_125816_0ee16c84, msg 1545835456298505) — the frozen v5.3 cost-based strata were found to have ZERO separating power in the real sampling frame.

@@ -218,3 +218,67 @@ changing the gate.
 2. Author the detailed OC-01 implementation spec and test matrix.
 3. In parallel, author and hash the P1 human-gold preregistration before P2
    implementation or test-label inspection.
+
+## 9. Execution status (2026-10-16)
+
+Progress record added under founder direction (Discord message
+`1560643912371146913`). Commit pointers are completion evidence anchors,
+not new claims.
+
+- **P0 — PASSED** 2026-08-21 (D-C-00…D-C-10 approved).
+- **P1 — OC-01 COMPLETE** 2026-08: spec frozen (`0cf192b`), ledger and
+  vectors landed through `36fb0bc`; preregistration frozen before P2.
+- **P2 — OC-02 + positive OC-03 prior COMPLETE** 2026-08: attribution
+  (`c8086f9`…`563b86e`), prior schema + entity graph
+  (`5da489a`…`5d176f8`).
+- **P3 — OC-04 IN PROGRESS (only human-gold step blocking).**
+  4A–4G ✅: metric harness (`db6ddd1`), gold plan v5.4 frozen
+  (`45eb96a`), Stage-0 v2 GO at n=192 (`bf8b3f7`), transcript importer
+  (`4d04054`), pilot union + blind packets `013524d` (16 sessions,
+  344 candidates). Annotators B (gpt-5.6-sol) and C (DeepSeek)
+  344/344 complete 2026-09-06; B↔C raw agreement 66.6%
+  (229 agree / 115 disagree). **Pending: annotator A.**
+  2026-10-16: founder directed AI pre-label pass A′ (blind, GLM,
+  independent of B/C) with founder adjudication of the
+  ambiguous subset; plan §5 amendment approval in progress
+  (frozen §5-2 currently forbids LLM label sources without one).
+  A′ COMPLETE 2026-10-16: 344/344 verified (required 241 /
+  supporting 61 / irrelevant 25 / dead_end 12 / uncertain 5);
+  agreement A′↔B 70.3%, A′↔C 77.0%, B↔C 66.6%.
+  206 events triple-unanimous (auto-adopt candidates, spot-check
+  pending), 138 ambiguous → founder adjudication packet
+  `packets/adjudication_A/ADJUDICATION.md` (local-only).
+  Founder requested a GPT-family cross-check: A″ (gpt-6.1-sol,
+  same frozen dispatcher protocol) COMPLETE 2026-10-16:
+  344/344 (required 227 / supporting 56 / irrelevant 52 /
+  dead_end 2 / uncertain 7); A″↔B 77.0% > A′↔B 70.3% (family
+  correlation signal); A′↔A″ 76.5%. Quadruple-unanimous 198 /
+  ambiguous 146 — quad protocol proposed for auto-adopt.
+  Founder review-budget correction: isolated-event packets were
+  unjudgeable (context starvation) → v3 session-dossier audit
+  format; founder chose MINIMAL audit = top-4 highest-disagreement
+  sessions (907ffba1/6c93c25f/b0760839/ace6cd53, 41 of 78 split
+  events). Remaining protocol: 4-0 and 3-1 auto-adopt everywhere;
+  split events in unaudited sessions (37) excluded from pilot κ
+  corpus with disclosure.
+  Session 7ea90104: A′ all-uncertain (5 events) — its 4 split
+  events fall under the fail-closed exclusion; its 1 majority
+  event is included.
+  **A COMPLETE 2026-11-02 (protocol v5.5):** founder audited top-4
+  sessions (44 overrides), waived further human adjudication.
+  Gold = 307 events (founder override > 3-of-4 cross-family
+  consensus; 37 split events excluded fail-closed). Pilot κ:
+  A↔B PASS (binary 0.7502 / 5-label 0.6881 / PA req 0.925,
+  supp 0.665); A↔C FAIL PA(supporting)=0.4704 → C demoted to
+  reference-only (recorded deviation, founder waiver of §5.3
+  full-relabel). Corpus = human-audited cross-family consensus
+  gold (NOT human gold — claim wording bound). Evidence:
+  `oc04-pilot-kappa-2026-11-02.md`; corpus `oc04-gold/labels.jsonl`.
+  Commit approval pending.
+  Remaining to P3-GO: commit batch → production labeling of the
+  192-session corpus on the consensus protocol → m4 prior seeds →
+  nDCG@12 + strict TF=0 recovery scoring → **P3-GO judgment**.
+- **P4 — Thorn: DEFERRED**, deployment state OFF (per §4 P4).
+- **P5 — OC-05 5A–5D COMPLETE** 2026-09: gate spec/matrix frozen v29,
+  verifier, adversarial probes 18/18 PASS (`058a73d`).
+  **P5-GO DEFERRED** (founder Option 2, `a95a193`) until P3-GO.
