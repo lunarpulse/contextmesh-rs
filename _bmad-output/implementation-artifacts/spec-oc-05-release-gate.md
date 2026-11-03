@@ -1,6 +1,6 @@
-# OC-05 Release and Claim Gate — Specification (FROZEN v30)
+# OC-05 Release and Claim Gate — Specification (FROZEN v31)
 
-Status: FROZEN v30 — v29 approved 2026-09-03 (Discord approval, message
+Status: FROZEN v31 — v30 same day; v29 approved 2026-09-03 (Discord approval, message
 `1544867811812184064`). §12 founder disposition: **Option 2 — P5-GO
 recorded `DEFERRED`** until OC-04 4G + real gold exist; no conditional
 release record. Freeze basis: dual review round 21 Compliance GO +
@@ -576,7 +576,26 @@ in lockstep. Evidence addenda: `oc-05-release-evidence.md` and
 `oc-05-claim-audit.md` record the OC-04 final state (P3 INCONCLUSIVE final,
 commits `d554a2c`/`3212d08`) and the P4 closure (Thorn recorded-evidence
 only, `p4-thorn-closure.md`); the §3.3 OC05-12 disposition literals remain
-the frozen Option-2 record. §10 wrapper unchanged.
+the frozen Option-2 record. §10 wrapper unchanged. →
+**v31 (2026-11-03): OC-01 dependency-contract re-baseline — founder Option 1**
+(auto-approved recommendation after the required impact briefing; the first
+v30 gate run FAILED at OC05-08 with 5 `oc01_workspace` failures). Cause:
+the migration contract frozen 2026-09-03 predates the founder-approved
+OC-04 dev-dependencies (rusqlite bundled/hex/sha2, commit `013524d`,
+2026-09-06) by three days. Founder Option 1 adopts: forbidden-capability
+scope limited to non-dev dependencies (dev-deps cannot enter production
+builds; the only hit, rusqlite, is a bundled test-fixture reader);
+`EXPECTED_LOCK_PACKAGES` 321→332; new `BASELINE_ALL_EXTERNAL_SHA256`
+37d379e70d4fa14d74eb1943a8c6ef8014acbd3db229a0b5e1a8100c95b896a1 (metadata
+and lock external sets, both verified equal); `BASELINE_SALIENCE_DIRECT_SHA256`
+a9bbfddd7094755be28ce546e99421b35cb8624f8b42a2a66edc116bf8585c01. The CORE
+closure remains byte-for-byte unchanged and still pins
+`BASELINE_EXTERNAL_SHA256` ae86da65… (320 reachable / 319 external,
+core direct signature, and feature tree all identical to the original
+freeze — verified mechanically before re-baselining). Implementation:
+`scripts/check-core-dependencies.py` + `oc01_workspace.rs` lock-count
+assertion, committed as C1, the sole parent of this pin commit.
+`OC05_SCRIPT_SHA256` unchanged (gate script untouched); §10 unchanged.
 
 ## 12. REQUIRED founder choice at freeze: P5-GO disposition
 
