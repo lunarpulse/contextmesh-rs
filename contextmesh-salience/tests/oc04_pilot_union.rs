@@ -48,6 +48,15 @@ fn session_hmac(key: &[u8; 32], raw_session_id: &str) -> String {
 
 #[test]
 fn generate_pilot_unions() {
+    // Local-only env-driven tool (see module header): in clean/CI/gate
+    // environments without the session DB, skip instead of panicking so the
+    // workspace suite stays green. The pilot-union outputs this generates
+    // are frozen in git (pilot gold 01cb86f, production digests 3212d08);
+    // re-running requires OC04_PILOT_DB/IDS/KEY/UNION_OUT as before.
+    if std::env::var("OC04_PILOT_DB").is_err() {
+        eprintln!("skipping generate_pilot_unions: local-only tool, OC04_PILOT_DB not set");
+        return;
+    }
     let db = std::env::var("OC04_PILOT_DB").expect("OC04_PILOT_DB (session db path)");
     let ids_json = std::env::var("OC04_PILOT_IDS").expect("OC04_PILOT_IDS (json array)");
     let key_hex = std::env::var("OC04_PILOT_KEY").expect("OC04_PILOT_KEY (hex64)");

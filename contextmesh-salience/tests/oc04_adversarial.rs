@@ -523,17 +523,22 @@ fn sha256(bytes: &[u8]) -> String {
 
 #[test]
 fn no_new_deps() {
+    // Manifest pins re-baselined 2026-11-03 (OC-05 v30/v31 cycle, founder
+    // Option 1): the founder-approved OC-04 dev-dependencies (commit 013524d,
+    // rusqlite bundled/hex/sha2) moved Cargo.lock and the salience manifest
+    // after this pin was frozen; the root manifest is unchanged. Matches the
+    // re-frozen OC05-03 literals in scripts/verify-oc05.sh.
     assert_eq!(
         sha256(include_bytes!("../../Cargo.toml")),
         "7c2075b807d9e5b7471e73aca95fa2984f9059da613d0eabae8c9bc5bb470124"
     );
     assert_eq!(
         sha256(include_bytes!("../../Cargo.lock")),
-        "653accffb3d64e3a2810d4974112637fb98e7efa7eb1ab0a3ce99c543ea1ddf0"
+        "2027f34946239187add1fc4c51037eaad49d22e8ffe14c6060169af864e44689"
     );
     assert_eq!(
         sha256(include_bytes!("../Cargo.toml")),
-        "e6aa9120a7115a08978dae517641fd6f80869ee2d393ae20ddf8db6f6261c3f4"
+        "a445de58912246b0f49fff9fa0a1259d833e08afde1ca2790810b2cd09f6910c"
     );
 }
 
