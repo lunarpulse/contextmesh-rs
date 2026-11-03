@@ -1,0 +1,22 @@
+{
+ "engines": {
+  "A6": {
+   "n_sessions": 192,
+   "n_rows": 3979,
+   "sha256_concat_sorted": "6cdb2d86c7f23cd0e319e9fb5030d950f944cb57529380c6a34b02050563b893",
+   "sha256_tree": "eb6b31892158b3a767d1bb866b2dd147bcb458bea1beac0ec71d848a7c4bfb48"
+  },
+  "B6": {
+   "n_sessions": 192,
+   "n_rows": 3979,
+   "sha256_concat_sorted": "2477bf8c73e127dec2b1863530bd06ea88cb8167d8812a3a87c2f06bc1a75a74",
+   "sha256_tree": "60ac5124e6b5684f0936b24bb257cd5f8d90d6e87ab22bf921e82242d55a474b"
+  },
+  "C6": {
+   "n_sessions": 192,
+   "n_rows": 3979,
+   "sha256_concat_sorted": "62b0984aaac26bf55a3775d8d09831dda01d2db85114d31987a717eb0dd2eb65",
+   "sha256_tree": "20a1a1f16677ac42def4a460e3be1da391d9001af3be56c713308d123a5206d5"
+  }
+ }
+}
