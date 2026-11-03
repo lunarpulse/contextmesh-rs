@@ -232,7 +232,7 @@ fn workspace_and_lock_counts_match_migration_contract() {
     assert_eq!(report["workspace_local_packages"], 2);
     assert_eq!(report["core_reachable_packages"], 320);
     assert_eq!(report["core_reachable_external_packages"], 319);
-    assert_eq!(report["lock_packages"], 321);
+    assert_eq!(report["lock_packages"], 332);
 }
 
 #[test]

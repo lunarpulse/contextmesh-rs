@@ -19,10 +19,18 @@ SALIENCE_NAME = "contextmesh-salience"
 EXPECTED_WORKSPACE_MEMBERS = 2
 EXPECTED_CORE_REACHABLE = 320
 EXPECTED_CORE_EXTERNAL = 319
-EXPECTED_LOCK_PACKAGES = 321
+# Re-baselined 2026-11-03 (OC-05 v30 cycle, founder-approved Option 1):
+# founder-approved OC-04 commit 013524d added salience DEV-dependencies
+# (rusqlite bundled/hex/sha2 for the recorded-transcript pilot test), adding
+# +11 lock packages. The CORE closure is byte-for-byte unchanged (320/319,
+# BASELINE_EXTERNAL_SHA256 identical); the all-external set, the salience
+# direct signature (dev-deps included by definition), and the lock count
+# moved, so they carry re-baselined values via BASELINE_ALL_EXTERNAL_SHA256.
+EXPECTED_LOCK_PACKAGES = 332
 BASELINE_EXTERNAL_SHA256 = "ae86da65ff5138bb51836d303ec9370ad9da8c8f112ad84ad59b5e362136113d"
+BASELINE_ALL_EXTERNAL_SHA256 = "37d379e70d4fa14d74eb1943a8c6ef8014acbd3db229a0b5e1a8100c95b896a1"
 BASELINE_CORE_DIRECT_SHA256 = "47b7df1d09c960c0ca1734a73fbb7974407d9a7aa240b04307b9aaa3399a76ef"
-BASELINE_SALIENCE_DIRECT_SHA256 = "37ea4732021965e1eace50fc39b523bb28b3fb2dd0484ce4fadf246a2e766914"
+BASELINE_SALIENCE_DIRECT_SHA256 = "a9bbfddd7094755be28ce546e99421b35cb8624f8b42a2a66edc116bf8585c01"
 BASELINE_FEATURE_TREE_SHA256 = "658b4fe016b1bc8ba748d31d88f61216df06afbd2c931059579bdff8375f461c"
 FORBIDDEN_DEPENDENCY_TOKENS = (
     "candle", "embedding", "fastembed", "judge", "llama", "model", "onnx",
@@ -190,20 +198,27 @@ def full_audit(root: Path) -> dict[str, Any]:
     require(salience.get("source") is None)
     salience_signature = dependency_signature(salience, root)
     require(canonical_sha256(salience_signature) == BASELINE_SALIENCE_DIRECT_SHA256)
+    # Forbidden-capability scope (re-baselined 2026-11-03, founder Option 1):
+    # dev-dependencies cannot enter production builds, so the capability
+    # boundary applies to normal/build dependencies only. The frozen
+    # dev-only rusqlite (bundled SQLite fixture reader for the OC-04 pilot
+    # test, commit 013524d) is therefore out of scope; any NON-dev hit
+    # still fails closed exactly as before.
     forbidden = sorted({
         dependency["name"] for dependency in salience_signature
-        if any(token in dependency["name"].lower() for token in FORBIDDEN_DEPENDENCY_TOKENS)
+        if dependency.get("kind") != "dev"
+        and any(token in dependency["name"].lower() for token in FORBIDDEN_DEPENDENCY_TOKENS)
     })
     require(not forbidden)
 
     all_external = external_identities(packages)
-    require(canonical_sha256(all_external) == BASELINE_EXTERNAL_SHA256)
+    require(canonical_sha256(all_external) == BASELINE_ALL_EXTERNAL_SHA256)
     lock = tomllib.loads((root / "Cargo.lock").read_text(encoding="utf-8"))
     lock_packages = lock.get("package")
     require(isinstance(lock_packages, list) and len(lock_packages) == EXPECTED_LOCK_PACKAGES)
     lock_packages = cast(list[dict[str, Any]], lock_packages)
     lock_external = external_identities(lock_packages)
-    require(canonical_sha256(lock_external) == BASELINE_EXTERNAL_SHA256)
+    require(canonical_sha256(lock_external) == BASELINE_ALL_EXTERNAL_SHA256)
 
     baseline_tree = (root / "cargo-tree-oa05-features.txt").read_bytes()
     require(hashlib.sha256(baseline_tree).hexdigest() == BASELINE_FEATURE_TREE_SHA256)
