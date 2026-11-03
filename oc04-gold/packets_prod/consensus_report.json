@@ -1,0 +1,102 @@
+{
+  "adopted": 2900,
+  "excluded": 1079,
+  "exclusion_rate": 0.2712,
+  "exclusion_ceiling": 0.15,
+  "ceiling_pass": false,
+  "adopted_dist": {
+    "required": 1909,
+    "irrelevant": 456,
+    "supporting": 425,
+    "dead_end": 110
+  },
+  "vote_patterns_top": [
+    [
+      "RRRR->required",
+      1352
+    ],
+    [
+      "SRRR->required",
+      233
+    ],
+    [
+      "RRRS->required",
+      162
+    ],
+    [
+      "RSSS->supporting",
+      132
+    ],
+    [
+      "IIIS->irrelevant",
+      130
+    ],
+    [
+      "IIIR->irrelevant",
+      118
+    ],
+    [
+      "IIII->irrelevant",
+      85
+    ],
+    [
+      "UUUS->supporting",
+      80
+    ],
+    [
+      "RSSR->required",
+      75
+    ],
+    [
+      "SSSS->supporting",
+      74
+    ],
+    [
+      "SIIS->supporting",
+      71
+    ],
+    [
+      "RRSR->required",
+      59
+    ],
+    [
+      "SRRS->supporting",
+      59
+    ],
+    [
+      "SIII->irrelevant",
+      59
+    ],
+    [
+      "RIIS->irrelevant",
+      57
+    ]
+  ],
+  "pairwise_kappa": {
+    "Aprime<->A2sol": {
+      "kappa5": 0.4073,
+      "kappa_bin": 0.4645
+    },
+    "Aprime<->B": {
+      "kappa5": 0.419,
+      "kappa_bin": 0.4753
+    },
+    "Aprime<->C": {
+      "kappa5": 0.2342,
+      "kappa_bin": 0.3194
+    },
+    "A2sol<->B": {
+      "kappa5": 0.6644,
+      "kappa_bin": 0.7687
+    },
+    "A2sol<->C": {
+      "kappa5": 0.3717,
+      "kappa_bin": 0.5429
+    },
+    "B<->C": {
+      "kappa5": 0.4094,
+      "kappa_bin": 0.5335
+    }
+  },
+  "primary_axis": "Aprime<->B (GLM<->GPT cross-family)"
+}

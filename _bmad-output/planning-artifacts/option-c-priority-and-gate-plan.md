@@ -278,6 +278,21 @@ not new claims.
   Remaining to P3-GO: commit batch → production labeling of the
   192-session corpus on the consensus protocol → m4 prior seeds →
   nDCG@12 + strict TF=0 recovery scoring → **P3-GO judgment**.
+- **Production labeling CLOSED 2026-11-03: P3 = INCONCLUSIVE (fail-closed).**
+  Phase 0 DONE (192 sessions, 3,979 candidates, double-run digest
+  `fa84ba0c…`). Phase 1 all gates PASS (4 blind annotators × 3,979
+  labels, 0 bad, key sets identical, uncertain ≤15% all). Phase 2
+  first consensus compile: primary κ A′↔B 0.419/0.475 FAILS frozen
+  gates (0.5/0.6); exclusion 27.12% > 15% ceiling (2-2 splits 436,
+  scatter 641). Cross-family consensus gold does not form at
+  production scale — the pilot founder↔B κ (0.688/0.750) does not
+  generalize to pure LLM consensus. D1–D4 never evaluated. Founder
+  selected INCONCLUSIVE closeout (msg 1566973269322764309) after
+  1-Lite (frontier tie-break + sample audit) was assessed as not
+  verdict-changing. Evidence: oc04-phase2-report.md. Plan v3
+  (recheck PASS-WITH-RESIDUALS, deleg_37c1b731); v2 amendments and
+  METH-03 disclosed deviation as recorded 2026-11-02. P5-GO remains
+  DEFERRED pending P3.
 - **P4 — Thorn: DEFERRED**, deployment state OFF (per §4 P4).
 - **P5 — OC-05 5A–5D COMPLETE** 2026-09: gate spec/matrix frozen v29,
   verifier, adversarial probes 18/18 PASS (`058a73d`).

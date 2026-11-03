@@ -21,3 +21,6 @@ _bmad
 
 # OC-04 pilot labeling packets (RAW transcript text — local only)
 oc04-gold/packets/
+
+# OC-04 production packets (RAW transcript text — local only)
+oc04-gold/packets_prod/
