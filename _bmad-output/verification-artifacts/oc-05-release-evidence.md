@@ -42,3 +42,21 @@ Probe E = 2c1d4f0ddf5358ad0f0dd8155141792cf28734c6 (corrections 8+9: R13(vi) sib
 | R14-porcelain | clean worktree | OK |
 
 Note: R14 full-run rc was blocked in earlier attempts (E8–E12) solely by host disk exhaustion (/tmp tmpfs 3.9GB < probe cargo build ~2.5GB; CARGO_TARGET_DIR workaround broke oa06_demo inner build via demo.sh ROOT/target expectation). Correction #9 relocates the probe clone to disk; R14 then passes with zero failures.
+
+## ADDENDUM 2026-11-03 — post-OC-04 re-pin run (spec v30)
+
+- OC-04 closed: **P3 verdict INCONCLUSIVE, final** — attempt #1 commit
+  `d554a2c` (kappa A'–B 0.419/0.475, exclusion 27.12% > 15%); attempt #2
+  commit `3212d08` (protocol v6.1+r2, one annotator per family: kappa A6–B6
+  binary 0.536 < 0.60; B6–C6 0.389/0.386). Structural cross-family
+  divergence independently confirmed twice; a third labeling attempt is
+  pre-registered as out of scope. The freeze-era disposition lines above
+  (`P5-GO: DEFERRED`, `P3-GO: OPEN`, synthetic-label corpus citation) remain
+  the recorded Option-2 record; P3-GO was never granted and is now moot.
+- P4 (Thorn) closed as recorded evidence only — `p4-thorn-closure.md` in
+  the planning-artifacts directory; P4-GO NOT-DETERMINED because the
+  human-audited incremental-benefit gold prerequisite does not exist.
+- This gate run (v30 re-pin, F `cf432df`) re-proves evidence integrity at
+  the current HEAD: manifests re-frozen to the legitimate values introduced
+  by the founder-approved OC-04 commit `013524d`; no other freeze changed;
+  §10 wrapper byte-identical in procedure.

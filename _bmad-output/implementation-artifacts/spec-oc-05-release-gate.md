@@ -1,6 +1,6 @@
-# OC-05 Release and Claim Gate — Specification (FROZEN v29)
+# OC-05 Release and Claim Gate — Specification (FROZEN v30)
 
-Status: FROZEN v29 — approved 2026-09-03 (Discord approval, message
+Status: FROZEN v30 — v29 approved 2026-09-03 (Discord approval, message
 `1544867811812184064`). §12 founder disposition: **Option 2 — P5-GO
 recorded `DEFERRED`** until OC-04 4G + real gold exist; no conditional
 release record. Freeze basis: dual review round 21 Compliance GO +
@@ -30,7 +30,7 @@ v1; spec-oa-07; OC-01..04 evidence/docs.
 `OC05_SCRIPT_SHA256` + §5 freezes). E's object id lives in the founder
 approval record outside the repo.
 
-OC05_SCRIPT_SHA256=0ef7a7f38fe3c4e65afaa42c4a2c21e3bd1bedfb7eb72a009e5d483698c9e9b4
+OC05_SCRIPT_SHA256=c0f4d59b0cdb3ccb441ae24a7a1f97bd147a5dcb0af1ed289a76cfc4782b16c9
 
 **3.2 Wrapper invariants (worded to match the implementation exactly):**
 i. **Unset-safe expansion**: no `set -u`; pins/expected read via `${VAR-}`.
@@ -110,9 +110,9 @@ defined HERE (no external reference):**
   `_bmad-output/planning-artifacts/`) component-wise.
 - OC05-03 frozen manifest hashes (OC-04 X06 literals, verbatim):
   `sha256sum Cargo.toml` == `7c2075b807d9e5b7471e73aca95fa2984f9059da613d0eabae8c9bc5bb470124`;
-  `sha256sum Cargo.lock` == `653accffb3d64e3a2810d4974112637fb98e7efa7eb1ab0a3ce99c543ea1ddf0`;
+  `sha256sum Cargo.lock` == `2027f34946239187add1fc4c51037eaad49d22e8ffe14c6060169af864e44689`;
   `sha256sum contextmesh-salience/Cargo.toml` ==
-  `e6aa9120a7115a08978dae517641fd6f80869ee2d393ae20ddf8db6f6261c3f4`.
+  `a445de58912246b0f49fff9fa0a1259d833e08afde1ca2790810b2cd09f6910c`.
 - OC05-04 dependency closure: root does NOT depend on salience;
   salience→root present; package-ID set == claim-audit snapshot.
 - OC05-05 fixture manifest: regenerated `oc-05-fixture-manifest.txt` ==
@@ -557,7 +557,26 @@ whitespace strip + bash-continuation strip) does NOT remove. Fixed: the
 anchor and the shared trailing clause are now written with plain literal
 pipes, `|| { echo "OC05-PINS: FAIL"` / `|| { echo "OC05-PINS: FAIL";
 exit 1; }`, exactly as the file bytes read. Nothing else changed; §10
-unchanged.
+unchanged. →
+**v30 (2026-11-03): post-OC-04 re-pin — founder directive "권고 대로 하자"
+(Discord message 1567241535446192270).** The OC05-03 manifest literals for
+`Cargo.lock` and `contextmesh-salience/Cargo.toml` are re-frozen to the
+values introduced by the founder-approved OC-04 commit `013524d` (pilot
+candidate-union + blind packets): `Cargo.lock`
+`2027f34946239187add1fc4c51037eaad49d22e8ffe14c6060169af864e44689`,
+salience `Cargo.toml`
+`a445de58912246b0f49fff9fa0a1259d833e08afde1ca2790810b2cd09f6910c`; root
+`Cargo.toml` unchanged at `7c2075b8…`. The drift was legitimate workspace
+evolution after the v29 freeze, not tampering; re-freezing restores the
+freeze guarantee (no further drift between pin and gate) at the current
+HEAD. `OC05_SCRIPT_SHA256` re-pinned to
+`c0f4d59b0cdb3ccb441ae24a7a1f97bd147a5dcb0af1ed289a76cfc4782b16c9`
+(F `cf432df`, sole parent of this pin commit). §3.3 OC05-03 literals updated
+in lockstep. Evidence addenda: `oc-05-release-evidence.md` and
+`oc-05-claim-audit.md` record the OC-04 final state (P3 INCONCLUSIVE final,
+commits `d554a2c`/`3212d08`) and the P4 closure (Thorn recorded-evidence
+only, `p4-thorn-closure.md`); the §3.3 OC05-12 disposition literals remain
+the frozen Option-2 record. §10 wrapper unchanged.
 
 ## 12. REQUIRED founder choice at freeze: P5-GO disposition
 
