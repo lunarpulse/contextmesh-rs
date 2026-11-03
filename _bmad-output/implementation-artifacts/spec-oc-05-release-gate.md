@@ -1,6 +1,6 @@
-# OC-05 Release and Claim Gate — Specification (FROZEN v31)
+# OC-05 Release and Claim Gate — Specification (FROZEN v32)
 
-Status: FROZEN v31 — v30 same day; v29 approved 2026-09-03 (Discord approval, message
+Status: FROZEN v32 — v31/v30 same day; v29 approved 2026-09-03 (Discord approval, message
 `1544867811812184064`). §12 founder disposition: **Option 2 — P5-GO
 recorded `DEFERRED`** until OC-04 4G + real gold exist; no conditional
 release record. Freeze basis: dual review round 21 Compliance GO +
@@ -595,6 +595,21 @@ core direct signature, and feature tree all identical to the original
 freeze — verified mechanically before re-baselining). Implementation:
 `scripts/check-core-dependencies.py` + `oc01_workspace.rs` lock-count
 assertion, committed as C1, the sole parent of this pin commit.
+**v32 (2026-11-03): second latent contract surface re-baselined.** The
+v31 gate run cleared oc01_workspace (11/11) but OC05-08 then surfaced
+`oc04_adversarial::no_new_deps`, which pins the SAME manifest digests as
+the original OC05-03 literals and had drifted identically since `013524d`
+(hidden since 2026-09-06 — the workspace suite was never run in full
+after that commit; no CI existed to catch it). C2 re-pins it to the same
+v30 literals (lock 2027f349…, salience manifest a445de58…; root manifest
+unchanged 7c2075b8…). A full pre-gate workspace scan (`cargo test
+--workspace --locked`) additionally surfaced `oc04_pilot_union::
+generate_pilot_unions`, a documented LOCAL-ONLY env-driven tool that
+panicked in clean environments for want of OC04_PILOT_DB; C2 converts it
+to an explicit skip (its outputs are frozen in git at 01cb86f/3212d08).
+Post-C2 workspace scan: 59 suites, 0 failures. No production code
+changed in v30–v32; all changes are frozen-surface re-pins and test
+harness hygiene, each mechanically verified before pinning.
 `OC05_SCRIPT_SHA256` unchanged (gate script untouched); §10 unchanged.
 
 ## 12. REQUIRED founder choice at freeze: P5-GO disposition
