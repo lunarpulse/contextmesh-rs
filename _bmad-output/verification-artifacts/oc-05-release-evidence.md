@@ -60,3 +60,31 @@ Note: R14 full-run rc was blocked in earlier attempts (E8–E12) solely by host 
   the current HEAD: manifests re-frozen to the legitimate values introduced
   by the founder-approved OC-04 commit `013524d`; no other freeze changed;
   §10 wrapper byte-identical in procedure.
+
+
+## FINAL GATE RUN — 2026-11-03 (spec v32, pin E3 `8940778`)
+
+**OC05 GATE: ALL PASS — GATE_EXIT=0.** All twelve checkpoints (OC05-01
+through OC05-12) executed from the E3 blob's §10 wrapper in detached HEAD;
+workspace regression REGRESSION_EXIT:0 (59 suites, 0 failures). Disposition
+line unchanged from the frozen record: P5-GO DEFERRED (founder Option 2,
+approval 1544867811812184064); P3-GO OPEN (synthetic-label evaluation only)
+— retained as historical record; P3 is in fact INCONCLUSIVE-final (OC-04
+attempt #2, commit 3212d08) and P4 is closed evidence-archived.
+
+Re-pin chain this cycle: F `cf432df` / E `7027413` (v30: OC05-03 literal
+re-freeze) → C1 `b795e37` / E2 `9b0e471` (v31: OC-01 dependency-contract
+re-baseline, founder Option 1 auto-approved under the standing
+recommendation-auto-approval directive) → C2 `62a0b31` / E3 `8940778`
+(v32: second latent manifest-pin surface `no_new_deps` re-baselined;
+local-only `generate_pilot_unions` converted to explicit skip). Both
+OC05-08 failures were latent drift from founder-approved commit `013524d`
+(2026-09-06 dev-deps), hidden because the workspace suite had not been
+run in full since 2026-08-31; no production code changed in v30–v32.
+Full run log: ~/.hermes/cache/scratch/oc05-v32-run.log (gate #1
+oc05-v30-run.log, gate #2 oc05-v31 run in proc_cc4703628409 log).
+
+OC-05 claim-audit closed: the pre-registered non_claims stand
+(non-claims: no human-audited cross-family consensus gold, no human-label
+incremental-benefit claim, no production Thorn enablement, no
+populated-prior evaluation claim).
