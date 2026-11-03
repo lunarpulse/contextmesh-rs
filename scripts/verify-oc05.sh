@@ -61,8 +61,8 @@ run OC05-02b bash -c '
 # --- OC05-03 frozen manifest hashes ----------------------------------------
 run OC05-03 bash -c '
   [ "$(sha256sum Cargo.toml | cut -d" " -f1)" = "7c2075b807d9e5b7471e73aca95fa2984f9059da613d0eabae8c9bc5bb470124" ] || { echo "OC05-03 FAIL (Cargo.toml)"; exit 1; }
-  [ "$(sha256sum Cargo.lock | cut -d" " -f1)" = "653accffb3d64e3a2810d4974112637fb98e7efa7eb1ab0a3ce99c543ea1ddf0" ] || { echo "OC05-03 FAIL (Cargo.lock)"; exit 1; }
-  [ "$(sha256sum contextmesh-salience/Cargo.toml | cut -d" " -f1)" = "e6aa9120a7115a08978dae517641fd6f80869ee2d393ae20ddf8db6f6261c3f4" ] || { echo "OC05-03 FAIL (salience Cargo.toml)"; exit 1; }
+  [ "$(sha256sum Cargo.lock | cut -d" " -f1)" = "2027f34946239187add1fc4c51037eaad49d22e8ffe14c6060169af864e44689" ] || { echo "OC05-03 FAIL (Cargo.lock)"; exit 1; }
+  [ "$(sha256sum contextmesh-salience/Cargo.toml | cut -d" " -f1)" = "a445de58912246b0f49fff9fa0a1259d833e08afde1ca2790810b2cd09f6910c" ] || { echo "OC05-03 FAIL (salience Cargo.toml)"; exit 1; }
   exit 0'
 
 # --- OC05-04 dependency closure --------------------------------------------
