@@ -297,3 +297,24 @@ not new claims.
 - **P5 — OC-05 5A–5D COMPLETE** 2026-09: gate spec/matrix frozen v29,
   verifier, adversarial probes 18/18 PASS (`058a73d`).
   **P5-GO DEFERRED** (founder Option 2, `a95a193`) until P3-GO.
+- **FINAL RECORD (2026-11-04) — project closed.** Successive terminal
+  dispositions after the entries above:
+  - v6 relabel attempt #2 (cross-family, 3 engines × 192 sessions,
+    uncertain 0.48–1.68%, G-0/G-1/G-2 PASS) still failed G-3 κ
+    (A6–B6 0.536/0.505, B6–C6 0.389/0.386) → **P3 = INCONCLUSIVE final,
+  no attempt #3** (commits `d554a2c`, `3212d08`; labels committed
+  HMAC-digest-only, raw stays local).
+  - **P4 closed evidence-archived, P4-GO NOT-DETERMINED** — the gate's
+  premise (human labels demonstrate incremental benefit) is void without
+  gold; Thorn stays disabled in all deployment configs
+  (`p4-thorn-closure.md`).
+  - **P5 closed via claim-audit: OC-05 gate ALL PASS** (spec v32, pin E3
+  `8940778`, 12/12 checkpoints, workspace regression 59 suites / 0
+  failures; closure evidence in `oc-05-release-evidence.md`, commit
+  `914ff8f`). Re-pin chain `cf432df`→`7027413`→`b795e37`→`9b0e471`→
+  `62a0b31`→`8940778` records two latent OC05-08 failures traced to
+  founder-approved dev-deps `013524d` (contract re-baselined under
+  standing auto-approval, Option 1). P5-GO disposition unchanged:
+  DEFERRED (Option 2) — now moot-consistent, as P3-GO was never granted.
+  The pre-registered non_claims (4) remain binding; no salience-utility
+  or gold-based claim is made anywhere in the corpus.
