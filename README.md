@@ -71,6 +71,15 @@ reports) are the reusable part of this negative result.
 
 ## Quick start
 
+    bash scripts/bootstrap-rust.sh
+    . "$HOME/.cargo/env"
+    cargo build --workspace --locked
+    cargo test --workspace --locked
+    bash scripts/demo.sh        # two-node signed-event sync demo
+    bash scripts/verify-oa07.sh # full Option A release gate
+
+Details and prerequisites are in "Toolchain and verification" below.
+
 ## What is implemented (Option A)
 
 currently implements **OA-07**: Option A is complete — the
