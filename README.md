@@ -1,6 +1,79 @@
 # contextmesh
 
-contextmesh currently implements **OA-07**: Option A is complete — the
+> Integrity-preserving context records for AI agents — and an honest,
+> pre-registered experiment in machine attention.
+
+## What this project is trying to do
+
+AI agent sessions produce enormous amounts of context — tool calls,
+decisions, results — but the record of what happened usually lives inside
+one platform and must be taken on trust. contextmesh explores the opposite
+extreme: **every meaningful event is a signed, canonically-encoded,
+tamper-evident artifact** that independent parties can verify and exchange
+themselves, with narrow, explicitly-frozen claims and no magic.
+
+The work runs on two tracks:
+
+- **Option A — the substrate (complete).** Signed events, a transactional
+  local store, deterministic DAG projection, strict bounded bundles,
+  authenticated pull-only synchronization between nodes, and provider-call
+  recording. Deterministic, offline-reproducible, and deliberately minimal
+  in what it claims.
+- **Option C — the attention-ledger experiment (closed 2026-11).** On top of
+  the substrate: can we reconstruct which past events actually mattered to
+  a task, and can a cross-family panel of LLMs agree on that well enough
+  to form an evaluation gold standard? Pre-registered, blind, and gated.
+  The honest answer turned out to be **no** — and the negative result is
+  shipped with the same rigor as a positive one would have been.
+
+## What Option C found (and why we publish it)
+
+- **OC-01…OC-03** built the deterministic machinery: an outcome ledger,
+  attribution marks (caller-supplied, never causal evidence), and a
+  positive-only entity-graph prior — all frozen and test-pinned.
+- **OC-04** ran the human-question experiment at full scale: 192 real agent
+  sessions → 3,979 candidate events, labeled blind by four annotators
+  (attempt 1) and a three-engine cross-family panel spanning GLM, GPT, and
+  DeepSeek (attempt 2), under a frozen codebook with uncertainty budgets
+  and laziness gates. Both independent attempts **failed the
+  pre-registered inter-annotator agreement gates** (cross-family κ
+  0.42–0.54 against a required 0.60 binary) while passing every integrity,
+  completeness, and effort gate. Conclusion, recorded fail-closed:
+  **cross-family LLM consensus does not form a gold standard at production
+  scale** — the pilot's founder-audited κ did not generalize.
+- The **Thorn** negative-knowledge suppression experiment was closed
+  evidence-archived: its go-gate required human labels to demonstrate
+  incremental benefit, a premise voided by the OC-04 outcome. It ships
+  disabled in every deployment configuration.
+- **OC-05**, the release and claim gate, ran its full twelve-checkpoint
+  verification (freeze identity, offline reproduction, dependency-closure
+  audit, privacy scan, replay determinism, claim audit against the
+  pre-registered non-claims) to **ALL PASS** on the final artifact.
+- Privacy discipline throughout: raw session transcripts and labels were
+  never committed — only HMAC-keyed identifiers and SHA-256 digests are in
+  git; the raw corpus stays on the machines that produced it.
+
+If you are researching LLM annotation agreement, evaluation gold
+construction, or agent-context provenance, the protocol artifacts
+(pre-registration, codebook, dispatchers, gate scripts, and both attempt
+reports) are the reusable part of this negative result.
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `src/`, `tests/` | Option A core crate and its 59 test suites |
+| `contextmesh-salience/` | OC-01…OC-05: ledger, attribution, prior, annotation tests |
+| `oc04-gold/` | Annotation protocol machinery (raw labels are local-only) |
+| `scripts/` | Deterministic verification gates and the two-node demo |
+| `_bmad-output/` | Frozen specs, plans, and evidence records |
+| `cargo-tree-*.txt` | Captured dependency feature graphs per option |
+
+## Quick start
+
+## What is implemented (Option A)
+
+currently implements **OA-07**: Option A is complete — the
 frozen OA-01 signed-event contract, OA-02 transactional local store, OA-03
 semantic-free DAG operations, deterministic projection, strict bounded
 Bundle v1 transfer, full-store integrity verification, OA-04 authenticated
@@ -213,6 +286,32 @@ Cross-machine operation requires an operator-managed encrypted tunnel or VPN
 address space; contextmesh itself provides no TLS, certificate management,
 key rotation service, or discovery, and makes no confidentiality claim on
 its own. A bearer token authorizes read-only history pulls only.
+
+## How to participate
+
+This is a research codebase with strict claim discipline — that discipline
+is the product as much as the code. Good ways in:
+
+1. **Reproduce the gates.** Everything runs offline from a clean clone:
+   `bash scripts/bootstrap-rust.sh`, then `bash scripts/demo.sh`,
+   `bash scripts/verify-oa07.sh`, `bash scripts/verify-oc01.sh`, and the
+   OC-05 wrapper in `_bmad-output/implementation-artifacts/spec-oc-05-release-gate.md` §10.
+   A gate that fails on your machine is a bug we want to hear about.
+2. **Read the evidence chain** in `_bmad-output/verification-artifacts/` —
+   every claim above has a four-layer evidence record, and the claim
+   audits list what is *not* claimed.
+3. **Challenge the negative result.** OC-04 closed INCONCLUSIVE after two
+   pre-registered attempts. A third attempt would need a new frozen
+   pre-registration *before* any data is touched — propose one and we
+   will review the protocol, not the outcome.
+4. **Extend the substrate.** Option B (semantic context selection) is
+   unblocked but untouched; anything new must keep Option A's frozen wire,
+   bounds, and claim discipline or go through explicit change control.
+5. **Report issues** with reproduction steps — failed gates, panics on
+   malformed input, doc/claim mismatches are all first-class bugs.
+
+Note: the repository has **no license yet** — code reuse before a license
+is chosen requires the maintainer's explicit permission.
 
 ## Claims, non-claims, and prohibited statements
 
