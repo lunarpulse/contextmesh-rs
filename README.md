@@ -319,8 +319,11 @@ is the product as much as the code. Good ways in:
 5. **Report issues** with reproduction steps — failed gates, panics on
    malformed input, doc/claim mismatches are all first-class bugs.
 
-Note: the repository has **no license yet** — code reuse before a license
-is chosen requires the maintainer's explicit permission.
+Licensed under the **MIT License** — see [LICENSE](LICENSE). Note that
+the frozen verification gates pin exact file hashes (including
+`Cargo.toml`); reuse is free, but in-repo modifications to frozen
+surfaces must follow the re-pin change-control process documented in the
+specs.
 
 ## Claims, non-claims, and prohibited statements
 
